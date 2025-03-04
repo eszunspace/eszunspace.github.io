@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EsZunSpace</title>
     <style>
-        /* Estilos Generales */
         body, html {
             margin: 0;
             padding: 0;
@@ -14,10 +13,9 @@
             font-style: italic;
             color: white;
             background-color: black;
-            overflow: hidden;
+            overflow-x: hidden;
         }
-
-        /* Encabezado */
+        
         header {
             display: flex;
             justify-content: center;
@@ -60,36 +58,19 @@
             font-size: 14px;
         }
 
-        /* Video de fondo */
-        .video-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-
-        .video-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Sección Principal */
         .hero {
-            height: 100vh;
+            height: 50vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             position: relative;
+            z-index: 1;
         }
 
         .hero-content {
             max-width: 600px;
-            z-index: 1;
+            z-index: 2;
         }
 
         .hero h1 {
@@ -121,7 +102,73 @@
             background: gray;
         }
 
-        /* Pie de página */
+        .video-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+            height: 500px;
+            margin: 50px auto;
+        }
+
+        .video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 10px;
+            border: 2px solid white;
+            height: 450px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .video-container video, .video-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .arrow {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 24px;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .services-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 40px auto;
+            width: 100%;
+            background-color: #333;
+            padding: 20px;
+        }
+
+        .service-item {
+            width: 100%;
+            background-color: #444;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 0;
+        }
+
         footer {
             text-align: center;
             padding: 20px;
@@ -131,30 +178,8 @@
             font-style: italic;
         }
     </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let videos = ["video1.mp4", "video2.mp4", "video3.mp4", "video4.mp4", "video5.mp4"];
-            let currentVideo = 0;
-            let videoElement = document.getElementById("background-video");
-
-            videoElement.src = videos[currentVideo];
-            videoElement.play();
-
-            videoElement.addEventListener("ended", function() {
-                currentVideo = (currentVideo + 1) % videos.length;
-                videoElement.src = videos[currentVideo];
-                videoElement.play();
-            });
-        });
-    </script>
 </head>
 <body>
-    <div class="video-container">
-        <video id="background-video" autoplay muted>
-            Tu navegador no soporta la reproducción de video.
-        </video>
-    </div>
-    
     <header>
         <div class="logo">EsZunSpace</div>
         <nav>
@@ -170,17 +195,43 @@
             </ul>
         </nav>
     </header>
-    
+
     <section class="hero">
         <div class="hero-content">
-            <h1>Haciendo la Vida Multiplanetaria</h1>
+            <h1>EsZunEngine Static Fire</h1>
             <p>Explora las últimas misiones e innovaciones de EsZunSpace.</p>
             <a href="#learn-more" class="btn">Saber Más</a>
         </div>
     </section>
-    
+
+    <section class="video-box">
+        <div class="video-container">
+            <video id="video" autoplay muted loop>
+                <source src="video1.mp4" type="video/mp4">
+                Tu navegador no soporta la reproducción de video.
+            </video>
+            <img id="image" src="imagen1.png" alt="Imagen de reemplazo" style="opacity: 0;">
+            <div class="arrow" onclick="toggleMedia()">&#9654;</div>
+        </div>
+    </section>
+
     <footer>
         <p>&copy; 2025 EsZunSpace. Todos los derechos reservados.</p>
     </footer>
+
+    <script>
+        function toggleMedia() {
+            var video = document.getElementById("video");
+            var image = document.getElementById("image");
+            
+            if (video.style.opacity !== "0") {
+                video.style.opacity = "0";
+                image.style.opacity = "1";
+            } else {
+                video.style.opacity = "1";
+                image.style.opacity = "0";
+            }
+        }
+    </script>
 </body>
 </html>
