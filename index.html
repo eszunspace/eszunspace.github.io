@@ -20,10 +20,10 @@
         
         header {
             display: flex;
-            justify-content: center; /* Centrar los elementos horizontalmente */
+            justify-content: center;
             align-items: center;
             padding: 10px 20px;
-            background: black;
+            background: rgba(0, 0, 0, 0.9);
             position: fixed;
             width: 100%;
             top: 0;
@@ -37,29 +37,25 @@
             font-style: italic;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-right: 40px; /* Espacio entre el logo y la navegación */
+            margin-right: 40px;
+            white-space: nowrap;
         }
 
-        nav ul {
-            list-style: none;
+        nav {
             display: flex;
-            gap: 10px; /* Reducir aún más el espacio entre elementos */
-            padding: 0;
-            margin: 0;
+            justify-content: center;
+            align-items: center;
         }
 
-        nav ul li {
-            display: inline;
-        }
-
-        nav ul li a {
+        nav a {
             color: white;
             text-decoration: none;
             font-weight: bold;
             font-style: italic;
             text-transform: uppercase;
             font-size: 12px;
-            padding: 0 10px; /* Añadir padding horizontal para simular el espaciado en la imagen */
+            padding: 0 15px;
+            white-space: nowrap;
         }
 
         .hero {
@@ -70,13 +66,13 @@
             justify-content: center;
             text-align: center;
             overflow: hidden;
-            padding: 80px 0 0 0; /* Reducido el padding inferior a 0 */
+            padding: 80px 0 0 0;
             z-index: 2;
             background: none;
         }
 
         .hero-background {
-            display: none; /* Ocultar el fondo gris */
+            display: none;
         }
 
         .hero-content {
@@ -84,8 +80,8 @@
             max-width: 600px;
             color: white;
             padding: 0 20px 0 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* Sombra para mejor legibilidad */
-            margin-bottom: 0; /* Eliminado margen inferior */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 0;
         }
 
         .video-box {
@@ -120,14 +116,14 @@
             background-color: black;
             left: 0;
             right: 0;
-            margin-left: -8px; /* Compensar cualquier margen del body */
+            margin-left: -8px;
             margin-right: -8px;
         }
 
         .video-container video {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* El video sigue usando cover para llenar el espacio */
+            object-fit: cover;
             position: absolute;
             top: 0;
             left: 0;
@@ -137,12 +133,12 @@
         .video-container img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Por defecto usa cover, pero se cambiará a contain con JavaScript */
+            object-fit: cover;
             position: absolute;
             top: 0;
             left: 0;
             background-color: black;
-            transition: opacity 0.5s ease, object-fit 0.5s ease; /* Transición suave para los cambios */
+            transition: opacity 0.5s ease, object-fit 0.5s ease;
         }
 
         .additional-banner {
@@ -154,7 +150,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            margin-top: 0; /* Eliminar margen superior */
+            margin-top: 0;
         }
 
         .additional-banner-content {
@@ -185,7 +181,7 @@
             font-style: italic;
             border-radius: 5px;
             transition: 0.3s;
-            margin-bottom: 0; /* Eliminado margen inferior */
+            margin-bottom: 0;
             display: inline-block;
         }
 
@@ -212,17 +208,15 @@
     <header>
         <div class="logo"><a href="https://eszunspace.es" style="color: white; text-decoration: none;">ESZUNSPACE</a></div>
         <nav>
-            <ul>
-                <li><a href="#neutron">NEUTRON</a></li>
-                <li><a href="#neutrino">NEUTRINO</a></li>
-                <li><a href="#estela">ESTELA</a></li>
-                <li><a href="#nebulaexplorer">NEBULA EXPLORER</a></li>
-                <li><a href="#humanflight">VUELOS TRIPULADOS</a></li>
-                <li><a href="#rideshare">COMPARTIR VUELO</a></li>
-                <li><a href="#información">INFORMACIÓN</a></li>
-                <li><a href="#eszunsat">EsZunSat</a></li>
-                <li><a href="Equipo.html">EQUIPO</a></li>
-            </ul>
+            <a href="Neutron.html">NEUTRON</a>
+            <a href="Neutrino.html">NEUTRINO</a>
+            <a href="Estela.html">ESTELA</a>
+            <a href="Explorer.html">NEBULA EXPLORER</a>
+            <a href="Tripulados.html">VUELOS TRIPULADOS</a>
+            <a href="Compartir.html">COMPARTIR VUELO</a>
+            <a href="informacion.html">INFORMACIÓN</a>
+            <a href="Eszunsat.html">ESZUNSAT</a>
+            <a href="Equipo.html">EQUIPO</a>
         </nav>
     </header>
 
@@ -243,9 +237,6 @@
             </div>
         </div>
     </section>
-    
-    <!-- Sección de texto negro debajo del video (eliminada) -->
-    <!-- La sección text-section ha sido eliminada -->
 
     <footer>
         <p style="text-align: center; font-style: italic;">&copy; 2025 EsZunSpace. Todos los derechos reservados.</p>
