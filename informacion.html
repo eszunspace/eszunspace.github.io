@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EsZunSpace - Información</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-style: italic;
+            color: white;
+            background-color: black;
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 20px;
+            background: black;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-right: 40px;
+            white-space: nowrap;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-style: italic;
+            text-transform: uppercase;
+            font-size: 12px;
+            padding: 0 15px;
+            white-space: nowrap;
+        }
+        
+        .info-container {
+            padding-top: 120px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .info-section {
+            margin-bottom: 40px;
+        }
+
+        .info-section img {
+            width: 100%;
+            max-width: 700px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .info-section p {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de navegación exactamente como en la imagen -->
+    <header>
+        <div class="logo"><a href="https://eszunspace.es" style="color: white; text-decoration: none;">ESZUNSPACE</a></div>
+        <nav style="display: flex; justify-content: center; align-items: center;">
+            <a href="Neutron.html">NEUTRON</a>
+            <a href="Neutrino.html">NEUTRINO</a>
+            <a href="Estela.html">ESTELA</a>
+            <a href="Explorer.html">NEBULA EXPLORER</a>
+            <a href="Tripulados.html">VUELOS TRIPULADOS</a>
+            <a href="Compartir.html">COMPARTIR VUELO</a>
+            <a href="informacion.html">INFORMACIÓN</a>
+            <a href="Eszunsat.html">ESZUNSAT</a>
+            <a href="Equipo.html">EQUIPO</a>
+        </nav>
+    </header>
+
+    <div class="info-container">
+        <div class="info-section">
+            <h2>EsZunCrew 1</h2>
+            <p>Fué una prueba crucial por nuestra empresa, ya que tubimos grandes aprendizajes durante las pruebas del vehiculo y de vuelo. 
+                Tenemos datos muy valiosos sobre el aprendizaje, para futuros vuelos del programa.</p>
+            <img src="eszuncrew1.png" alt="Flight 1">
+        </div>
+
+        <div class="info-section">
+            <h2>"14 septiembre de 2024" - NEUTRINO first stage static fire</h2>
+            <p>Necesitamos un vehículo más potente, así que os presentamos a NEUTRINO, vehículo superpeado capaz de llevar mucha craga útil pesada al espacio.</p>
+            <img src="neutrinofirststage.png" alt="Test 4">
+        </div>
+
+        <div class="info-section">
+            <h2>"8 septiembre de 2024" EZE-V2 Sea level Neutron First Stage</h2>
+            <p>En el mismo día, unas 6h después del encendido estático de la segunda etapa, se procedió a hacer el test 3
+                del enecendido estático de la 1a etapa con 11 motores EZE-V2 (sea level).</p>
+            <img src="Neutron 1a etapa test.png" alt="Test 3">
+        </div>
+
+        <div class="info-section">
+            <h2>"8 septiembre de 2024" - EZE-V2 Vacuum Neutron Second Stage</h2>
+            <p>Estamos desarrollando un vehículo espacial, llamado NEUTRON. Podrá poner carga útil a orbitas:
+                - LEO (Orbita baja)
+                - GEO (Orbita de transferéncia geoestacionaria)
+                Es un paso exitoso para la empresa de cara a los lanzamientos comerciales.
+                Finalmente, durante la prueba, pudimos encender lso 4 motores EsZunEngine V2 Vacuum, son motores V2 optimizados para el vacio.
+                Pronto realizaremos el encendido estático de la primera etapa y estrenaremos los EsZunEngine V2 (sea level).</p>
+            <img src="neutronsecondstagetest4eszunenginev2.png" alt="Test 2">
+        </div>
+
+        <div class="info-section">
+            <h2>"28 junio 2024" - EZO-V2</h2>
+            <p>Test de nuestra nueva versión de nuestro cohete EZO-V2.
+                La 1a etapa va a ser totalmente reutilizable..</p>
+            <img src="EZO-V2.png" alt="Flight 2">
+        </div>
+
+        <div class="info-section">
+            <h2>"25 junio 2024" - EZO-V1</h2>
+            <p>Hicimos nuestro 1r vuelo al espacio, con nuestro vehículo EZO-V1.
+                Llevamos carga útil experimental, y depués de unos días fué desorbitado para no causar basura espacial.</p>
+            <img src="EsZunSpace - Flight Test 1.png" alt="Flight 1">
+        </div>
+
+        <div class="info-section">
+            <h2>"19 junio de 2024" - EsZunEngine V1</h2>
+            <p>Hicimos por primera vez un encendido de nuestro primer motor EsZunEngine V1.01, esa especifica prueba era para
+                probar todos los sistemas del motor, como: trubobomba, gimbal, y que el softwere y hardwere para que funcionaran a la perfección. ¡Y así fué!
+                pudimos hacer un testeo de 10.</p>
+            <img src="eszunengine test 1.png" alt="Test 1">
+        </div>
+    </div>
+</body>
+</html>
