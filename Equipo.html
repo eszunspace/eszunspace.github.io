@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipo - EsZunSpace</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-weight: normal;
+            color: white;
+            background-color: black;
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgb(0, 0, 0);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-right: 40px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 10px;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            display: inline;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-style: italic;
+            text-transform: uppercase;
+            font-size: 12px;
+            padding: 0 10px;
+        }
+
+        .content {
+            margin-top: 100px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .team-section {
+            margin-top: 60px;
+        }
+
+        h1 {
+            text-align: left;
+            font-size: 36px;
+            margin-bottom: 40px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+        }
+
+        .team-member {
+            background-color: #111;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            padding-bottom: 20px;
+        }
+
+        .team-member img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+        }
+
+        .member-info {
+            padding: 20px;
+        }
+
+        .member-info h3 {
+            margin-top: 0;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .member-info p.position {
+            color: #ccc;
+            font-weight: normal;
+            margin: 5px 0 15px 0;
+            font-size: 16px;
+        }
+        
+        .member-info p.discord a {
+            color: #5865F2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .member-info p.discord a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: black;
+            font-size: 14px;
+            font-weight: bold;
+            font-style: italic;
+            width: 100%;
+            position: relative;
+            bottom: 0;
+            clear: both;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo"><a href="Index.html" style="color: white; text-decoration: none;">ESZUNSPACE</a></div>
+        <nav>
+            <ul>
+                <li><a href="#neutron">NEUTRON</a></li>
+                <li><a href="#neutrino">NEUTRINO</a></li>
+                <li><a href="#estela">ESTELA</a></li>
+                <li><a href="#nebulaexplorer">NEBULA EXPLORER</a></li>
+                <li><a href="#humanflight">VUELOS TRIPULADOS</a></li>
+                <li><a href="#rideshare">COMPARTIR VUELO</a></li>
+                <li><a href="#información">INFORMACIÓN</a></li>
+                <li><a href="#eszunsat">EsZunSat</a></li>
+                <li><a href="Equipo.html">EQUIPO</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="content">
+        <div class="team-section">
+            <h1>Liderazgo</h1>
+            
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="esstor.png" alt="CEO & Co-Fundador">
+                    <div class="member-info">
+                        <h3>Esstor</h3>
+                        <p class="position">CEO & Co-Fundador</p>
+                        <p class="discord"><a href="https://discord.gg/tuenlace" target="_blank">Discord ›</a></p>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <img src="zundaky.png" alt="CTO & Co-Fundador">
+                    <div class="member-info">
+                        <h3>Zundaky</h3>
+                        <p class="position">CTO & Co-Fundador</p>
+                        <p class="discord"><a href="https://discord.gg/tuenlace2" target="_blank">Discord ›</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p style="text-align: center; color: white; font-style: italic;">&copy; 2025 EsZunSpace. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>
