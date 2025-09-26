@@ -7,7 +7,7 @@
   <style>
     :root {
       /* Cambia esta ruta por tu imagen */
-      --bg-image: url('Neutron Vuelo 1');
+      --bg-image: url('background.jpg');
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
@@ -36,6 +36,17 @@
       background: radial-gradient(80% 60% at 50% 20%, rgba(0,0,0,0.0), rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.85));
       pointer-events: none;
     }
+    header {
+      position: absolute; top: 24px; left: 24px; right: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; opacity: 0.95;
+    }
+    .brand {
+      display: flex; align-items: baseline; gap: 12px;
+      font-weight: 700; letter-spacing: 0.02em;
+    }
+    .brand .name { font-size: clamp(18px, 2.2vw, 28px); text-transform: uppercase; }
+    .brand .mission { font-size: clamp(14px, 1.5vw, 18px); opacity: 0.8; }
 
     .card {
       position: relative;
@@ -97,6 +108,14 @@
     <div class="bg" aria-hidden="true"></div>
     <div class="overlay" aria-hidden="true"></div>
 
+    <header>
+      <div class="brand">
+        <div class="name">EsZunSpace</div>
+        <div class="mission">Misión: Neutron</div>
+      </div>
+      <div class="when" id="whenText" aria-live="polite"></div>
+    </header>
+
     <section class="card" role="region" aria-label="Cuenta regresiva al lanzamiento">
       <h1>Cuenta regresiva — Neutron</h1>
       <p class="sub">Lanzamiento programado para <strong>27 de septiembre, 00:00 (Europa/Madrid)</strong></p>
@@ -108,7 +127,8 @@
         <div class="unit"><div class="value" id="s">00</div><div class="label">Segundos</div></div>
       </div>
 
-      <a class="cta" href="#" onclick="event.preventDefault(); alert('¡Vamos! 🚀');">Seguir la misión</a>
+      <!-- Botón actualizado -->
+      <a class="cta" href="https://youtu.be/l7RhCbT9Oq4">Seguir la misión</a>
     </section>
 
     <footer>
