@@ -1,267 +1,159 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EsZunSpace</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            font-weight: bold;
-            font-style: italic;
-            color: white;
-            background-color: black;
-            overflow-x: hidden;
-            width: 100%;
-        }
-        
-        header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.9);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-sizing: border-box;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EsZunSpace – Cuenta regresiva Neutron</title>
+  <style>
+    :root {
+      /* Cambia esta ruta por tu imagen */
+      --bg-image: url('Neutron Vuelo 1');
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: #fff;
+      background: #000;
+    }
+    .hero {
+      position: relative;
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .bg {
+      position: absolute; inset: 0;
+      background-image: var(--bg-image);
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      filter: brightness(0.7) saturate(1.1);
+      transform: scale(1.02);
+    }
+    .overlay {
+      position: absolute; inset: 0;
+      background: radial-gradient(80% 60% at 50% 20%, rgba(0,0,0,0.0), rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.85));
+      pointer-events: none;
+    }
 
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            font-style: italic;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-right: 40px;
-            white-space: nowrap;
-        }
+    .card {
+      position: relative;
+      width: min(1100px, 92vw);
+      padding: clamp(20px, 3vw, 40px);
+      border-radius: 24px;
+      backdrop-filter: blur(6px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.55);
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 12px 0;
+      font-size: clamp(28px, 5vw, 56px);
+      line-height: 1.05;
+      letter-spacing: 0.01em;
+    }
+    .sub {
+      margin-bottom: clamp(18px, 2.5vw, 28px);
+      font-size: clamp(14px, 2vw, 18px);
+      opacity: 0.85;
+    }
+    .timer {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(80px, 1fr));
+      gap: clamp(10px, 2vw, 18px);
+      margin: clamp(10px, 3vw, 28px) auto;
+    }
+    .unit {
+      padding: clamp(12px, 2vw, 18px);
+      border-radius: 18px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .value { font-size: clamp(28px, 6vw, 64px); font-weight: 800; line-height: 1; }
+    .label { font-size: clamp(12px, 1.6vw, 16px); opacity: 0.8; text-transform: uppercase; letter-spacing: 0.12em; }
 
-        nav {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .cta {
+      margin-top: clamp(14px, 2vw, 20px);
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.22);
+      text-decoration: none; color: #fff;
+      font-weight: 600;
+      background: rgba(255,255,255,0.08);
+    }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-style: italic;
-            text-transform: uppercase;
-            font-size: 12px;
-            padding: 0 15px;
-            white-space: nowrap;
-        }
+    footer { position: absolute; bottom: 16px; left: 24px; right: 24px; opacity: 0.8; font-size: 12px; text-align: center; }
 
-        .hero {
-            position: relative;
-            height: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            overflow: hidden;
-            padding: 80px 0 0 0;
-            z-index: 2;
-            background: none;
-        }
-
-        .hero-background {
-            display: none;
-        }
-
-        .hero-content {
-            position: relative;
-            max-width: 600px;
-            color: white;
-            padding: 0 20px 0 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-            margin-bottom: 0;
-        }
-
-        .video-box {
-            width: 100vw;
-            max-width: 100vw;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            flex-direction: column;
-            height: 70vh;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            top: 60px;
-            margin-top: 50px;
-            box-sizing: border-box;
-            overflow: hidden;
-            left: 0;
-            right: 0;
-        }
-
-        .video-container {
-            width: 100vw;
-            max-width: 100vw;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: none;
-            height: 100%;
-            overflow: hidden;
-            position: relative;
-            background-color: black;
-            left: 0;
-            right: 0;
-            margin-left: -8px;
-            margin-right: -8px;
-        }
-
-        .video-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: black;
-        }
-        
-        .video-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: black;
-            transition: opacity 0.5s ease, object-fit 0.5s ease;
-        }
-
-        .additional-banner {
-            width: 100%;
-            height: 400px;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            margin-top: 0;
-        }
-
-        .additional-banner-content {
-            text-align: center;
-            color: white;
-            z-index: 2;
-            max-width: 800px;
-            padding: 20px;
-            background: rgba(0,0,0,0.5);
-        }
-
-        .additional-banner-content h2 {
-            font-size: 36px;
-            margin-bottom: 15px;
-        }
-
-        .additional-banner-content p {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            background: white;
-            color: black;
-            text-decoration: none;
-            font-weight: bold;
-            font-style: italic;
-            border-radius: 5px;
-            transition: 0.3s;
-            margin-bottom: 0;
-            display: inline-block;
-        }
-
-        .btn:hover {
-            background: gray;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: black;
-            font-size: 14px;
-            font-weight: bold;
-            font-style: italic;
-            width: 100%;
-            position: relative;
-            bottom: 0;
-            clear: both;
-            margin-top: 50px;
-        }
-    </style>
+    @media (max-width: 520px) {
+      .timer { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <div class="logo"><a href="https://eszunspace.es" style="color: white; text-decoration: none;">ESZUNSPACE</a></div>
-        <nav>
-            <a href="Neutron.html">NEUTRON</a>
-            <a href="Neutrino.html">NEUTRINO</a>
-            <a href="Estela.html">ESTELA</a>
-            <a href="Explorer.html">NEBULA EXPLORER</a>
-            <a href="Tripulados.html">VUELOS TRIPULADOS</a>
-            <a href="Compartir.html">COMPARTIR VUELO</a>
-            <a href="informacion.html">INFORMACIÓN</a>
-            <a href="Eszunsat.html">ESZUNSAT</a>
-            <a href="Equipo.html">EQUIPO</a>
-        </nav>
-    </header>
+  <main class="hero">
+    <div class="bg" aria-hidden="true"></div>
+    <div class="overlay" aria-hidden="true"></div>
 
-    <!-- Video con texto superpuesto -->
-    <section class="video-box">
-        <div class="video-container">
-            <video id="video" autoplay muted>
-                <source src="video1.mp4" type="video/mp4">
-                Tu navegador no soporta la reproducción de video.
-            </video>
-            <img id="image" src="imagen1.png" alt="Imagen de reemplazo" style="opacity: 0;">
-            
-            <!-- Texto superpuesto similar al ejemplo -->
-            <div class="overlay-text" style="position: absolute; bottom: 100px; left: 50px; text-align: left; z-index: 10;">
-                <p style="margin: 0; font-size: 16px; text-transform: uppercase;">EsZunEngine Test</p>
-                <h2 style="margin: 10px 0 20px 0; font-size: 42px; font-weight: bold; text-transform: uppercase;">Static Fire</h2>
-                <a href="Eszunengine.html" style="display: inline-block; padding: 12px 30px; border: 2px solid white; color: white; text-decoration: none; text-transform: uppercase; font-size: 14px;">Información</a>
-            </div>
-        </div>
+    <section class="card" role="region" aria-label="Cuenta regresiva al lanzamiento">
+      <h1>Cuenta regresiva — Neutron</h1>
+      <p class="sub">Lanzamiento programado para <strong>27 de septiembre, 00:00 (Europa/Madrid)</strong></p>
+
+      <div class="timer" aria-live="polite">
+        <div class="unit"><div class="value" id="d">00</div><div class="label">Días</div></div>
+        <div class="unit"><div class="value" id="h">00</div><div class="label">Horas</div></div>
+        <div class="unit"><div class="value" id="m">00</div><div class="label">Minutos</div></div>
+        <div class="unit"><div class="value" id="s">00</div><div class="label">Segundos</div></div>
+      </div>
+
+      <a class="cta" href="#" onclick="event.preventDefault(); alert('¡Vamos! 🚀');">Seguir la misión</a>
     </section>
 
     <footer>
-        <p style="text-align: center; font-style: italic;">&copy; 2025 EsZunSpace. Todos los derechos reservados.</p>
+      © <span id="year"></span> EsZunSpace — Todos los derechos reservados
     </footer>
+  </main>
 
-    <script>
-        const video = document.getElementById("video");
-        const image = document.getElementById("image");
+  <script>
+    // === Configuración de fecha objetivo ===
+    // "12:00 de la noche" → 00:00 del 27/09/2025 en Europa/Madrid (CEST, UTC+2 en esa fecha)
+    // Convertimos esa hora a UTC para evitar problemas de zona horaria en el navegador del usuario.
+    const targetUTC = Date.UTC(2025, 8, 26, 22, 0, 0); // 26 sep 2025 22:00 UTC = 27 sep 00:00 Europa/Madrid
 
-        // Cambiar a imagen cuando el video termina
-        video.addEventListener('ended', () => {
-            video.style.opacity = "0";
-            image.style.opacity = "1";
-            // Aplicar menos zoom a la imagen
-            image.style.objectFit = "contain";
-            
-            // Cambiar a video después de 5 segundos
-            setTimeout(() => {
-                image.style.opacity = "0";
-                video.style.opacity = "1";
-                // Restaurar el estilo del video
-                image.style.objectFit = "cover";
-                video.play(); // Reiniciar el video
-            }, 5000);
-        });
-    </script>
+    const dEl = document.getElementById('d');
+    const hEl = document.getElementById('h');
+    const mEl = document.getElementById('m');
+    const sEl = document.getElementById('s');
+    const yearEl = document.getElementById('year');
+    yearEl.textContent = new Date().getFullYear();
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function tick() {
+      const now = Date.now();
+      let diff = Math.max(0, targetUTC - now);
+
+      const sec = Math.floor(diff / 1000) % 60;
+      const min = Math.floor(diff / (1000*60)) % 60;
+      const hrs = Math.floor(diff / (1000*60*60)) % 24;
+      const days = Math.floor(diff / (1000*60*60*24));
+
+      dEl.textContent = pad(days);
+      hEl.textContent = pad(hrs);
+      mEl.textContent = pad(min);
+      sEl.textContent = pad(sec);
+
+      if (diff === 0) {
+        document.querySelector('h1').textContent = '¡Despegue!';
+        document.querySelector('.sub').textContent = 'Neutron ha iniciado su misión.';
+        clearInterval(ticker);
+      }
+    }
+
+    const ticker = setInterval(tick, 1000);
+    tick();
+  </script>
 </body>
 </html>
