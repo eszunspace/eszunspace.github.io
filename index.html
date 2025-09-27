@@ -120,7 +120,7 @@
 
     <section class="card" role="region" aria-label="Cuenta regresiva al lanzamiento">
       <h1>Cuenta regresiva — Neutron</h1>
-      <p class="sub">Lanzamiento programado para <strong>27 de septiembre, 00:00 (Europa/Madrid)</strong></p>
+      <p class="sub">Lanzamiento programado para <strong>28 de septiembre, 01:50 (Europa/Madrid)</strong></p>
 
       <div class="timer" aria-live="polite">
         <div class="unit"><div class="value" id="d">00</div><div class="label">Días</div></div>
@@ -142,7 +142,7 @@
     // === Configuración de fecha objetivo ===
     // "12:00 de la noche" → 00:00 del 27/09/2025 en Europa/Madrid (CEST, UTC+2 en esa fecha)
     // Convertimos esa hora a UTC para evitar problemas de zona horaria en el navegador del usuario.
-    const targetUTC = Date.UTC(2025, 8, 26, 22, 0, 0); // 26 sep 2025 22:00 UTC = 27 sep 00:00 Europa/Madrid
+    const targetUTC = Date.UTC(2025, 8, 27, 23, 50, 0); // 27 sep 2025 23:50 UTC = 28 sep 01:50 Europa/Madrid
 
     const dEl = document.getElementById('d');
     const hEl = document.getElementById('h');
