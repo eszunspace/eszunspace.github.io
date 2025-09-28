@@ -176,6 +176,49 @@
   transition: opacity 0.2s, text-shadow 0.3s;
 }
 
+
+    /* === Plan de vuelo (timeline) === */
+    .timeline {
+      margin-top: clamp(18px, 3vw, 28px);
+      text-align: left;
+    }
+    .timeline h2 {
+      margin: 0 0 12px 0;
+      font-size: clamp(18px, 3vw, 28px);
+      letter-spacing: 0.02em;
+    }
+    .timeline .items {
+      display: grid;
+      gap: 10px;
+    }
+    .timeline .item {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+    .timeline .t {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      opacity: 0.95;
+    }
+    .timeline .desc {
+      opacity: 0.9;
+    }
+    @media (max-width: 560px) {
+      .timeline .item {
+        grid-template-columns: 1fr;
+      }
+      .timeline .t {
+        margin-bottom: 4px;
+      }
+    }
+
 </style>
 
   <style>
@@ -224,6 +267,53 @@
 
       <!-- Botón actualizado -->
       <a class="cta" href="https://youtu.be/l7RhCbT9Oq4">Seguir la misión</a>
+      <hr style="margin: 18px 0; border: none; border-top: 1px solid rgba(255,255,255,0.15);" />
+      <section class="timeline" aria-label="Plan de vuelo">
+        <h2>Plan de vuelo</h2>
+        <div class="items" role="list">
+          <div class="item" role="listitem">
+            <div class="t">T–00:30</div>
+            <div class="desc">Empieza directo</div>
+          </div>
+          <div class="item" role="listitem">
+            <div class="t">T–03:00</div>
+            <div class="desc">Acabado la carga de combustible del cohete</div>
+          </div>
+          <div class="item" role="listitem">
+            <div class="t">T+00:03</div>
+            <div class="desc">Despegue</div>
+          </div>
+          <div class="item" role="listitem">
+            <div class="t">T+00:50</div>
+            <div class="desc">MaxQ</div>
+          </div>
+          <div class="item" role="listitem">
+            <div class="t">T+02:45</div>
+            <div class="desc">Separación</div>
+          </div>
+          <div class="item" role="listitem">
+            <div class="t">T+07:43</div>
+            <div class="desc">Aterrizaje del booster</div>
+          </div>
+          <div class="item" role="listitem">
+            <div class="t">T+08:10</div>
+            <div class="desc">Llegada a órbita</div>
+          </div>
+          <div class="item" role="listitem">
+            <div class="t">T+25:00</div>
+            <div class="desc">Despliegue de satélites</div>
+          </div>
+          <div class="item" role="listitem">
+            <div class="t">T+40:00</div>
+            <div class="desc">Reencendido de motor</div>
+          </div>
+          <div class="item" role="listitem">
+            <div class="t">T+1:32:00</div>
+            <div class="desc">Aterrizaje</div>
+          </div>
+        </div>
+      </section>
+
     </section>
 
     <footer>
