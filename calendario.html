@@ -1,360 +1,286 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EsZunSpace | Calendario</title>
+  <title>EsZunSpace — Calendario</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoarriba.jpg">
   <style>
     :root{
-      --bg:#0b0b0e;
-      --panel:#141417;
-      --muted:#9aa0a6;
-      --fg:#eaecef;
-      --accent:#5ad1ff;
-      --chip:#0f1b23;
-      --chipBorder:#1e2c35;
-      --border:rgba(255,255,255,.08);
-      --shadow:0 15px 45px rgba(0,0,0,.45);
-      --radius:16px;
+      --glass1: rgba(255,255,255,.07);
+      --glass2: rgba(255,255,255,.03);
+      --stroke: rgba(255,255,255,.12);
+      --ring: rgba(0,0,0,.65);
+      --fg: #fff;
+      --muted: rgba(255,255,255,.7);
+      --accent1:#00f0ff; --accent2:#ff00d4;
+      --tile: #141416;
+      --tile-border: rgba(255,255,255,.12);
     }
     *{box-sizing:border-box}
+    html,body{margin:0}
     body{
-      margin:0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      transition: opacity 0.5s ease;
+      background:#0b0b0c; color:var(--fg);
+      font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial;
+      opacity:0; transition:opacity .6s ease;
     }
-    body.fade-out{ opacity:0; }
+    body.fade-in{opacity:1} body.fade-out{opacity:0}
 
-    /* ===== Barra superior ===== */
-    .topbar{
+    /* ===== Header cápsula con marcador activo ===== */
+    header.topbar{
+      position:sticky; top:0; left:0; right:0; z-index:1000;
+      padding:14px 16px;
+      background:linear-gradient(180deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,0) 100%);
+      backdrop-filter: blur(2px);
+    }
+    .nav-shell{
+      width:min(1200px, 94vw);
+      margin:0 auto;
+      height:60px; padding:0 18px;
       display:flex; align-items:center; justify-content:space-between;
-      padding:10px 24px;
-      background:linear-gradient(to bottom, #0b0b0e, #111);
-      border-bottom:1px solid var(--border);
+      border-radius:18px;
+      background:linear-gradient(180deg,var(--glass1),var(--glass2));
+      border:1px solid var(--stroke);
+      box-shadow:0 10px 30px rgba(0,0,0,.6);
+      position:relative; overflow:hidden;
     }
-    .topbar img{ height:36px; border-radius:50%; }
-    .topbar .brand{
-      display:flex; align-items:center; gap:10px; font-weight:800; font-size:18px;
-      text-decoration:none; color:#fff;
+    .nav-shell::before{
+      content:""; position:absolute; inset:-1px;
+      background:conic-gradient(from 0deg, var(--accent1), var(--accent2), var(--accent1));
+      filter:blur(22px); opacity:.14; pointer-events:none;
     }
-    .topbar .brand:hover{ color:var(--accent); }
-    .topbar nav{ display:flex; gap:20px; }
-    .topbar nav a{
-      color:#fff; text-decoration:none; font-size:14px; font-weight:700;
-      letter-spacing:.5px;
+    .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff;}
+    .brand img{height:36px; width:36px; border-radius:50%;}
+    .brand .title{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:800; letter-spacing:.02em;}
+    .menu{display:flex; align-items:center; gap:18px}
+    .menu a{
+      position:relative; display:inline-flex; align-items:center;
+      padding:10px 10px; text-decoration:none; color:#fff;
+      font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:12px; opacity:.9;
+      transition:opacity .2s ease;
     }
-    .topbar nav a:hover{ color:var(--accent); }
-
-    /* ===== Contenido principal ===== */
-    .wrap{
-      max-width:1000px;
-      margin:32px auto;
-      padding:0 16px 40px;
+    .menu a:hover{opacity:1}
+    .menu a::after{
+      content:""; position:absolute; left:12px; right:12px; bottom:6px; height:2px;
+      background:linear-gradient(90deg, var(--accent1), var(--accent2));
+      transform:scaleX(0); transform-origin:left; transition:transform .25s ease; border-radius:2px;
     }
-    header.app{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:16px; margin-bottom:16px;
-    }
-    header.app h1{font-size:22px;margin:0;font-weight:800;letter-spacing:.2px}
-    .nav{ display:flex; gap:8px; align-items:center; }
-    .btn{
-      appearance:none; border:1px solid var(--border); background:var(--panel);
-      color:var(--fg); padding:8px 12px; border-radius:12px; cursor:pointer;
-      box-shadow:var(--shadow);
-    }
-    .btn:hover{border-color:#2b2b2f}
-    .month-label{font-weight:700; padding:6px 10px; border-radius:10px; background:var(--panel); border:1px solid var(--border)}
+    .menu a:hover::after{transform:scaleX(1)}
+    .menu a[aria-current="page"]{opacity:1}
+    .menu a[aria-current="page"]::after{transform:scaleX(1)}
 
     /* ===== Calendario ===== */
-    .calendar{
-      display:grid; grid-template-columns: repeat(7, 1fr);
-      gap:8px;
+    main{max-width:1200px; width:92vw; margin:28px auto 64px}
+    .cal-header{
+      display:flex; align-items:center; justify-content:space-between;
+      margin:10px 0 16px;
     }
-    .dow{
-      text-align:center; font-size:12px; text-transform:uppercase; letter-spacing:.08em;
-      color:var(--muted); padding:6px 0;
+    .cal-title{
+      display:flex; align-items:center; gap:14px;
+      font-family:'Space Grotesk',system-ui,sans-serif; text-transform:uppercase; letter-spacing:.04em;
+    }
+    .cal-title h1{margin:0; font-size:clamp(22px,3.4vw,28px)}
+    .controls{
+      display:flex; align-items:center; gap:8px;
+      background:linear-gradient(180deg,var(--glass1),var(--glass2));
+      border:1px solid var(--stroke); border-radius:14px;
+      padding:6px 8px; box-shadow:0 10px 24px rgba(0,0,0,.35);
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:32px; height:32px; border-radius:10px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+      color:var(--fg); cursor:pointer; user-select:none;
+      transition:transform .15s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
+    }
+    .btn:hover{transform:translateY(-1px); background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3)}
+    .month-pill{
+      font-weight:800; padding:8px 12px; border-radius:10px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+      letter-spacing:.03em;
+    }
+
+    .weekday-row{
+      display:grid; grid-template-columns:repeat(7,1fr); gap:14px; margin:18px 0 8px; padding:0 4px;
+      color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:12px;
+    }
+    .grid{
+      display:grid; grid-template-columns:repeat(7,1fr); gap:14px;
     }
     .day{
-      background: var(--panel);
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      min-height:110px;
-      padding:8px;
-      display:flex; flex-direction:column; gap:6px;
-      position:relative;
-      overflow:hidden;
+      height:120px; border-radius:16px; background:#121214;
+      border:1px solid var(--tile-border); position:relative; overflow:hidden;
+      box-shadow:0 6px 16px rgba(0,0,0,.35);
+      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
     }
-    .day-num{
-      position:absolute; top:6px; left:8px;
-      font-size:12px; font-weight:800; color:#cbd5e1;
-      background: rgba(255,255,255,.05);
-      padding:4px 7px; border-radius:10px; border:1px solid var(--border);
+    .day:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(0,0,0,.5); border-color:rgba(255,255,255,.22); }
+    .day .num{
+      position:absolute; top:8px; left:8px;
+      min-width:26px; height:26px; padding:0 8px; display:inline-flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:800; color:#dfefff;
+      background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.22); border-radius:999px;
     }
-    .tags{ margin-top:24px; display:flex; flex-direction:column; gap:6px; }
-    .tag{
-      display:flex; flex-direction:column; align-items:flex-start; gap:2px;
-      padding:6px 10px; line-height:1.1; width:100%;
-      background:linear-gradient(180deg, var(--chip), #0b141a);
-      border:1px solid var(--chipBorder);
-      border-radius:12px; cursor:pointer;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    .day.today{
+      outline:2px solid transparent;
+      box-shadow:0 0 0 2px rgba(0,240,255,.25) inset, 0 10px 26px rgba(0,0,0,.5);
+      border-color:rgba(0,240,255,.35);
     }
-    .tag:hover{ border-color:#2a3a45 }
-    .tag .t-title{ font-size:11px; font-weight:800; letter-spacing:.02em; color:#d7f1ff; }
-    .tag .t-count{ font-size:11px; opacity:.95; color:#a9d8ee; }
-
-    /* ===== Modal con transición ===== */
-    #eventModalOverlay{
-      position:fixed; inset:0; background:rgba(0,0,0,.55);
-      display:flex; align-items:center; justify-content:center; z-index:2000;
-      backdrop-filter:blur(2px);
-      opacity:0; pointer-events:none; transition:opacity .28s ease;
+    .day .events{ position:absolute; inset:38px 10px 10px 10px; display:flex; flex-direction:column; gap:6px; }
+    .pill{
+      display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border-radius:10px;
+      font-size:12px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
-    #eventModal{
-      width:min(640px,92vw); background:linear-gradient(180deg,#0f0f10,#141414);
-      color:#fff; border:1px solid rgba(255,255,255,.12); border-radius:18px;
-      box-shadow:0 20px 60px rgba(0,0,0,.6); padding:18px;
-      transform:translateY(12px) scale(.98); opacity:0;
-      transition:transform .32s ease, opacity .32s ease;
+    .dot{width:8px; height:8px; border-radius:50%; background:linear-gradient(90deg,var(--accent1),var(--accent2))}
+    @media (max-width: 820px){
+      .day{height:90px}
+      .weekday-row{gap:10px}
+      .grid{gap:10px}
     }
-    #eventModalOverlay.open{ opacity:1; pointer-events:auto; }
-    #eventModalOverlay.open #eventModal{ transform:translateY(0) scale(1); opacity:1; }
-
-    #eventModal header{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    #eventModal h3{ margin:4px 0 0; font-size:18px; letter-spacing:.2px }
-    #eventModal .close{
-      appearance:none; border:1px solid var(--border); border-radius:10px;
-      background:#1c1c20; color:#fff; padding:6px 8px; cursor:pointer;
-    }
-    #eventModal .countdown{
-      font-weight:800; margin:6px 0 10px; font-size:16px; color:var(--accent);
-    }
-    #eventModal .meta{ color:var(--muted); font-size:13px; margin-bottom:10px; }
-    #eventModal .desc{ font-size:14px; line-height:1.45; margin-bottom:12px; color:#e6e8ea; }
-    #eventModal .media{ display:flex; align-items:center; gap:12px; }
-    .event-image{ width:180px; height:120px; object-fit:cover; border-radius:10px; border:1px solid var(--border); }
-    .yt-btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:10px 14px; border-radius:12px; text-decoration:none;
-      background:linear-gradient(45deg, #ff3d00, #ffbd45);
-      color:#111; font-weight:800; border:0;
-      box-shadow: var(--shadow);
-    }
-    .foot{ margin-top:18px; display:flex; justify-content:flex-end; }
-    .foot .btn{ background:#1b1b1f; }
   </style>
 </head>
 <body>
-  <!-- Barra superior -->
-  <div class="topbar">
-    <a href="index.html" class="brand" id="brandLink">
-      <img src="logoarriba.jpg" alt="EsZunSpace Logo">
-      EsZunSpace
-    </a>
-    <nav>
-      <a href="#">CALENDARIO</a>
-      <a href="#">COHETES</a>
-      <a href="#">MOTORES</a>
-      <a href="#">SATÉLITES</a>
-      <a href="#">LANZAMIENTOS</a>
-    </nav>
-  </div>
+  <header class="topbar">
+    <div class="nav-shell">
+      <a class="brand" href="index.html" aria-label="Ir a inicio">
+        <img src="logoarriba.jpg" alt="">
+        <span class="title">EsZunSpace</span>
+      </a>
+      <nav class="menu">
+        <a href="calendario.html">Calendario</a>
+        <a href="cohetes.html">Cohetes</a>
+        <a href="motores.html">Motores</a>
+        <a href="#">Satélites</a>
+        <a href="#">Lanzamientos</a>
+      </nav>
+    </div>
+  </header>
 
-  <!-- Calendario -->
-  <div class="wrap">
-    <header class="app">
-      <h1>Calendario de lanzamientos</h1>
-      <div class="nav">
-        <button class="btn" id="prevBtn">◀</button>
-        <span class="month-label" id="monthLabel">—</span>
-        <button class="btn" id="nextBtn">▶</button>
+  <main>
+    <div class="cal-header">
+      <div class="cal-title">
+        <h1>Calendario de lanzamientos</h1>
       </div>
-    </header>
-    <div id="calendar" class="calendar"></div>
-  </div>
-
-  <!-- Modal -->
-  <div id="eventModalOverlay" aria-hidden="true">
-    <div id="eventModal" role="dialog" aria-modal="true" aria-labelledby="eventTitle">
-      <header>
-        <h3 id="eventTitle">Lanzamiento</h3>
-        <button class="close" id="eventCloseBtn" aria-label="Cerrar">Cerrar</button>
-      </header>
-      <div id="eventCountdown" class="countdown"></div>
-      <div class="meta" id="eventDateTime"></div>
-      <div class="desc" id="eventDesc">Información del lanzamiento.</div>
-      <div class="media">
-        <img id="eventImage" class="event-image" alt="Imagen del evento" style="display:none;" />
-        <a id="eventYT" class="yt-btn" href="#" target="_blank" rel="noopener" style="display:none;">Ver en YouTube</a>
-      </div>
-      <div class="foot">
-        <button class="btn" id="eventCloseBtn2">Cerrar</button>
+      <div class="controls">
+        <button class="btn" id="prev" aria-label="Mes anterior">◀</button>
+        <span class="month-pill" id="monthLabel">octubre 2025</span>
+        <button class="btn" id="next" aria-label="Mes siguiente">▶</button>
       </div>
     </div>
-  </div>
+
+    <div class="weekday-row" aria-hidden="true">
+      <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+    </div>
+
+    <section class="grid" id="grid" role="grid" aria-label="Calendario mensual"></section>
+  </main>
 
   <script>
-    // ======= Datos del evento =======
-    const events = [
-      {
-        id: "neutron-ift2",
-        title: "Lanzamiento",
-        shortName: "NEUTRON IFT-2",
-        date: new Date(2025, 8, 28, 23, 0), // 28 Sep 2025 01:50
-        description: "Lanzamiento programado para el 28 de septiembre a las 23:00. Cohete Neutron – Segundo vuelo de prueba.",
-        imageUrl: "NeutronIFT2.jpg",
-        youtubeUrl: "https://youtu.be/-m2H9ervpAY"
-      }
-    ];
-
-    // ======= Utilidades =======
-    const dow = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
-    const monthNames = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-    const pad = n => n<10? "0"+n : ""+n;
-    const formatDT = d => `${d.getDate()} de ${monthNames[d.getMonth()]} de ${d.getFullYear()}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    const sameDate = (a,b)=>a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
-
-    // ======= Render del calendario =======
-    const calEl = document.getElementById('calendar');
-    const monthLabel = document.getElementById('monthLabel');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    let view = new Date();
-    view.setDate(1);
-
-    function render(){
-      calEl.innerHTML = "";
-      dow.forEach(d => {
-        const h = document.createElement('div');
-        h.className = 'dow';
-        h.textContent = d;
-        calEl.appendChild(h);
+    // ===== Header: marcador activo + transiciones =====
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.classList.add("fade-in");
+      // marcar activo
+      const path = location.pathname.split("/").pop() || "calendario.html";
+      document.querySelectorAll(".menu a").forEach(a=>{
+        if(a.getAttribute("href")===path) a.setAttribute("aria-current","page");
       });
-
-      const firstDow = (view.getDay() || 7) - 1;
-      const year = view.getFullYear();
-      const month = view.getMonth();
-      const lastDay = new Date(year, month+1, 0).getDate();
-      monthLabel.textContent = `${monthNames[month]} ${year}`;
-
-      for(let i=0;i<firstDow;i++){
-        const d = document.createElement('div');
-        d.className='day';
-        d.style.visibility='hidden';
-        calEl.appendChild(d);
-      }
-
-      for(let day=1; day<=lastDay; day++){
-        const cell = document.createElement('div');
-        cell.className = 'day';
-        const dn = document.createElement('div');
-        dn.className = 'day-num';
-        dn.textContent = day;
-        cell.appendChild(dn);
-
-        const tags = document.createElement('div');
-        tags.className = 'tags';
-        cell.appendChild(tags);
-
-        const cellDate = new Date(year, month, day);
-        const dayEvents = events.filter(ev => sameDate(ev.date, cellDate));
-
-        dayEvents.forEach(ev => {
-          const tag = document.createElement('div');
-          tag.className='tag';
-          tag.setAttribute('data-ev-id', ev.id);
-          tag.innerHTML = `
-            <span class="t-title">${ev.shortName || ev.title}</span>
-            <span class="t-count">—</span>
-          `;
-          tag.addEventListener('click', (e)=>{ e.stopPropagation(); openEvent(ev); });
-          tags.appendChild(tag);
-        });
-
-        calEl.appendChild(cell);
-      }
-      updateTagCountdown();
-    }
-
-    prevBtn.addEventListener('click', ()=>{ view.setMonth(view.getMonth()-1); render(); });
-    nextBtn.addEventListener('click', ()=>{ view.setMonth(view.getMonth()+1); render(); });
-
-    // ======= Countdown de chips =======
-    function updateTagCountdown(){
-      document.querySelectorAll('.tag[data-ev-id]').forEach(tag=>{
-        const ev = events.find(e=>e.id===tag.getAttribute('data-ev-id'));
-        if(!ev) return;
-        const diff = ev.date - new Date();
-        const countEl = tag.querySelector('.t-count');
-        if(diff<=0){ countEl.textContent = "¡En curso!"; return; }
-        const sec = Math.floor(diff/1000)%60;
-        const min = Math.floor(diff/1000/60)%60;
-        const hr  = Math.floor(diff/1000/60/60)%24;
-        const days= Math.floor(diff/1000/60/60/24);
-        countEl.textContent = `${days}d ${hr}h ${min}m ${sec}s`;
+      // transición suave
+      document.querySelectorAll('a[href]').forEach(link=>{
+        const url = new URL(link.href, location.href);
+        if(url.origin===location.origin && !link.target){
+          link.addEventListener("click", e=>{
+            if(url.pathname===location.pathname && url.hash) return;
+            e.preventDefault(); document.body.classList.add("fade-out");
+            setTimeout(()=> location.href=url.href, 600);
+          });
+        }
       });
-    }
-    setInterval(updateTagCountdown, 1000);
-
-    // ======= Modal =======
-    const overlay = document.getElementById('eventModalOverlay');
-    const closeBtn = document.getElementById('eventCloseBtn');
-    const closeBtn2 = document.getElementById('eventCloseBtn2');
-    const titleEl = document.getElementById('eventTitle');
-    const dateEl = document.getElementById('eventDateTime');
-    const descEl = document.getElementById('eventDesc');
-    const imgEl = document.getElementById('eventImage');
-    const ytEl  = document.getElementById('eventYT');
-    const cdEl  = document.getElementById('eventCountdown');
-    let cdInt = null;
-
-    function openEvent(ev){
-      titleEl.textContent = ev.shortName || ev.title;
-      dateEl.textContent = formatDT(ev.date);
-      descEl.textContent = ev.description || "";
-      if(ev.imageUrl){ imgEl.src = ev.imageUrl; imgEl.style.display = 'block'; }
-      else { imgEl.removeAttribute('src'); imgEl.style.display = 'none'; }
-      if(ev.youtubeUrl){ ytEl.href = ev.youtubeUrl; ytEl.style.display = 'inline-flex'; }
-      else { ytEl.removeAttribute('href'); ytEl.style.display = 'none'; }
-
-      const update = ()=>{ const diff = ev.date - new Date();
-        if(diff<=0){ cdEl.textContent = "¡En curso!"; return; }
-        const sec = Math.floor(diff/1000)%60;
-        const min = Math.floor(diff/1000/60)%60;
-        const hr  = Math.floor(diff/1000/60/60)%24;
-        const days= Math.floor(diff/1000/60/60/24);
-        cdEl.textContent = `${days}d ${hr}h ${min}m ${sec}s`;
-      };
-      update();
-      if(cdInt) clearInterval(cdInt);
-      cdInt = setInterval(update, 1000);
-
-      overlay.classList.add('open');
-      overlay.setAttribute('aria-hidden','false');
-    }
-
-    function closeEvent(){
-      overlay.classList.remove('open');
-      overlay.setAttribute('aria-hidden','true');
-      if(cdInt){ clearInterval(cdInt); cdInt = null; }
-    }
-
-    document.getElementById('eventCloseBtn').addEventListener('click', closeEvent);
-    document.getElementById('eventCloseBtn2').addEventListener('click', closeEvent);
-    overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeEvent(); });
-    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeEvent(); });
-
-    // ======= Transición a index.html =======
-    document.getElementById("brandLink").addEventListener("click", function(e) {
-      e.preventDefault();
-      document.body.classList.add("fade-out");
-      setTimeout(() => { window.location.href = this.href; }, 500);
     });
 
-    // Inicializa
+    // ===== Calendario =====
+    const monthLabel = document.getElementById('monthLabel');
+    const grid = document.getElementById('grid');
+    const btnPrev = document.getElementById('prev');
+    const btnNext = document.getElementById('next');
+
+    // Estado inicial: hoy
+    let current = new Date();
+    current.setDate(1); // al primer día del mes
+
+    const MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+    function firstDayMondayIndex(date){
+      // devuelve índice 0..6 donde 0=Lunes, usando getDay() (0=Domingo)
+      const d = new Date(date);
+      const day = d.getDay(); // 0..6 (dom..sáb)
+      return (day + 6) % 7;   // 0=lun, 6=dom
+    }
+
+    function daysInMonth(date){
+      return new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
+    }
+
+    function isToday(d){
+      const t = new Date();
+      return d.getFullYear()===t.getFullYear() && d.getMonth()===t.getMonth() && d.getDate()===t.getDate();
+    }
+
+    // Render principal (sin días de otros meses: celdas vacías delante)
+    function render(){
+      const year = current.getFullYear();
+      const month = current.getMonth();
+      monthLabel.textContent = `${MES[month]} ${year}`;
+
+      grid.innerHTML = '';
+      const firstIdx = firstDayMondayIndex(current); // huecos al principio
+      const total = daysInMonth(current);
+
+      // añade huecos (celdas vacías)
+      for(let i=0;i<firstIdx;i++){
+        const cell = document.createElement('div');
+        cell.className = 'day';
+        grid.appendChild(cell);
+      }
+
+      // días del mes
+      for(let day=1; day<=total; day++){
+        const cell = document.createElement('div');
+        cell.className = 'day';
+        const date = new Date(year, month, day);
+        if(isToday(date)) cell.classList.add('today');
+
+        // número
+        const num = document.createElement('span');
+        num.className = 'num';
+        num.textContent = day;
+
+        // contenedor eventos (vacío por ahora)
+        const events = document.createElement('div');
+        events.className = 'events';
+        // ejemplo para mostrar cómo se vería una píldora (puedes borrar esto):
+        // if (Math.random() < 0.06) {
+        //   const p = document.createElement('div');
+        //   p.className = 'pill';
+        //   p.innerHTML = '<span class="dot"></span> Ventana de lanzamiento';
+        //   events.appendChild(p);
+        // }
+
+        cell.appendChild(num);
+        cell.appendChild(events);
+        grid.appendChild(cell);
+      }
+    }
+
+    // Controles
+    btnPrev.addEventListener('click', ()=>{ current.setMonth(current.getMonth()-1); render(); });
+    btnNext.addEventListener('click', ()=>{ current.setMonth(current.getMonth()+1); render(); });
+
+    // Inicia mostrando el mes actual
     render();
+
+    // Si quieres abrir directamente en octubre 2025 (como tu captura), descomenta:
+    // current = new Date(2025, 9, 1); render();
   </script>
 </body>
 </html>
