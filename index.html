@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EsZunSpace</title>
+  <title>EsZunSpace — Responsive</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="logoarriba.jpg">
   <style>
     :root {
       --bg-image: url('background.jpg');
+      --header-h: 64px;
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
@@ -23,15 +24,16 @@
     /* ===== Header cápsula con marcador activo ===== */
     header.topbar{
       position:fixed; top:0; left:0; right:0; z-index:1000;
-      padding:14px 16px;
+      padding:12px 12px;
       background:linear-gradient(180deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,0) 100%);
+      -webkit-backdrop-filter: blur(2px);
       backdrop-filter: blur(2px);
     }
     .nav-shell{
       width:min(1200px, 94vw);
       margin:0 auto;
-      height:60px;
-      padding:0 18px;
+      height:var(--header-h);
+      padding:0 14px;
       display:flex; align-items:center; justify-content:space-between;
       border-radius:18px;
       background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
@@ -47,9 +49,18 @@
     .brand{
       display:flex; align-items:center; gap:10px;
       text-decoration:none; color:#fff;
+      min-width:0;
     }
     .brand img{height:36px; width:36px; border-radius:50%; box-shadow:0 0 8px rgba(255,255,255,.1)}
-    .brand .title{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:800; letter-spacing:.02em;}
+    .brand .title{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:800; letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+    /* === Toggle (mobile) === */
+    .menu-toggle{
+      display:none;
+      background:transparent; border:0; color:#fff;
+      width:44px; height:44px; border-radius:12px;
+    }
+    .menu-toggle:focus-visible{ outline:2px solid #00f0ff; outline-offset:2px; }
 
     .menu{display:flex; align-items:center; gap:18px}
     .menu a{
@@ -57,6 +68,7 @@
       padding:10px 10px; text-decoration:none; color:#fff;
       font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:12px; opacity:.9;
       transition:opacity .2s ease;
+      -webkit-tap-highlight-color: transparent;
     }
     .menu a:hover{opacity:1}
     .menu a::after{
@@ -71,15 +83,17 @@
 
     /* ===== Hero ===== */
     .hero {
-      position: relative; min-height: 100%;
+      position: relative; min-height: 100svh;
       display: grid; place-items: center;
       overflow: hidden;
-      padding-top: 92px;
+      padding-top: calc(var(--header-h) + 24px);
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
     }
     .bg { position: absolute; inset: 0;
       background-image: var(--bg-image);
       background-size: cover; background-position: center;
       filter: brightness(0.7) saturate(1.1);
+      transform: translateZ(0);
     }
     .overlay { position: absolute; inset: 0;
       background: radial-gradient(80% 60% at 50% 20%, rgba(0,0,0,0), rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.85));
@@ -88,9 +102,11 @@
     /* Título central animado */
     .brand-name {
       position: relative;
+      margin: 0 16px;
+      text-align:center;
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 800;
-      font-size: clamp(44px, 9vw, 120px);
+      font-size: clamp(36px, 11vw, 120px);
       text-transform: uppercase;
       background: linear-gradient(180deg, #e7f9ff, #bfe4ff 40%, #a6a6a6 60%, #ffffff);
       -webkit-background-clip: text;
@@ -98,6 +114,7 @@
       text-shadow: 0 0 20px rgba(255,255,255,0.15);
       animation: fadeZoom 1.5s ease forwards;
       overflow: hidden;
+      line-height: 1.05;
     }
 
     /* Efecto de brillo que cruza */
@@ -120,17 +137,64 @@
       100% { left: 100%; }
     }
 
-    footer{ position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:12px; opacity:.8; }
+    footer{ position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:12px; opacity:.85; }
+
+    /* =========================
+       Responsive
+       ========================= */
+    @media (max-width: 900px){
+      :root{ --header-h: 56px; }
+      .brand img{ width:32px; height:32px; }
+      .nav-shell{ padding:0 10px; border-radius:14px; }
+      .menu-toggle{ display:inline-flex; align-items:center; justify-content:center; }
+      .menu{
+        position: fixed; inset: calc(var(--header-h) + 8px) 8px auto 8px;
+        right: 8px; left: 8px; top: calc(var(--header-h) + 12px);
+        display: none; flex-direction: column; align-items: stretch; gap: 6px;
+        padding: 10px;
+        background: rgba(18,18,18,0.92);
+        border:1px solid rgba(255,255,255,0.12);
+        border-radius:16px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.6);
+        backdrop-filter: blur(8px);
+      }
+      .menu.open{ display:flex; }
+      .menu a{
+        padding:14px 12px; font-size:13px; letter-spacing:.12em;
+        border-radius:10px;
+      }
+      .menu a::after{ display:none; }
+      .brand .title{ font-size:16px; }
+    }
+
+    @media (hover:none){
+      .menu a:hover::after{ transform:none; }
+      .menu a:hover{ opacity:1; }
+    }
+
+    /* Accesibilidad: respetar reduce-motion */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="nav-shell">
       <a class="brand" href="index.html" aria-label="Ir a inicio">
-        <img src="logoarriba.jpg" alt="">
+        <img src="logoarriba.jpg" alt="Logo de EsZunSpace">
         <span class="title">EsZunSpace</span>
       </a>
-      <nav class="menu">
+
+      <!-- Toggle sólo visible en móvil -->
+      <button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false" aria-label="Abrir menú">
+        <!-- simple icono hamburguesa -->
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <nav id="primary-menu" class="menu" role="navigation" aria-label="Menú principal">
         <a href="calendario.html">Calendario</a>
         <a href="cohetes.html">Cohetes</a>
         <a href="motores.html">Motores</a>
@@ -141,8 +205,8 @@
   </header>
 
   <main class="hero">
-    <div class="bg"></div>
-    <div class="overlay"></div>
+    <div class="bg" role="img" aria-label="Fondo espacial"></div>
+    <div class="overlay" aria-hidden="true"></div>
     <h1 class="brand-name">EsZunSpace</h1>
     <footer>© <span id="year"></span> EsZunSpace — Todos los derechos reservados</footer>
   </main>
@@ -161,17 +225,45 @@
         }
       });
 
-      // Transición suave
+      // Transición suave entre páginas internas
       document.querySelectorAll('a[href]').forEach(link=>{
         const url = new URL(link.href, location.href);
         if(url.origin === location.origin && !link.target){
           link.addEventListener("click", e=>{
             if(url.pathname === location.pathname && url.hash) return;
+            // Si el menú está abierto en móvil, cerrar primero sin fade-out de página
+            const menu = document.querySelector('.menu');
+            if(menu && menu.classList.contains('open')) return;
             e.preventDefault();
             document.body.classList.add("fade-out");
             setTimeout(()=> location.href=url.href,600);
           });
         }
+      });
+
+      // Toggle del menú en móvil
+      const toggle = document.querySelector('.menu-toggle');
+      const menu = document.getElementById('primary-menu');
+      function setOpen(open){
+        menu.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      }
+      toggle.addEventListener('click', ()=> setOpen(!menu.classList.contains('open')));
+      // Cerrar al pulsar un enlace
+      menu.addEventListener('click', (e)=>{
+        if(e.target.closest('a')) setOpen(false);
+      });
+      // Cerrar al pulsar fuera
+      document.addEventListener('click', (e)=>{
+        if(menu.classList.contains('open')){
+          const within = e.target.closest('.nav-shell');
+          if(!within) setOpen(false);
+        }
+      });
+      // Cerrar con Escape
+      document.addEventListener('keydown', (e)=>{
+        if(e.key === 'Escape') setOpen(false);
       });
     });
   </script>
