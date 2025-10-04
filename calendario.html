@@ -265,10 +265,10 @@
 
     const EVENTS = [
       {
-        id: "neutron-2025-10-03",
+        id: "neutron-2025-10-04",
         title: "Cohete Neutron — Lanzamiento",
         vehicle: "Neutron",
-        datetimeISO: "2025-10-03T23:00:00+02:00", // CEST
+        datetimeISO: "2025-10-04T23:00:00+02:00", // CEST
         streamUrl: "https://youtu.be/n_GD25u_On8",
         description: "Este evento corresponde al lanzamiento del Neutron. La cuenta atrás se basa en la hora de Europa/Madrid.",
         mission: "Neutron Snipex-1 Launch",
@@ -285,19 +285,26 @@
     function startCountdowns(){
       const nodes = document.querySelectorAll('[data-countdown-dt]');
       function fmt(diffMs){
-        if (diffMs <= 0) return "En curso / completado";
+        if (diffMs <= 0) {
+          const sec = Math.abs(Math.floor(diffMs/1000));
+          const d = Math.floor(sec/86400);
+          const h = Math.floor((sec%86400)/3600);
+          const m = Math.floor((sec%3600)/60);
+          const s = sec%60;
+          return `T+ ${d>0? d+'d':'0d'} ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+        }
         const sec = Math.floor(diffMs/1000);
         const d = Math.floor(sec/86400);
         const h = Math.floor((sec%86400)/3600);
         const m = Math.floor((sec%3600)/60);
         const s = sec%60;
-        return `${d>0? d+'d':'0d'} ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+        return `T- ${d>0? d+'d':'0d'} ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
       }
       function tick(){
         const now = new Date();
         nodes.forEach(el=>{
           const target = new Date(el.getAttribute('data-countdown-dt'));
-          el.textContent = 'T- ' + fmt(target - now);
+          el.textContent = fmt(target - now);
         });
       }
       tick();
@@ -396,8 +403,8 @@
       goal.innerHTML = `<span class="goal-dot"></span> Ventana objetivo: ${formatGoalWindow(ev.datetimeISO)} (España)`;
       countdown.setAttribute('data-countdown-dt', ev.datetimeISO);
 
-      // Solo para este evento específico
-      if (ev.id === "neutron-2025-10-03") {
+      // Mostrar ficha detallada para los dos eventos (3 y 4 de octubre)
+      if (["neutron-2025-10-03","neutron-2025-10-04"].includes(ev.id)) {
         const fecha = `${formatLongDate(ev.datetimeISO)} (hora de España)`;
         info.innerHTML = `
           <div><b>Misión:</b> ${ev.mission}</div>
