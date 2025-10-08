@@ -383,6 +383,21 @@ const firebaseConfig = {
     const database = firebase.database();
 
     let currentUser = null;
+  const SESSION_KEY = 'esz_user';
+
+  function hydrateSessionFromStorage(){
+    const saved = localStorage.getItem(SESSION_KEY);
+    currentUser = (saved && saved.trim()) ? saved : null;
+    checkAuth();
+  }
+
+  // Keep multiple tabs/pages in sync
+  window.addEventListener('storage', (e) => {
+    if (e.key === SESSION_KEY) {
+      hydrateSessionFromStorage();
+    }
+  });
+
     let allUsers = {};
 
     async function loadUsers() {
@@ -464,6 +479,9 @@ const firebaseConfig = {
       
       if (allUsers[username] && allUsers[username] === password) {
         currentUser = username;
+    localStorage.setItem(SESSION_KEY, currentUser);
+    checkAuth();
+
         checkAuth();
         closeAuthModal();
       } else {
@@ -483,7 +501,12 @@ const firebaseConfig = {
       if (allUsers[username]) {
         document.getElementById('register-username-error').classList.add('show');
         return;
-      }
+      
+  currentUser = username;
+  localStorage.setItem(SESSION_KEY, currentUser);
+  checkAuth();
+}
+
       
       const saved = await saveUser(username, password);
       
@@ -501,6 +524,8 @@ const firebaseConfig = {
 
     function logout() {
       currentUser = null;
+  localStorage.removeItem(SESSION_KEY);
+  checkAuth();
       checkAuth();
     }
 
@@ -509,7 +534,7 @@ const firebaseConfig = {
       document.getElementById("year").textContent = new Date().getFullYear();
       
       await loadUsers();
-      checkAuth();
+      hydrateSessionFromStorage();
 
       // Marca activo
       const path = location.pathname.split("/").pop() || "index.html";

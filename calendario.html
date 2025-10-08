@@ -397,6 +397,21 @@ const firebaseConfig = {
 
     // Sistema de autenticación
     let currentUser = null;
+  const SESSION_KEY = 'esz_user';
+
+  function hydrateSessionFromStorage(){
+    const saved = localStorage.getItem(SESSION_KEY);
+    currentUser = (saved && saved.trim()) ? saved : null;
+    checkAuth();
+  }
+
+  // Keep multiple tabs/pages in sync
+  window.addEventListener('storage', (e) => {
+    if (e.key === SESSION_KEY) {
+      hydrateSessionFromStorage();
+    }
+  });
+
     let allUsers = {};
 
     // Cargar usuarios desde Firebase Realtime Database
@@ -486,6 +501,9 @@ const firebaseConfig = {
       
       if (allUsers[username] && allUsers[username] === password) {
         currentUser = username;
+    localStorage.setItem(SESSION_KEY, currentUser);
+    checkAuth();
+
         checkAuth();
         closeAuthModal();
       } else {
@@ -507,7 +525,12 @@ const firebaseConfig = {
       if (allUsers[username]) {
         document.getElementById('register-username-error').classList.add('show');
         return;
-      }
+      
+  currentUser = username;
+  localStorage.setItem(SESSION_KEY, currentUser);
+  checkAuth();
+}
+
       
       // Guardar usuario en Firebase
       const saved = await saveUser(username, password);
@@ -528,13 +551,15 @@ const firebaseConfig = {
 
     function logout() {
       currentUser = null;
+  localStorage.removeItem(SESSION_KEY);
+  checkAuth();
       checkAuth();
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
       document.body.classList.add("fade-in");
       await loadUsers();
-      checkAuth();
+      hydrateSessionFromStorage();
     });
 
     const monthLabel = document.getElementById('monthLabel');
