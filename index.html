@@ -3,9 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EsZunSpace — Responsive</title>
+  <title>EsZunSpace – Responsive</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="logoarriba.jpg">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  
   <style>
     :root {
       --bg-image: url('background.jpg');
@@ -81,6 +86,37 @@
     .menu a[aria-current="page"]{opacity:1}
     .menu a[aria-current="page"]::after{ transform:scaleX(1); }
 
+    /* User section */
+    .user-section{display:flex; align-items:center; gap:10px;}
+    .user-info{
+      display:flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:10px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+    }
+    .user-avatar{
+      width:28px; height:28px; border-radius:50%;
+      background:linear-gradient(135deg, #00f0ff, #ff00d4);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:12px;
+    }
+    .user-name{font-weight:600; font-size:13px;}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      height:32px; min-width:32px; padding:0 10px; border-radius:10px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+      color:#fff; cursor:pointer; user-select:none;
+      transition:transform .15s ease, background .2s ease, border-color .2s ease;
+      text-decoration:none; gap:8px; font-family:inherit; font-size:13px;
+    }
+    .btn:hover{transform:translateY(-1px); background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3)}
+    .btn.primary{
+      border:0;
+      background: linear-gradient(90deg, #00f0ff, #ff00d4);
+      font-weight:700;
+      box-shadow:0 8px 24px rgba(0,0,0,.35);
+    }
+    .btn.ghost{ background:rgba(255,255,255,.06); }
+
     /* ===== Hero ===== */
     .hero {
       position: relative; min-height: 100svh;
@@ -139,6 +175,62 @@
 
     footer{ position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:12px; opacity:.85; }
 
+    /* Modal */
+    .modal-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 18px;
+    }
+    .modal-overlay.show{ display:flex; }
+    .modal-card{
+      width:min(680px, 96vw);
+      border-radius:18px;
+      background: radial-gradient(1200px 1200px at -10% -20%, rgba(0,240,255,.08), transparent 35%) , #111113;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: 0 28px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06);
+      padding:18px 18px 16px;
+    }
+    .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .modal-title{ margin:0; font-family:'Space Grotesk', system-ui, sans-serif; font-size:1.15rem; letter-spacing:.2px; font-weight:700; }
+
+    .login-form{
+      display:flex; flex-direction:column; gap:16px; margin-top:20px;
+    }
+    .form-group{display:flex; flex-direction:column; gap:6px;}
+    .form-group label{font-weight:600; font-size:14px;}
+    .form-group input{
+      padding:12px 14px; border-radius:10px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+      color:#fff; font-size:14px; font-family:inherit;
+      transition:border-color .2s ease, background .2s ease;
+    }
+    .form-group input:focus{
+      outline:none; border-color:#00f0ff;
+      background:rgba(255,255,255,.08);
+    }
+    .error-msg{
+      color:#ff6b6b; font-size:13px; margin-top:4px; display:none;
+    }
+    .error-msg.show{display:block;}
+    .success-msg{
+      color:#51cf66; font-size:13px; margin-top:4px; display:none;
+    }
+    .success-msg.show{display:block;}
+    .toggle-form{
+      text-align:center; margin-top:16px; color:rgba(255,255,255,.72); font-size:14px;
+    }
+    .toggle-form a{
+      color:#00f0ff; text-decoration:none; font-weight:600;
+      transition:opacity .2s ease;
+    }
+    .toggle-form a:hover{opacity:.8}
+    .modal-actions{ display:flex; gap:10px; justify-content:flex-end; }
+
     /* =========================
        Responsive
        ========================= */
@@ -165,6 +257,7 @@
       }
       .menu a::after{ display:none; }
       .brand .title{ font-size:16px; }
+      .user-section{ display:none; }
     }
 
     @media (hover:none){
@@ -188,7 +281,6 @@
 
       <!-- Toggle sólo visible en móvil -->
       <button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false" aria-label="Abrir menú">
-        <!-- simple icono hamburguesa -->
         <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
@@ -198,9 +290,20 @@
         <a href="calendario.html">Calendario</a>
         <a href="cohetes.html">Cohetes</a>
         <a href="motores.html">Motores</a>
-        <a href="#">Satélites</a>
-        <a href="#">Lanzamientos</a>
+        <a href="satelites.html">Satélites</a>
+        <a href="lanzamientos.html">Lanzamientos</a>
       </nav>
+
+      <div class="user-section">
+        <div id="user-display" style="display:none;">
+          <div class="user-info">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <span class="user-name" id="user-name">Usuario</span>
+          </div>
+          <button class="btn ghost" onclick="logout()">Salir</button>
+        </div>
+        <button id="login-btn" class="btn primary" onclick="showLoginModal()">Iniciar sesión</button>
+      </div>
     </div>
   </header>
 
@@ -208,13 +311,205 @@
     <div class="bg" role="img" aria-label="Fondo espacial"></div>
     <div class="overlay" aria-hidden="true"></div>
     <h1 class="brand-name">EsZunSpace</h1>
-    <footer>© <span id="year"></span> EsZunSpace — Todos los derechos reservados</footer>
+    <footer>© <span id="year"></span> EsZunSpace – Todos los derechos reservados</footer>
   </main>
 
+  <!-- Login/Register Modal -->
+  <div id="auth-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h3 id="auth-modal-title" class="modal-title">Iniciar sesión</h3>
+        <button class="btn ghost" onclick="closeAuthModal()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-username">Usuario</label>
+          <input type="text" id="login-username" name="username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" name="password" required autocomplete="current-password">
+          <div id="login-error" class="error-msg">Usuario o contraseña incorrectos</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Entrar</button>
+          <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+        </div>
+        <div class="toggle-form">
+          ¿No tienes cuenta? <a href="#" onclick="showRegisterForm(event)">Crear cuenta</a>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="login-form" style="display:none;" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="register-username">Usuario</label>
+          <input type="text" id="register-username" name="username" required autocomplete="username">
+          <div id="register-username-error" class="error-msg">Este nombre de usuario ya está en uso</div>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Contraseña</label>
+          <input type="password" id="register-password" name="password" required autocomplete="new-password" minlength="6">
+          <div id="register-error" class="error-msg">Error al crear la cuenta</div>
+          <div id="register-success" class="success-msg">¡Cuenta creada! Iniciando sesión...</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Crear cuenta</button>
+          <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+        </div>
+        <div class="toggle-form">
+          ¿Ya tienes cuenta? <a href="#" onclick="showLoginForm(event)">Iniciar sesión</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    // ===== CONFIGURACIÓN DE FIREBASE =====
+const firebaseConfig = {
+  apiKey: "AIzaSyDKvGLsd1jKfsSlzgTjBas-8WvbFqV1xU",
+  authDomain: "eszunspace-bc900.firebaseapp.com",
+  databaseURL: "https://eszunspace-bc900-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "eszunspace-bc900",
+  storageBucket: "eszunspace-bc900.firebasestorage.app",
+  messagingSenderId: "105651684829",
+  appId: "1:105651684829:web:5c8fd5051c8c2daf24f744",
+  measurementId: "G-ZDM5GF0MBW"
+};
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let currentUser = null;
+    let allUsers = {};
+
+    async function loadUsers() {
+      try {
+        const snapshot = await database.ref('users').once('value');
+        allUsers = snapshot.val() || {};
+      } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        allUsers = {};
+      }
+    }
+
+    async function saveUser(username, password) {
+      try {
+        const snapshot = await database.ref('users/' + username).once('value');
+        if (snapshot.exists()) {
+          return false;
+        }
+        await database.ref('users/' + username).set(password);
+        allUsers[username] = password;
+        return true;
+      } catch (error) {
+        console.error('Error al guardar usuario:', error);
+        return false;
+      }
+    }
+
+    function checkAuth() {
+      if (currentUser) {
+        document.getElementById('login-btn').style.display = 'none';
+        document.getElementById('user-display').style.display = 'flex';
+        document.getElementById('user-name').textContent = currentUser;
+        document.getElementById('user-avatar').textContent = currentUser.charAt(0).toUpperCase();
+      } else {
+        document.getElementById('login-btn').style.display = 'inline-flex';
+        document.getElementById('user-display').style.display = 'none';
+      }
+    }
+
+    function showLoginModal() {
+      showLoginForm();
+      document.getElementById('auth-modal-overlay').classList.add('show');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal-overlay').classList.remove('show');
+      document.getElementById('login-error').classList.remove('show');
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+    }
+
+    function showLoginForm(e) {
+      if (e) e.preventDefault();
+      document.getElementById('auth-modal-title').textContent = 'Iniciar sesión';
+      document.getElementById('login-form').style.display = 'flex';
+      document.getElementById('register-form').style.display = 'none';
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+      document.getElementById('login-error').classList.remove('show');
+    }
+
+    function showRegisterForm(e) {
+      if (e) e.preventDefault();
+      document.getElementById('auth-modal-title').textContent = 'Crear cuenta';
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('register-form').style.display = 'flex';
+      document.getElementById('register-username').value = '';
+      document.getElementById('register-password').value = '';
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      
+      if (allUsers[username] && allUsers[username] === password) {
+        currentUser = username;
+        checkAuth();
+        closeAuthModal();
+      } else {
+        document.getElementById('login-error').classList.add('show');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('register-username').value.trim();
+      const password = document.getElementById('register-password').value;
+      
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+      
+      if (allUsers[username]) {
+        document.getElementById('register-username-error').classList.add('show');
+        return;
+      }
+      
+      const saved = await saveUser(username, password);
+      
+      if (saved) {
+        document.getElementById('register-success').classList.add('show');
+        setTimeout(() => {
+          currentUser = username;
+          checkAuth();
+          closeAuthModal();
+        }, 1500);
+      } else {
+        document.getElementById('register-error').classList.add('show');
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      checkAuth();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
       document.body.classList.add("fade-in");
       document.getElementById("year").textContent = new Date().getFullYear();
+      
+      await loadUsers();
+      checkAuth();
 
       // Marca activo
       const path = location.pathname.split("/").pop() || "index.html";
@@ -231,7 +526,6 @@
         if(url.origin === location.origin && !link.target){
           link.addEventListener("click", e=>{
             if(url.pathname === location.pathname && url.hash) return;
-            // Si el menú está abierto en móvil, cerrar primero sin fade-out de página
             const menu = document.querySelector('.menu');
             if(menu && menu.classList.contains('open')) return;
             e.preventDefault();
@@ -250,18 +544,15 @@
         toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
       }
       toggle.addEventListener('click', ()=> setOpen(!menu.classList.contains('open')));
-      // Cerrar al pulsar un enlace
       menu.addEventListener('click', (e)=>{
         if(e.target.closest('a')) setOpen(false);
       });
-      // Cerrar al pulsar fuera
       document.addEventListener('click', (e)=>{
         if(menu.classList.contains('open')){
           const within = e.target.closest('.nav-shell');
           if(!within) setOpen(false);
         }
       });
-      // Cerrar con Escape
       document.addEventListener('keydown', (e)=>{
         if(e.key === 'Escape') setOpen(false);
       });
