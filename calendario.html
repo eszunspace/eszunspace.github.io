@@ -3,9 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EsZunSpace — Calendario</title>
+  <title>EsZunSpace – Calendario</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/jpeg" href="logoarriba.jpg">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  
   <style>
     :root{
       --glass1: rgba(255,255,255,.07);
@@ -49,7 +53,6 @@
       filter:blur(22px); opacity:.14; pointer-events:none;
     }
     .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff;}
-    .brand img{height:36px; width:36px; border-radius:50%;}
     .brand .title{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:800; letter-spacing:.02em;}
     .menu{display:flex; align-items:center; gap:18px}
     .menu a{
@@ -67,6 +70,20 @@
     .menu a:hover::after{transform:scaleX(1)}
     .menu a[aria-current="page"]{opacity:1}
     .menu a[aria-current="page"]::after{transform:scaleX(1)}
+
+    .user-section{display:flex; align-items:center; gap:10px;}
+    .user-info{
+      display:flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:10px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+    }
+    .user-avatar{
+      width:28px; height:28px; border-radius:50%;
+      background:linear-gradient(135deg, var(--accent1), var(--accent2));
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:12px;
+    }
+    .user-name{font-weight:600; font-size:13px;}
 
     main{max-width:1200px; width:92vw; margin:28px auto 64px}
     .cal-header{
@@ -130,7 +147,6 @@
       border-color:rgba(0,240,255,.35);
     }
     .day .events{ position:absolute; inset:38px 10px 10px 10px; display:flex; flex-direction:column; gap:6px; }
-    .dot{width:8px; height:8px; border-radius:50%; background:linear-gradient(90deg,var(--accent1),var(--accent2))}
 
     .event-mini-card{
       display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -153,6 +169,7 @@
       .day{height:90px}
       .weekday-row{gap:10px}
       .grid{gap:10px}
+      .menu{display:none;}
     }
 
     /* Modal */
@@ -203,22 +220,64 @@
       border-radius:12px; padding:12px 14px;
     }
     .modal-info b{ font-weight:700; }
+
+    /* Login/Register Modal */
+    .login-form{
+      display:flex; flex-direction:column; gap:16px; margin-top:20px;
+    }
+    .form-group{display:flex; flex-direction:column; gap:6px;}
+    .form-group label{font-weight:600; font-size:14px;}
+    .form-group input{
+      padding:12px 14px; border-radius:10px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
+      color:var(--fg); font-size:14px; font-family:inherit;
+      transition:border-color .2s ease, background .2s ease;
+    }
+    .form-group input:focus{
+      outline:none; border-color:var(--accent1);
+      background:rgba(255,255,255,.08);
+    }
+    .error-msg{
+      color:#ff6b6b; font-size:13px; margin-top:4px; display:none;
+    }
+    .error-msg.show{display:block;}
+    .success-msg{
+      color:#51cf66; font-size:13px; margin-top:4px; display:none;
+    }
+    .success-msg.show{display:block;}
+    .toggle-form{
+      text-align:center; margin-top:16px; color:var(--muted); font-size:14px;
+    }
+    .toggle-form a{
+      color:var(--accent1); text-decoration:none; font-weight:600;
+      transition:opacity .2s ease;
+    }
+    .toggle-form a:hover{opacity:.8}
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="nav-shell">
-      <a class="brand" href="index.html" aria-label="Ir a inicio">
-        <img src="logoarriba.jpg" alt="">
+      <a class="brand" href="#" aria-label="Ir a inicio">
         <span class="title">EsZunSpace</span>
       </a>
       <nav class="menu">
-        <a href="calendario.html">Calendario</a>
-        <a href="cohetes.html">Cohetes</a>
-        <a href="motores.html">Motores</a>
+        <a href="#" aria-current="page">Calendario</a>
+        <a href="#">Cohetes</a>
+        <a href="#">Motores</a>
         <a href="#">Satélites</a>
         <a href="#">Lanzamientos</a>
       </nav>
+      <div class="user-section">
+        <div id="user-display" style="display:none;">
+          <div class="user-info">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <span class="user-name" id="user-name">Usuario</span>
+          </div>
+          <button class="btn ghost" onclick="logout()">Salir</button>
+        </div>
+        <button id="login-btn" class="btn primary" onclick="showLoginModal()">Iniciar sesión</button>
+      </div>
     </div>
   </header>
 
@@ -239,23 +298,243 @@
     <section class="grid" id="grid" role="grid" aria-label="Calendario mensual"></section>
   </main>
 
+  <!-- Login/Register Modal -->
+  <div id="auth-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h3 id="auth-modal-title" class="modal-title">Iniciar sesión</h3>
+        <button class="btn ghost" onclick="closeAuthModal()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-username">Usuario</label>
+          <input type="text" id="login-username" name="username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" name="password" required autocomplete="current-password">
+          <div id="login-error" class="error-msg">Usuario o contraseña incorrectos</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Entrar</button>
+          <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+        </div>
+        <div class="toggle-form">
+          ¿No tienes cuenta? <a href="#" onclick="showRegisterForm(event)">Crear cuenta</a>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="login-form" style="display:none;" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="register-username">Usuario</label>
+          <input type="text" id="register-username" name="username" required autocomplete="username">
+          <div id="register-username-error" class="error-msg">Este nombre de usuario ya está en uso</div>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Contraseña</label>
+          <input type="password" id="register-password" name="password" required autocomplete="new-password" minlength="6">
+          <div id="register-error" class="error-msg">Error al crear la cuenta</div>
+          <div id="register-success" class="success-msg">¡Cuenta creada! Iniciando sesión...</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Crear cuenta</button>
+          <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+        </div>
+        <div class="toggle-form">
+          ¿Ya tienes cuenta? <a href="#" onclick="showLoginForm(event)">Iniciar sesión</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Event Modal -->
+  <div id="event-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h3 id="modal-title" class="modal-title">Cohete – Lanzamiento</h3>
+        <button class="btn ghost" onclick="closeEventModal()" aria-label="Cerrar">Cerrar</button>
+      </div>
+
+      <div id="modal-goal" class="goal-pill">
+        <span class="goal-dot"></span>
+        Ventana objetivo: —
+      </div>
+
+      <div class="countdown-hero"><span id="modal-countdown" data-countdown-dt=""></span></div>
+
+      <div id="modal-info" class="modal-info"></div>
+      <div id="modal-desc" class="modal-desc"></div>
+
+      <div class="timezone-note">La cuenta atrás se basa en la hora de <strong>Europa/Madrid</strong>.</div>
+
+      <div class="modal-actions">
+        <a id="modal-watch" class="btn primary" href="#" target="_blank" rel="noopener noreferrer">Ver transmisión</a>
+        <button class="btn ghost" onclick="closeEventModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      document.body.classList.add("fade-in");
-      const path = location.pathname.split("/").pop() || "calendario.html";
-      document.querySelectorAll(".menu a").forEach(a=>{
-        if(a.getAttribute("href")===path) a.setAttribute("aria-current","page");
-      });
-      document.querySelectorAll('a[href]').forEach(link=>{
-        const url = new URL(link.href, location.href);
-        if(url.origin===location.origin && !link.target){
-          link.addEventListener("click", e=>{
-            if(url.pathname===location.pathname && url.hash) return;
-            e.preventDefault(); document.body.classList.add("fade-out");
-            setTimeout(()=> location.href=url.href, 600);
-          });
+    // ===== CONFIGURACIÓN DE FIREBASE =====
+    // ⚠️ IMPORTANTE: Reemplaza estos valores con los de tu proyecto Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDKvGLsd1jKfsSlzgTjBas-8WvbFqV1xU",
+  authDomain: "eszunspace-bc900.firebaseapp.com",
+  databaseURL: "https://eszunspace-bc900-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "eszunspace-bc900",
+  storageBucket: "eszunspace-bc900.firebasestorage.app",
+  messagingSenderId: "105651684829",
+  appId: "1:105651684829:web:5c8fd5051c8c2daf24f744",
+  measurementId: "G-ZDM5GF0MBW"
+};
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Sistema de autenticación
+    let currentUser = null;
+    let allUsers = {};
+
+    // Cargar usuarios desde Firebase Realtime Database
+    async function loadUsers() {
+      try {
+        const snapshot = await database.ref('users').once('value');
+        allUsers = snapshot.val() || {};
+        console.log('Usuarios cargados desde Firebase:', Object.keys(allUsers).length);
+      } catch (error) {
+        console.error('Error al cargar usuarios desde Firebase:', error);
+        allUsers = {};
+      }
+    }
+
+    // Guardar nuevo usuario en Firebase
+    async function saveUser(username, password) {
+      try {
+        // Verificar si el usuario ya existe
+        const snapshot = await database.ref('users/' + username).once('value');
+        if (snapshot.exists()) {
+          console.log('Usuario ya existe:', username);
+          return false;
         }
-      });
+
+        // Guardar nuevo usuario en Firebase
+        await database.ref('users/' + username).set(password);
+        allUsers[username] = password;
+        console.log('Usuario guardado en Firebase:', username);
+        return true;
+      } catch (error) {
+        console.error('Error al guardar usuario en Firebase:', error);
+        return false;
+      }
+    }
+
+    function checkAuth() {
+      if (currentUser) {
+        document.getElementById('login-btn').style.display = 'none';
+        document.getElementById('user-display').style.display = 'flex';
+        document.getElementById('user-name').textContent = currentUser;
+        document.getElementById('user-avatar').textContent = currentUser.charAt(0).toUpperCase();
+      } else {
+        document.getElementById('login-btn').style.display = 'inline-flex';
+        document.getElementById('user-display').style.display = 'none';
+      }
+    }
+
+    function showLoginModal() {
+      showLoginForm();
+      document.getElementById('auth-modal-overlay').classList.add('show');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal-overlay').classList.remove('show');
+      document.getElementById('login-error').classList.remove('show');
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+    }
+
+    function showLoginForm(e) {
+      if (e) e.preventDefault();
+      document.getElementById('auth-modal-title').textContent = 'Iniciar sesión';
+      document.getElementById('login-form').style.display = 'flex';
+      document.getElementById('register-form').style.display = 'none';
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+      document.getElementById('login-error').classList.remove('show');
+    }
+
+    function showRegisterForm(e) {
+      if (e) e.preventDefault();
+      document.getElementById('auth-modal-title').textContent = 'Crear cuenta';
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('register-form').style.display = 'flex';
+      document.getElementById('register-username').value = '';
+      document.getElementById('register-password').value = '';
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      
+      if (allUsers[username] && allUsers[username] === password) {
+        currentUser = username;
+        checkAuth();
+        closeAuthModal();
+      } else {
+        document.getElementById('login-error').classList.add('show');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('register-username').value.trim();
+      const password = document.getElementById('register-password').value;
+      
+      // Limpiar mensajes anteriores
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+      
+      // Validar que el usuario no exista
+      if (allUsers[username]) {
+        document.getElementById('register-username-error').classList.add('show');
+        return;
+      }
+      
+      // Guardar usuario en Firebase
+      const saved = await saveUser(username, password);
+      
+      if (saved) {
+        document.getElementById('register-success').classList.add('show');
+        
+        // Iniciar sesión automáticamente después de 1.5 segundos
+        setTimeout(() => {
+          currentUser = username;
+          checkAuth();
+          closeAuthModal();
+        }, 1500);
+      } else {
+        document.getElementById('register-error').classList.add('show');
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      checkAuth();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      document.body.classList.add("fade-in");
+      await loadUsers();
+      checkAuth();
     });
 
     const monthLabel = document.getElementById('monthLabel');
@@ -266,9 +545,9 @@
     const EVENTS = [
       {
         id: "neutron-2025-10-04",
-        title: "Cohete Neutron — Lanzamiento",
+        title: "Cohete Neutron – Lanzamiento",
         vehicle: "Neutron",
-        datetimeISO: "2025-10-04T23:00:00+02:00", // CEST
+        datetimeISO: "2025-10-04T23:00:00+02:00",
         streamUrl: "https://youtu.be/vCODD_Nc400",
         description: "Este evento corresponde al lanzamiento del Neutron. La cuenta atrás se basa en la hora de Europa/Madrid.",
         mission: "Neutron Snipex-1 Launch",
@@ -282,6 +561,7 @@
     function sameDay(a, b){
       return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
     }
+    
     function startCountdowns(){
       const nodes = document.querySelectorAll('[data-countdown-dt]');
       function fmt(diffMs){
@@ -386,9 +666,9 @@
     function formatLongDate(dtISO){
       const dt = new Date(dtISO);
       const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' };
-      let s = dt.toLocaleString('es-ES', opts); // e.g., viernes, 3 de octubre de 2025, 23:00
+      let s = dt.toLocaleString('es-ES', opts);
       s = s.replace(/^\w/, c=>c.toLowerCase());
-      return capitalizarPrimera(s); // "Viernes 3 de octubre de 2025, 23:00"
+      return capitalizarPrimera(s);
     }
     function openEventModal(ev){
       const overlay = document.getElementById('event-modal-overlay');
@@ -403,7 +683,6 @@
       goal.innerHTML = `<span class="goal-dot"></span> Ventana objetivo: ${formatGoalWindow(ev.datetimeISO)} (España)`;
       countdown.setAttribute('data-countdown-dt', ev.datetimeISO);
 
-      // Mostrar ficha detallada para los dos eventos (3 y 4 de octubre)
       if (["neutron-2025-10-03","neutron-2025-10-04"].includes(ev.id)) {
         const fecha = `${formatLongDate(ev.datetimeISO)} (hora de España)`;
         info.innerHTML = `
@@ -435,31 +714,5 @@
       overlay.setAttribute('aria-hidden','true');
     }
   </script>
-
-  <div id="event-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal-card" role="document">
-      <div class="modal-head">
-        <h3 id="modal-title" class="modal-title">Cohete — Lanzamiento</h3>
-        <button class="btn ghost" onclick="closeEventModal()" aria-label="Cerrar">Cerrar</button>
-      </div>
-
-      <div id="modal-goal" class="goal-pill">
-        <span class="goal-dot"></span>
-        Ventana objetivo: —
-      </div>
-
-      <div class="countdown-hero"><span id="modal-countdown" data-countdown-dt=""></span></div>
-
-      <div id="modal-info" class="modal-info"></div>
-      <div id="modal-desc" class="modal-desc"></div>
-
-      <div class="timezone-note">La cuenta atrás se basa en la hora de <strong>Europa/Madrid</strong>.</div>
-
-      <div class="modal-actions">
-        <a id="modal-watch" class="btn primary" href="#" target="_blank" rel="noopener noreferrer">Ver transmisión</a>
-        <button class="btn ghost" onclick="closeEventModal()">Cerrar</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
