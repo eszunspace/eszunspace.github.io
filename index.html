@@ -834,5 +834,48 @@
       });
     });
   </script>
+
+  <!-- 🔒 Protección reforzada anti-inspección -->
+  <script>
+  (function(){
+    // Bloquear clic derecho
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Bloquear combinaciones de teclas comunes
+    document.addEventListener('keydown', e => {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'U')
+      ) e.preventDefault();
+    });
+
+    // Bloquear selección de texto y arrastre de imágenes
+    document.addEventListener('selectstart', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+
+    // Detección básica de DevTools abiertos
+    function detectDevTools(){
+      const threshold = 160;
+      if (window.outerWidth - window.innerWidth > threshold ||
+          window.outerHeight - window.innerHeight > threshold){
+        alert('⚠️ Herramientas de desarrollador detectadas. Cierre la consola.');
+        location.reload();
+      }
+    }
+    setInterval(detectDevTools, 1000);
+
+    // Intento adicional: detectar debugger
+    setInterval(()=>{
+      const start = performance.now();
+      debugger;
+      if (performance.now() - start > 50){
+        alert('⚠️ No se permite inspeccionar esta página.');
+        location.reload();
+      }
+    }, 1500);
+  })();
+  </script>
+
 </body>
 </html>
