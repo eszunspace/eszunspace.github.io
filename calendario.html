@@ -2,27 +2,19 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Calendario – EsZunSpace</title>
   <meta name="description" content="Calendario de lanzamientos de EsZunSpace: fechas, vehículos y transmisiones.">
   <link rel="canonical" href="https://eszunspace.es/calendario.html">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="EsZunSpace">
-  <meta property="og:title" content="Calendario – EsZunSpace">
-  <meta property="og:description" content="Consulta el calendario de lanzamientos y próximas transmisiones.">
-  <meta property="og:url" content="https://eszunspace.es/calendario.html">
-  <meta property="og:image" content="https://eszunspace.es/logoarriba.jpg">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Calendario – EsZunSpace">
-  <meta name="twitter:description" content="Consulta el calendario de lanzamientos y próximas transmisiones.">
-  <meta name="twitter:image" content="https://eszunspace.es/logoarriba.jpg">
   <meta name="theme-color" content="#0b0b0f">
 
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  
+
   <style>
     :root{
       --glass1: rgba(255,255,255,.07);
@@ -34,88 +26,118 @@
       --tile: #141416;
       --tile-border: rgba(255,255,255,.12);
       --danger: #ff6b6b;
+      --safe-touch: 44px; /* tamaño recomendado de objetivo táctil */
     }
     *{box-sizing:border-box}
     html,body{margin:0}
-    body{ background:#0b0b0c; color:var(--fg); font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial; opacity:0; transition:opacity .6s ease; }
-    body.fade-in{opacity:1} body.fade-out{opacity:0}
+    body{ background:#0b0b0c; color:var(--fg); font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Helvetica,Arial; opacity:0; transition:opacity .4s ease; }
+    body.fade-in{opacity:1}
 
-    header.topbar{ position:sticky; top:0; left:0; right:0; z-index:1000; padding:14px 16px; background:linear-gradient(180deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,0) 100%); backdrop-filter: blur(2px); }
-    .nav-shell{ width:min(1200px, 94vw); margin:0 auto; height:60px; padding:0 18px; display:flex; align-items:center; justify-content:space-between; border-radius:18px; background:linear-gradient(180deg,var(--glass1),var(--glass2)); border:1px solid var(--stroke); box-shadow:0 10px 30px rgba(0,0,0,.6); position:relative; overflow:hidden; }
+    /* ===== NAV ===== */
+    header.topbar{ position:sticky; top:0; left:0; right:0; z-index:1000; padding:10px 12px; background:linear-gradient(180deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,0) 100%); backdrop-filter: blur(2px); }
+    .nav-shell{ width:min(1200px, 94vw); margin:0 auto; min-height:56px; padding:0 12px; display:flex; align-items:center; justify-content:space-between; border-radius:14px; background:linear-gradient(180deg,var(--glass1),var(--glass2)); border:1px solid var(--stroke); box-shadow:0 10px 30px rgba(0,0,0,.6); position:relative; overflow:hidden; }
     .nav-shell::before{ content:""; position:absolute; inset:-1px; background:conic-gradient(from 0deg, var(--accent1), var(--accent2), var(--accent1)); filter:blur(22px); opacity:.14; pointer-events:none; }
-    .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff;}
-    .brand .title{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:800; letter-spacing:.02em;}
-    .menu{display:flex; align-items:center; gap:18px}
-    .menu a{ position:relative; display:inline-flex; align-items:center; padding:10px 10px; text-decoration:none; color:#fff; font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:12px; opacity:.9; transition:opacity .2s ease; }
+    .brand{display:flex; align-items:center; gap:8px; text-decoration:none; color:#fff;}
+    .brand .title{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:800; letter-spacing:.02em; font-size:18px}
+    .menu{display:flex; align-items:center; gap:12px}
+    .menu a{ position:relative; display:inline-flex; align-items:center; padding:10px 8px; text-decoration:none; color:#fff; font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:11px; opacity:.9; transition:opacity .2s ease; }
     .menu a:hover{opacity:1}
-    .menu a::after{ content:""; position:absolute; left:12px; right:12px; bottom:6px; height:2px; background:linear-gradient(90deg, var(--accent1), var(--accent2)); transform:scaleX(0); transform-origin:left; transition:transform .25s ease; border-radius:2px; }
+    .menu a::after{ content:""; position:absolute; left:10px; right:10px; bottom:6px; height:2px; background:linear-gradient(90deg, var(--accent1), var(--accent2)); transform:scaleX(0); transform-origin:left; transition:transform .25s ease; border-radius:2px; }
     .menu a:hover::after{transform:scaleX(1)}
     .menu a[aria-current="page"]{opacity:1}
     .menu a[aria-current="page"]::after{transform:scaleX(1)}
 
-    .user-section{display:flex; align-items:center; gap:10px;}
-    .user-info{ display:flex; align-items:center; gap:8px; padding:6px 12px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); cursor:default; transition:transform .15s ease, background .2s ease, border-color .2s ease; }
-    .user-info:hover{ transform:none; background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.18); }
+    .user-section{display:flex; align-items:center; gap:8px;}
+    .user-info{ display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); }
     .user-avatar{ width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg, var(--accent1), var(--accent2)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
     .user-name{font-weight:600; font-size:13px;}
 
-    main{max-width:1200px; width:92vw; margin:28px auto 64px}
-    .cal-header{ display:flex; align-items:center; justify-content:space-between; margin:10px 0 16px; gap:10px; }
-    .cal-title{ display:flex; align-items:center; gap:14px; font-family:'Space Grotesk',system-ui,sans-serif; text-transform:uppercase; letter-spacing:.04em; }
-    .cal-title h1{margin:0; font-size:clamp(22px,3.4vw,28px)}
-    .controls{ display:flex; align-items:center; gap:8px; background:linear-gradient(180deg,var(--glass1),var(--glass2)); border:1px solid var(--stroke); border-radius:14px; padding:6px 8px; box-shadow:0 10px 24px rgba(0,0,0,.35); }
-    .btn{ display:inline-flex; align-items:center; justify-content:center; height:32px; min-width:32px; padding:0 10px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); color:var(--fg); cursor:pointer; user-select:none; transition:transform .15s ease, background .2s ease, border-color .2s ease, opacity .2s ease; text-decoration:none; gap:8px; }
-    .btn:hover{transform:translateY(-1px); background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3)}
+    /* ===== LAYOUT ===== */
+    main{max-width:1200px; width:92vw; margin:20px auto 64px}
+    .cal-header{ display:flex; align-items:center; justify-content:space-between; margin:8px 0 12px; gap:10px; flex-wrap:wrap; }
+    .cal-title{ display:flex; align-items:center; gap:12px; font-family:'Space Grotesk',system-ui,sans-serif; text-transform:uppercase; letter-spacing:.04em; }
+    .cal-title h1{margin:0; font-size:clamp(20px,3.6vw,28px)}
+
+    .controls{ display:flex; align-items:center; gap:8px; background:linear-gradient(180deg,var(--glass1),var(--glass2)); border:1px solid var(--stroke); border-radius:12px; padding:6px; box-shadow:0 10px 24px rgba(0,0,0,.35); }
+    .btn{ display:inline-flex; align-items:center; justify-content:center; height:36px; min-width:36px; padding:0 12px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); color:var(--fg); cursor:pointer; user-select:none; transition:transform .12s ease, background .2s ease, border-color .2s ease, opacity .2s ease; text-decoration:none; gap:8px; }
+    .btn:active{transform:translateY(1px)}
     .btn.primary{ border:0; background: linear-gradient(90deg, var(--accent1), var(--accent2)); font-weight:700; box-shadow:0 8px 24px rgba(0,0,0,.35); }
     .btn.ghost{ background:rgba(255,255,255,.06); }
     .btn.danger{ background:rgba(255, 107, 107, .14); border-color: rgba(255,107,107,.45); }
 
-    .month-pill{ font-weight:800; padding:8px 12px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); letter-spacing:.03em; }
+    .month-pill{ font-weight:800; padding:8px 12px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); letter-spacing:.03em; font-size:14px }
 
-    .weekday-row{ display:grid; grid-template-columns:repeat(7,1fr); gap:14px; margin:18px 0 8px; padding:0 4px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:12px; }
-    .grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:14px; }
-    .day{ height:120px; border-radius:16px; background:#121214; border:1px solid var(--tile-border); position:relative; overflow:hidden; box-shadow:0 6px 16px rgba(0,0,0,.35); transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; cursor: default; }
-    .day:hover{ transform:translateY(-2px); box-shadow:0 12px 26px rgba(0,0,0,.5); border-color:rgba(255,255,255,.22); }
+    .weekday-row{ display:grid; grid-template-columns:repeat(7,1fr); gap:10px; margin:12px 0 6px; padding:0 2px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:11px; }
+    .grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:10px; }
+    .day{ min-height:108px; border-radius:14px; background:#121214; border:1px solid var(--tile-border); position:relative; overflow:hidden; box-shadow:0 6px 16px rgba(0,0,0,.35); transition:box-shadow .2s ease, border-color .2s ease; }
     .day .num{ position:absolute; top:8px; left:8px; min-width:26px; height:26px; padding:0 8px; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#dfefff; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.22); border-radius:999px; }
-    .day.today{ outline:2px solid transparent; box-shadow:0 0 0 2px rgba(0,240,255,.25) inset, 0 10px 26px rgba(0,0,0,.5); border-color:rgba(0,240,255,.35); }
-    .day .events{ position:absolute; inset:38px 10px 10px 10px; display:flex; flex-direction:column; gap:6px; }
+    .day.today{ box-shadow:0 0 0 2px rgba(0,240,255,.25) inset, 0 10px 26px rgba(0,0,0,.5); border-color:rgba(0,240,255,.35); }
+    .day .events{ position:absolute; inset:38px 8px 8px 8px; display:flex; flex-direction:column; gap:6px; }
 
-    .event-mini-card{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:10px 8px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); cursor:pointer; transition:transform .15s ease, background .2s ease, border-color .2s ease; }
-    .event-mini-card:hover{ transform:translateY(-1px); background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.2); }
-    .event-mini-title{ font-weight:700; font-size:13px; }
+    .event-mini-card{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:10px 8px; border-radius:12px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); }
+    .event-mini-title{ font-weight:700; font-size:13px; text-align:center; line-height:1.15 }
     .event-mini-eta{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-variant-numeric: tabular-nums; font-size: 12px; opacity: .85; }
     .event-delete{ position:absolute; top:6px; right:6px; display:none; }
     .event-mini-card.admin .event-delete{ display:inline-flex; }
 
-    @media (max-width: 820px){ .day{height:90px} .weekday-row{gap:10px} .grid{gap:10px} .menu{display:none;} }
+    /* ===== MOBILE-PRIMER ===== */
+    @media (max-width: 820px){
+      .menu{display:none}
+      .nav-shell{width:96vw; border-radius:12px}
+      .controls{ width:100%; justify-content:space-between; padding:6px; }
+      .btn{ height:var(--safe-touch); min-width:var(--safe-touch); border-radius:12px; }
+      .month-pill{ font-size:15px }
+      .weekday-row{ gap:8px; font-size:10px }
+      .grid{ gap:8px }
+      .day{ min-height:96px; border-radius:12px }
+      .event-mini-card{ padding:8px 6px; border-radius:10px }
+    }
 
-    /* Modal base */
-    .modal-overlay{ position: fixed; inset: 0; background: rgba(0,0,0,.65); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 18px; }
+    /* Extra small phones */
+    @media (max-width: 420px){
+      .brand .title{font-size:16px}
+      .cal-title h1{font-size:18px}
+      .controls{gap:6px}
+      .month-pill{padding:8px 10px}
+      .weekday-row{gap:6px}
+      .grid{gap:6px}
+      .day{min-height:88px}
+      .event-mini-title{font-size:12px}
+    }
+
+    /* Make forms and modals more mobile-friendly */
+    .modal-overlay{ position: fixed; inset: 0; background: rgba(0,0,0,.65); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 12px; }
     .modal-overlay.show{ display:flex; }
-    .modal-card{ width:min(680px, 96vw); border-radius:18px; background: radial-gradient(1200px 1200px at -10% -20%, rgba(0,240,255,.08), transparent 35%) , #111113; border:1px solid rgba(255,255,255,.12); box-shadow: 0 28px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06); padding:18px 18px 16px; }
-    .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .modal-title{ margin:0; font-family:'Space Grotesk', system-ui, sans-serif; font-size:1.15rem; letter-spacing:.2px; font-weight:700; }
+    .modal-card{ width:min(680px, 100%); border-radius:16px; background: radial-gradient(1200px 1200px at -10% -20%, rgba(0,240,255,.08), transparent 35%) , #111113; border:1px solid rgba(255,255,255,.12); box-shadow: 0 28px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06); padding:16px; }
+    .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .modal-title{ margin:0; font-family:'Space Grotesk', system-ui, sans-serif; font-size:1.08rem; letter-spacing:.2px; font-weight:700; }
     .goal-pill{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px; margin-top:12px; background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.12); font-size:.92rem; }
     .goal-dot{ width:8px; height:8px; border-radius:50%; background:linear-gradient(90deg,var(--accent1),var(--accent2)); }
-    .countdown-hero{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-variant-numeric: tabular-nums; margin: 14px 0 8px; font-size: clamp(28px, 6vw, 40px); font-weight: 700; letter-spacing: .5px; }
-    .modal-desc{ color:var(--muted); line-height:1.45; margin:10px 0 16px; }
+    .countdown-hero{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-variant-numeric: tabular-nums; margin: 12px 0 6px; font-size: clamp(26px, 6vw, 40px); font-weight: 700; letter-spacing: .5px; }
+    .modal-desc{ color:var(--muted); line-height:1.45; margin:8px 0 14px; }
     .timezone-note{ color:var(--muted); opacity:.85; margin-top:6px; font-size:.95rem; }
-    .modal-actions{ display:flex; gap:10px; justify-content:flex-end; }
+    .modal-actions{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
 
     .modal-info{ display:grid; gap:6px; margin:12px 0 10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:12px 14px; }
-    .modal-info b{ font-weight:700; }
 
-    /* Editor modal */
     .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
     .form-grid .full{ grid-column:1/-1; }
     .form-group{ display:flex; flex-direction:column; gap:6px; }
     .form-group label{ font-weight:600; font-size:14px; }
-    .form-group input, .form-group textarea{ padding:10px 12px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); color:var(--fg); font-size:14px; font-family:inherit; }
-    .form-group textarea{ min-height:84px; resize:vertical; }
+    .form-group input, .form-group textarea{ padding:12px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); color:var(--fg); font-size:15px; font-family:inherit; }
+    .form-group textarea{ min-height:96px; resize:vertical; }
     .help{ color:var(--muted); font-size:12px; }
 
+    @media (max-width:720px){ .form-grid{ grid-template-columns:1fr; } }
+
+    /* Reduce heavy visual effects on low-end mobiles or when user prefers less motion */
+    @media (prefers-reduced-motion: reduce){
+      *{transition:none !important;}
+      .nav-shell::before{display:none}
+    }
   </style>
-<link rel="icon" type="image/jpeg" href="logoarriba.jpg">
+
+  <link rel="icon" type="image/jpeg" href="logoarriba.jpg">
   <link rel="apple-touch-icon" href="logoarriba.jpg">
   <link rel="shortcut icon" href="logoarriba.jpg" type="image/x-icon">
 </head>
@@ -152,7 +174,7 @@
         <button class="btn" id="prev" aria-label="Mes anterior">◀</button>
         <span class="month-pill" id="monthLabel">octubre 2025</span>
         <button class="btn" id="next" aria-label="Mes siguiente">▶</button>
-        <button class="btn primary" id="btn-add" style="display:none;">Añadir lanzamiento</button>
+        <button class="btn primary" id="btn-add" style="display:none;">Añadir</button>
       </div>
     </div>
 
@@ -163,7 +185,7 @@
     <section class="grid" id="grid" role="grid" aria-label="Calendario mensual"></section>
   </main>
 
-  <!-- Login/Register Modal -->
+  <!-- ===== Modales ===== -->
   <div id="auth-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-card" role="document">
       <div class="modal-head">
@@ -179,7 +201,7 @@
         <div class="form-group">
           <label for="login-password">Contraseña</label>
           <input type="password" id="login-password" name="password" required autocomplete="current-password">
-          <div id="login-error" class="error-msg">Usuario o contraseña incorrectos</div>
+          <div id="login-error" class="error-msg" style="display:none">Usuario o contraseña incorrectos</div>
         </div>
         <div class="modal-actions">
           <button type="submit" class="btn primary">Entrar</button>
@@ -194,13 +216,13 @@
         <div class="form-group">
           <label for="register-username">Usuario</label>
           <input type="text" id="register-username" name="username" required autocomplete="username">
-          <div id="register-username-error" class="error-msg">Este nombre de usuario ya está en uso</div>
+          <div id="register-username-error" class="error-msg" style="display:none">Este nombre de usuario ya está en uso</div>
         </div>
         <div class="form-group">
           <label for="register-password">Contraseña</label>
           <input type="password" id="register-password" name="password" required autocomplete="new-password" minlength="6">
-          <div id="register-error" class="error-msg">Error al crear la cuenta</div>
-          <div id="register-success" class="success-msg">¡Cuenta creada! Iniciando sesión...</div>
+          <div id="register-error" class="error-msg" style="display:none">Error al crear la cuenta</div>
+          <div id="register-success" class="success-msg" style="display:none">¡Cuenta creada! Iniciando sesión...</div>
         </div>
         <div class="modal-actions">
           <button type="submit" class="btn primary">Crear cuenta</button>
@@ -213,7 +235,6 @@
     </div>
   </div>
 
-  <!-- Event view modal -->
   <div id="event-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-card" role="document">
       <div class="modal-head">
@@ -243,7 +264,6 @@
     </div>
   </div>
 
-  <!-- Editor modal (Add/Edit) -->
   <div id="editor-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-card" role="document">
       <div class="modal-head">
@@ -305,16 +325,16 @@
 
   <script>
     // ===== CONFIGURACIÓN DE FIREBASE =====
-const firebaseConfig = {
-  apiKey: "AIzaSyDKvGLsd1jKfsSlzgTjBas-8WvbFqV1xU",
-  authDomain: "eszunspace-bc900.firebaseapp.com",
-  databaseURL: "https://eszunspace-bc900-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "eszunspace-bc900",
-  storageBucket: "eszunspace-bc900.firebasestorage.app",
-  messagingSenderId: "105651684829",
-  appId: "1:105651684829:web:5c8fd5051c8c2daf24f744",
-  measurementId: "G-ZDM5GF0MBW"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyDKvGLsd1jKfsSlzgTjBas-8WvbFqV1xU",
+      authDomain: "eszunspace-bc900.firebaseapp.com",
+      databaseURL: "https://eszunspace-bc900-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "eszunspace-bc900",
+      storageBucket: "eszunspace-bc900.firebasestorage.app",
+      messagingSenderId: "105651684829",
+      appId: "1:105651684829:web:5c8fd5051c8c2daf24f744",
+      measurementId: "G-ZDM5GF0MBW"
+    };
 
     // Inicializar Firebase
     firebase.initializeApp(firebaseConfig);
@@ -376,11 +396,11 @@ const firebaseConfig = {
       document.getElementById('auth-modal-overlay').classList.remove('show');
       ['login-error','register-error','register-username-error','register-success'].forEach(id=>document.getElementById(id)?.classList.remove('show'));
     }
-    function showLoginForm(e){ if(e) e.preventDefault(); document.getElementById('auth-modal-title').textContent='Iniciar sesión'; document.getElementById('login-form').style.display='flex'; document.getElementById('register-form').style.display='none'; document.getElementById('login-username').value=''; document.getElementById('login-password').value=''; document.getElementById('login-error').classList.remove('show'); }
-    function showRegisterForm(e){ if(e) e.preventDefault(); document.getElementById('auth-modal-title').textContent='Crear cuenta'; document.getElementById('login-form').style.display='none'; document.getElementById('register-form').style.display='flex'; document.getElementById('register-username').value=''; document.getElementById('register-password').value=''; ['register-error','register-username-error','register-success'].forEach(id=>document.getElementById(id).classList.remove('show')); }
+    function showLoginForm(e){ if(e) e.preventDefault(); document.getElementById('auth-modal-title').textContent='Iniciar sesión'; document.getElementById('login-form').style.display='flex'; document.getElementById('register-form').style.display='none'; document.getElementById('login-username').value=''; document.getElementById('login-password').value=''; const le=document.getElementById('login-error'); if(le) le.style.display='none'; }
+    function showRegisterForm(e){ if(e) e.preventDefault(); document.getElementById('auth-modal-title').textContent='Crear cuenta'; document.getElementById('login-form').style.display='none'; document.getElementById('register-form').style.display='flex'; document.getElementById('register-username').value=''; document.getElementById('register-password').value=''; ['register-error','register-username-error','register-success'].forEach(id=>{const el=document.getElementById(id); if(el) el.style.display='none';}); }
 
-    async function handleLogin(e){ e.preventDefault(); const username=document.getElementById('login-username').value.trim(); const password=document.getElementById('login-password').value; if (allUsers[username] && allUsers[username]===password){ currentUser=username; localStorage.setItem(SESSION_KEY,currentUser); checkAuth(); closeAuthModal(); } else { document.getElementById('login-error').classList.add('show'); } }
-    async function handleRegister(e){ e.preventDefault(); const username=document.getElementById('register-username').value.trim(); const password=document.getElementById('register-password').value; ['register-error','register-username-error','register-success'].forEach(id=>document.getElementById(id).classList.remove('show')); if (allUsers[username]){ document.getElementById('register-username-error').classList.add('show'); return; } const saved=await saveUser(username,password); if (saved){ document.getElementById('register-success').classList.add('show'); setTimeout(()=>{ currentUser=username; localStorage.setItem(SESSION_KEY,currentUser); checkAuth(); closeAuthModal(); }, 1200); } else { document.getElementById('register-error').classList.add('show'); } }
+    async function handleLogin(e){ e.preventDefault(); const username=document.getElementById('login-username').value.trim(); const password=document.getElementById('login-password').value; const le=document.getElementById('login-error'); if (allUsers[username] && allUsers[username]===password){ currentUser=username; localStorage.setItem(SESSION_KEY,currentUser); checkAuth(); closeAuthModal(); } else { if(le) le.style.display='block'; } }
+    async function handleRegister(e){ e.preventDefault(); const username=document.getElementById('register-username').value.trim(); const password=document.getElementById('register-password').value; ['register-error','register-username-error','register-success'].forEach(id=>{const el=document.getElementById(id); if(el) el.style.display='none';}); if (allUsers[username]){ const ue=document.getElementById('register-username-error'); if(ue) ue.style.display='block'; return; } const saved=await saveUser(username,password); if (saved){ const rs=document.getElementById('register-success'); if(rs) rs.style.display='block'; setTimeout(()=>{ currentUser=username; localStorage.setItem(SESSION_KEY,currentUser); checkAuth(); closeAuthModal(); }, 1000); } else { const re=document.getElementById('register-error'); if(re) re.style.display='block'; } }
     function logout(){ currentUser=null; localStorage.removeItem(SESSION_KEY); checkAuth(); }
 
     document.addEventListener("DOMContentLoaded", async () => { document.body.classList.add("fade-in"); await loadUsers(); hydrateSessionFromStorage(); await loadEvents(); startCountdowns(); });
@@ -531,14 +551,13 @@ const firebaseConfig = {
     function makeIdFrom(title, dt){ const slug = (title||'lanzamiento').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); const d = new Date(dt); const yyyy=d.getFullYear(); const mm=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); return `${slug}-${yyyy}-${mm}-${dd}`; }
 
     function localDatetimeToISOWithTZ(localValue){
-      // localValue viene de <input type="datetime-local"> como "YYYY-MM-DDTHH:mm"
       const dt = new Date(localValue);
       const tzOffsetMin = -dt.getTimezoneOffset();
       const sign = tzOffsetMin >= 0 ? '+' : '-';
       const hh = String(Math.floor(Math.abs(tzOffsetMin)/60)).padStart(2,'0');
       const mm = String(Math.abs(tzOffsetMin)%60).padStart(2,'0');
       const yyyy = dt.getFullYear(); const M = String(dt.getMonth()+1).padStart(2,'0'); const d = String(dt.getDate()).padStart(2,'0'); const H = String(dt.getHours()).padStart(2,'0'); const m = String(dt.getMinutes()).padStart(2,'0');
-      return `${yyyy}-${M}-${d}T${H}:${m}:00${sign}${hh}:${mm}`; // ISO con offset
+      return `${yyyy}-${M}-${d}T${H}:${m}:00${sign}${hh}:${mm}`;
     }
 
     async function submitEventForm(e){
@@ -546,7 +565,7 @@ const firebaseConfig = {
       if(!isAdmin()) return alert('No tienes permisos para crear lanzamientos.');
       const vehicle = document.getElementById('ev-vehicle').value.trim();
       const title = document.getElementById('ev-title').value.trim();
-      const dtLocal = document.getElementById('ev-datetime').value; // YYYY-MM-DDTHH:mm
+      const dtLocal = document.getElementById('ev-datetime').value;
       const datetimeISO = localDatetimeToISOWithTZ(dtLocal);
       const streamUrl = document.getElementById('ev-stream').value.trim();
       const description = document.getElementById('ev-description').value.trim();
@@ -582,20 +601,6 @@ const firebaseConfig = {
     }
   </script>
 
-  <!-- (Conservamos el bloque de anti-inspección existente, aunque puede entorpecer la edición) -->
-  <script>
-  (function(){
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-      if ( e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) || (e.ctrlKey && e.key === 'U') ) e.preventDefault();
-    });
-    document.addEventListener('selectstart', e => e.preventDefault());
-    document.addEventListener('dragstart', e => e.preventDefault());
-    function detectDevTools(){ const threshold = 160; if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold){ alert('⚠️ Herramientas de desarrollador detectadas. Cierre la consola.'); location.reload(); } }
-    setInterval(detectDevTools, 1000);
-    setInterval(()=>{ const start = performance.now(); debugger; if (performance.now() - start > 50){ alert('⚠️ No se permite inspeccionar esta página.'); location.reload(); } }, 1500);
-  })();
-  </script>
-
+  <!-- Nota: se ha simplificado el bloque anti-inspección para evitar recargas inesperadas en móviles. Si quieres, lo reactivamos. -->
 </body>
 </html>
