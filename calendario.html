@@ -26,7 +26,7 @@
       --tile: #141416;
       --tile-border: rgba(255,255,255,.12);
       --danger: #ff6b6b;
-      --safe-touch: 44px; /* tamaño objetivo táctil */
+      --safe-touch: 44px;
     }
     *{box-sizing:border-box}
     html,body{margin:0}
@@ -93,7 +93,7 @@
     @media (max-width: 820px){
       .menu{display:none}
       .nav-shell{width:96vw; border-radius:12px}
-      .controls{ width:100%; justify-content:space-between; padding:6px; }
+      .controls{ width:100%; justify-content:space-between; padding:6px; flex-wrap:wrap; }
       .btn{ height:var(--safe-touch); min-width:var(--safe-touch); border-radius:12px; }
       .month-pill{ font-size:15px }
       .weekday-row{ gap:8px; font-size:10px }
@@ -146,11 +146,6 @@
       font-size:15px; font-family:inherit;
       -webkit-tap-highlight-color: transparent;
     }
-    .form-group select{
-      appearance:none; /* estiliza en iOS/Android/desktop */
-      background-image: linear-gradient(45deg, rgba(255,255,255,.7) 0 0);
-      background-size: 0 0; /* sin icono extra, simple */
-    }
     .form-group textarea{ min-height:96px; resize:vertical; }
     .help{ color:var(--muted); font-size:12px; }
 
@@ -163,6 +158,63 @@
     @media (prefers-reduced-motion: reduce){
       *{transition:none !important;}
       .nav-shell::before{display:none}
+    }
+
+    /* ===== Vista Agenda (móvil) ===== */
+    .view-toggle { display:flex; gap:6px; }
+    .view-toggle .btn[aria-selected="true"]{
+      background:linear-gradient(90deg, var(--accent1), var(--accent2));
+      border-color: transparent; font-weight:700;
+    }
+
+    .agenda{ display:none; }
+    .agenda.show{ display:block; }
+
+    .agenda-day{
+      margin:10px 0;
+      border:1px solid var(--tile-border);
+      border-radius:14px;
+      background:#121214;
+      box-shadow:0 6px 16px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .agenda-day-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px;
+      background:rgba(255,255,255,.05);
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-weight:700; letter-spacing:.02em;
+    }
+    .agenda-day-head .date{
+      display:flex; gap:8px; align-items:center;
+    }
+    .agenda-day-head .date .num{
+      width:28px; height:28px; border-radius:999px;
+      display:inline-flex; align-items:center; justify-content:center;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.22);
+      font-weight:800; font-size:12px; color:#dfefff;
+    }
+    .agenda-list{ padding:10px; display:grid; gap:10px; }
+    .agenda-card{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      border-radius:12px; padding:10px;
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .agenda-card-title{ font-weight:700; }
+    .agenda-card-meta{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; font-size:12px; opacity:.85; }
+    .agenda-card-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+    .agenda-card .btn{ min-width:auto; height:var(--safe-touch); }
+    .agenda-day.today .agenda-day-head{
+      box-shadow: inset 0 0 0 2px rgba(0,240,255,.25);
+      border-bottom-color: rgba(0,240,255,.35);
+    }
+
+    /* Responsive: en ≤ 600px, por defecto Agenda */
+    @media (max-width:600px){
+      .grid{ display:none !important; }
+      .agenda{ display:block; }
     }
   </style>
 
@@ -221,6 +273,13 @@
         <button class="btn" id="prev" aria-label="Mes anterior">◀</button>
         <span class="month-pill" id="monthLabel">octubre 2025</span>
         <button class="btn" id="next" aria-label="Mes siguiente">▶</button>
+
+        <!-- Conmutador de vista -->
+        <div class="view-toggle" role="tablist" aria-label="Cambiar vista">
+          <button class="btn ghost" id="viewMonth" role="tab" aria-selected="true">Mes</button>
+          <button class="btn ghost" id="viewAgenda" role="tab" aria-selected="false">Agenda</button>
+        </div>
+
         <button class="btn primary" id="btn-add" style="display:none;">Añadir</button>
       </div>
     </div>
@@ -230,6 +289,9 @@
     </div>
 
     <section class="grid" id="grid" role="grid" aria-label="Calendario mensual"></section>
+
+    <!-- Contenedor de Agenda -->
+    <section id="agenda" class="agenda" role="list" aria-label="Agenda mensual" hidden></section>
   </main>
 
   <!-- ===== Modales ===== -->
@@ -453,6 +515,7 @@
       }
       document.getElementById('btn-add').style.display = isAdmin() ? 'inline-flex' : 'none';
       render(); // re-render para mostrar controles admin
+      if (CURRENT_VIEW==='agenda') renderAgenda();
     }
 
     function showLoginModal() { showLoginForm(); document.getElementById('auth-modal-overlay').classList.add('show'); }
@@ -496,6 +559,8 @@
           hamburger.setAttribute('aria-expanded', 'false');
         }
       });
+
+      applyDefaultViewForViewport();
     });
 
     // ====== CALENDARIO ======
@@ -505,8 +570,8 @@
     const btnNext = document.getElementById('next');
     const btnAdd  = document.getElementById('btn-add');
 
-    btnPrev.addEventListener('click', ()=>{ current.setMonth(current.getMonth()-1); render(); startCountdowns(); });
-    btnNext.addEventListener('click', ()=>{ current.setMonth(current.getMonth()+1); render(); startCountdowns(); });
+    btnPrev.addEventListener('click', ()=>{ current.setMonth(current.getMonth()-1); render(); startCountdowns(); if (CURRENT_VIEW==='agenda') renderAgenda(); });
+    btnNext.addEventListener('click', ()=>{ current.setMonth(current.getMonth()+1); render(); startCountdowns(); if (CURRENT_VIEW==='agenda') renderAgenda(); });
     btnAdd.addEventListener('click', ()=>{ if(isAdmin()) openEditorModal(); });
 
     let EVENTS = [];
@@ -517,6 +582,7 @@
         const data = snap.val() || {};
         EVENTS = Object.values(data).sort((a,b)=> new Date(a.datetimeISO)-new Date(b.datetimeISO));
         render();
+        if (CURRENT_VIEW==='agenda') renderAgenda();
       }catch(err){ console.error('Error cargando eventos', err); }
     }
 
@@ -705,14 +771,14 @@
       e.preventDefault();
       if(!isAdmin()) return alert('No tienes permisos para crear lanzamientos.');
 
-      const vehicle = document.getElementById('ev-vehicle').value;        // ahora SELECT
+      const vehicle = document.getElementById('ev-vehicle').value;
       const title = document.getElementById('ev-title').value.trim();
       const dtLocal = document.getElementById('ev-datetime').value;
       const datetimeISO = localDatetimeToISOWithTZ(dtLocal);
       const streamUrl = document.getElementById('ev-stream').value.trim();
       const description = document.getElementById('ev-description').value.trim();
       const mission = document.getElementById('ev-mission').value.trim();
-      const site = document.getElementById('ev-site').value;              // ahora SELECT
+      const site = document.getElementById('ev-site').value;
       const vehicleFull = document.getElementById('ev-vehicleFull').value.trim();
       const payload = document.getElementById('ev-payload').value.trim();
       const orbit = document.getElementById('ev-orbit').value.trim();
@@ -741,8 +807,121 @@
         alert('No se pudo eliminar el lanzamiento.');
       }
     }
+
+    /* ===== Vista Agenda ===== */
+    let CURRENT_VIEW = 'month'; // 'month' | 'agenda'
+    const agendaEl = document.getElementById('agenda');
+    const viewMonthBtn = document.getElementById('viewMonth');
+    const viewAgendaBtn = document.getElementById('viewAgenda');
+
+    function setView(next){
+      CURRENT_VIEW = next;
+      const isAgenda = next === 'agenda';
+      document.getElementById('grid').style.display = isAgenda ? 'none' : 'grid';
+      if (isAgenda) { agendaEl.hidden = false; agendaEl.classList.add('show'); renderAgenda(); }
+      else { agendaEl.hidden = true; agendaEl.classList.remove('show'); }
+      viewMonthBtn.setAttribute('aria-selected', String(!isAgenda));
+      viewAgendaBtn.setAttribute('aria-selected', String(isAgenda));
+    }
+
+    viewMonthBtn.addEventListener('click', ()=> setView('month'));
+    viewAgendaBtn.addEventListener('click', ()=> setView('agenda'));
+
+    function applyDefaultViewForViewport(){
+      const mobile = window.matchMedia('(max-width: 600px)').matches;
+      setView(mobile ? 'agenda' : 'month');
+    }
+    window.addEventListener('resize', applyDefaultViewForViewport);
+
+    function renderAgenda(){
+      if (!agendaEl) return;
+      const year = current.getFullYear();
+      const month = current.getMonth();
+
+      const last  = new Date(year, month + 1, 0);
+      const days = last.getDate();
+
+      const byDay = Array.from({length: days}, ()=>[]);
+      EVENTS.forEach(ev=>{
+        const d = new Date(ev.datetimeISO);
+        if (d.getFullYear()===year && d.getMonth()===month){
+          byDay[d.getDate()-1].push(ev);
+        }
+      });
+
+      const MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+      const WD  = ['lun','mar','mié','jue','vie','sáb','dom'];
+
+      agendaEl.innerHTML = '';
+      for (let i=0;i<days;i++){
+        const dayNum = i+1;
+        const date = new Date(year, month, dayNum);
+        const w = (date.getDay()+6)%7; // lunes=0
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'agenda-day' + (isToday(date) ? ' today' : '');
+
+        const head = document.createElement('div');
+        head.className = 'agenda-day-head';
+        head.innerHTML = `
+          <div class="date">
+            <span class="num">${dayNum}</span>
+            <span>${WD[w]} · ${MES[month]} ${year}</span>
+          </div>
+          <div></div>
+        `;
+        wrapper.appendChild(head);
+
+        const list = document.createElement('div');
+        list.className = 'agenda-list';
+
+        if (byDay[i].length === 0){
+          const empty = document.createElement('div');
+          empty.className = 'agenda-card';
+          empty.innerHTML = `<div class="agenda-card-title" style="opacity:.75">Sin eventos</div>`;
+          list.appendChild(empty);
+        } else {
+          byDay[i]
+            .sort((a,b)=> new Date(a.datetimeISO)-new Date(b.datetimeISO))
+            .forEach(ev=>{
+              const card = document.createElement('div');
+              card.className = 'agenda-card';
+              const dt = new Date(ev.datetimeISO);
+              const hh = String(dt.getHours()).padStart(2,'0');
+              const mm = String(dt.getMinutes()).padStart(2,'0');
+
+              card.innerHTML = `
+                <div class="agenda-card-title">${ev.title || ev.vehicle || 'Lanzamiento'}</div>
+                <div class="agenda-card-meta">${hh}:${mm} — <span data-countdown-dt="${ev.datetimeISO}"></span></div>
+                <div style="opacity:.85">${ev.mission ? ('Misión: '+ev.mission) : (ev.description||'')}</div>
+                <div class="agenda-card-actions">
+                  ${ev.streamUrl ? `<a class="btn primary" href="${ev.streamUrl}" target="_blank" rel="noopener">Ver transmisión</a>` : ``}
+                  <button class="btn ghost" data-open-modal>Detalles</button>
+                  ${isAdmin() ? `<button class="btn danger" data-delete="${ev.id}">Eliminar</button>` : ``}
+                </div>
+              `;
+
+              card.querySelector('[data-open-modal]')?.addEventListener('click', ()=> openEventModal(ev));
+              if (isAdmin()){
+                card.querySelector('[data-delete]')?.addEventListener('click', async (e)=>{
+                  const id = e.currentTarget.getAttribute('data-delete');
+                  await deleteEvent(id);
+                  renderAgenda();
+                });
+              }
+
+              list.appendChild(card);
+            });
+        }
+
+        wrapper.appendChild(list);
+        agendaEl.appendChild(wrapper);
+      }
+
+      startCountdowns();
+    }
   </script>
 
-  <!-- Nota: se ha simplificado el bloque anti-inspección para evitar recargas inesperadas en móviles. Si quieres, lo reactivamos. -->
+  <!-- Nota: se ha simplificado el bloque anti-inspección para evitar recargas inesperadas en móviles. -->
 </body>
 </html>
