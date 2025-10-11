@@ -115,18 +115,18 @@
       .event-mini-title{font-size:12px}
     }
 
-    /* Make forms and modals more mobile-friendly */
-    .modal-overlay{ position: fixed; inset: 0; background: rgba(0,0,0,.65); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 12px; }
+    /* ===== Modales: móvil mejorado (scroll, sticky header/acciones) ===== */
+    .modal-overlay{ position: fixed; inset: 0; background: rgba(0,0,0,.65); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 12px; overflow:auto; }
     .modal-overlay.show{ display:flex; }
-    .modal-card{ width:min(680px, 100%); border-radius:16px; background: radial-gradient(1200px 1200px at -10% -20%, rgba(0,240,255,.08), transparent 35%) , #111113; border:1px solid rgba(255,255,255,.12); box-shadow: 0 28px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06); padding:16px; }
-    .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .modal-card{ width:min(680px, 100%); max-height:92vh; border-radius:16px; background: radial-gradient(1200px 1200px at -10% -20%, rgba(0,240,255,.08), transparent 35%) , #111113; border:1px solid rgba(255,255,255,.12); box-shadow: 0 28px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06); padding:16px; overflow:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
+    .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; position:sticky; top:0; background:inherit; backdrop-filter:saturate(1.2) blur(6px); margin:-16px -16px 0; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,.08); z-index:2; }
     .modal-title{ margin:0; font-family:'Space Grotesk', system-ui, sans-serif; font-size:1.08rem; letter-spacing:.2px; font-weight:700; }
     .goal-pill{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px; margin-top:12px; background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)); border:1px solid rgba(255,255,255,.12); font-size:.92rem; }
     .goal-dot{ width:8px; height:8px; border-radius:50%; background:linear-gradient(90deg,var(--accent1),var(--accent2)); }
     .countdown-hero{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-variant-numeric: tabular-nums; margin: 12px 0 6px; font-size: clamp(26px, 6vw, 40px); font-weight: 700; letter-spacing: .5px; }
     .modal-desc{ color:var(--muted); line-height:1.45; margin:8px 0 14px; }
     .timezone-note{ color:var(--muted); opacity:.85; margin-top:6px; font-size:.95rem; }
-    .modal-actions{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
+    .modal-actions{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; position:sticky; bottom:0; background:linear-gradient(180deg, rgba(17,17,19,.2), rgba(17,17,19,.9)); margin:12px -16px -16px; padding:12px 16px calc(12px + env(safe-area-inset-bottom)); border-top:1px solid rgba(255,255,255,.1); z-index:2; }
 
     .modal-info{ display:grid; gap:6px; margin:12px 0 10px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:12px; padding:12px 14px; }
 
@@ -139,6 +139,10 @@
     .help{ color:var(--muted); font-size:12px; }
 
     @media (max-width:720px){ .form-grid{ grid-template-columns:1fr; } }
+    @media (max-width:600px){
+      .modal-overlay{ align-items:flex-end; padding:0; }
+      .modal-card{ width:100%; max-width:none; max-height:92vh; border-radius:16px 16px 0 0; }
+    }
 
     @media (prefers-reduced-motion: reduce){
       *{transition:none !important;}
@@ -629,10 +633,30 @@
     function closeEventModal(){ const overlay = document.getElementById('event-modal-overlay'); overlay.classList.remove('show'); overlay.setAttribute('aria-hidden','true'); __currentModalEvent = null; }
 
     // ====== EDITOR ======
-    function openEditorModal(){ document.getElementById('editor-modal-overlay').classList.add('show'); document.getElementById('editor-modal-title').textContent='Nuevo lanzamiento'; document.getElementById('event-form').reset(); }
-    function closeEditorModal(){ document.getElementById('editor-modal-overlay').classList.remove('show'); }
+    function openEditorModal(){
+      const overlay = document.getElementById('editor-modal-overlay');
+      overlay.classList.add('show');
+      document.getElementById('editor-modal-title').textContent='Nuevo lanzamiento';
+      document.getElementById('event-form').reset();
+      // Bloquear scroll del fondo y foco al primer campo
+      document.documentElement.style.overflow='hidden';
+      document.body.style.overflow='hidden';
+      setTimeout(()=>{ document.getElementById('ev-vehicle')?.focus(); }, 80);
+    }
+    function closeEditorModal(){
+      const overlay = document.getElementById('editor-modal-overlay');
+      overlay.classList.remove('show');
+      // Restaurar scroll del fondo
+      document.documentElement.style.overflow='';
+      document.body.style.overflow='';
+    }
 
-    function makeIdFrom(title, dt){ const slug = (title||'lanzamiento').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); const d = new Date(dt); const yyyy=d.getFullYear(); const mm=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0'); return `${slug}-${yyyy}-${mm}-${dd}`; }
+    function makeIdFrom(title, dt){
+      const slug = (title||'lanzamiento').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+      const d = new Date(dt);
+      const yyyy=d.getFullYear(); const mm=String(d.getMonth()+1).padStart(2,'0'); const dd=String(d.getDate()).padStart(2,'0');
+      return `${slug}-${yyyy}-${mm}-${dd}`;
+    }
 
     function localDatetimeToISOWithTZ(localValue){
       const dt = new Date(localValue);
