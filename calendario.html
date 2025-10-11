@@ -52,6 +52,15 @@
     .user-avatar{ width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg, var(--accent1), var(--accent2)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
     .user-name{font-weight:600; font-size:13px;}
 
+    /* Hamburger (3 barras) */
+    .hamburger{display:none; flex-direction:column; justify-content:center; align-items:center; width:36px; height:36px; border-radius:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); cursor:pointer;}
+    .hamburger span{width:18px; height:2px; background:#fff; margin:3px 0; border-radius:1px; transition:all .3s ease;}
+    .mobile-menu{display:none; flex-direction:column; background:#111; position:absolute; top:calc(100% + 8px); right:12px; left:12px; border-radius:10px; border:1px solid var(--stroke); overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.5);}
+    .mobile-menu a{padding:14px; text-align:center; color:#fff; text-decoration:none; border-bottom:1px solid rgba(255,255,255,.1); font-weight:700; text-transform:uppercase; letter-spacing:.06em; font-size:12px;}
+    .mobile-menu a:last-child{border-bottom:none;}
+    .mobile-menu.show{display:flex; animation:fadeIn .2s ease forwards;}
+    @keyframes fadeIn{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:none;}}
+
     /* ===== LAYOUT ===== */
     main{max-width:1200px; width:92vw; margin:20px auto 64px}
     .cal-header{ display:flex; align-items:center; justify-content:space-between; margin:8px 0 12px; gap:10px; flex-wrap:wrap; }
@@ -91,6 +100,7 @@
       .grid{ gap:8px }
       .day{ min-height:96px; border-radius:12px }
       .event-mini-card{ padding:8px 6px; border-radius:10px }
+      .hamburger{display:flex}
     }
 
     /* Extra small phones */
@@ -130,7 +140,6 @@
 
     @media (max-width:720px){ .form-grid{ grid-template-columns:1fr; } }
 
-    /* Reduce heavy visual effects on low-end mobiles or when user prefers less motion */
     @media (prefers-reduced-motion: reduce){
       *{transition:none !important;}
       .nav-shell::before{display:none}
@@ -147,13 +156,22 @@
       <a class="brand" href="index.html" aria-label="Ir a inicio">
         <span class="title">EsZunSpace</span>
       </a>
-      <nav class="menu">
+
+      <!-- Menú desktop -->
+      <nav class="menu" aria-label="Principal">
         <a href="calendario.html" aria-current="page">Calendario</a>
         <a href="cohetes.html">Cohetes</a>
         <a href="motores.html">Motores</a>
         <a href="satelites.html">Satélites</a>
         <a href="lanzamientos.html">Lanzamientos</a>
       </nav>
+
+      <!-- Botón hamburguesa -->
+      <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- Usuario / login -->
       <div class="user-section">
         <div id="user-display" style="display:none;">
           <div class="user-info">
@@ -165,6 +183,15 @@
         <button id="login-btn" class="btn primary" onclick="showLoginModal()">Iniciar sesión</button>
       </div>
     </div>
+
+    <!-- Menú móvil desplegable -->
+    <nav class="mobile-menu" id="mobileMenu" aria-label="Principal móvil">
+      <a href="calendario.html">Calendario</a>
+      <a href="cohetes.html">Cohetes</a>
+      <a href="motores.html">Motores</a>
+      <a href="satelites.html">Satélites</a>
+      <a href="lanzamientos.html">Lanzamientos</a>
+    </nav>
   </header>
 
   <main>
@@ -403,7 +430,36 @@
     async function handleRegister(e){ e.preventDefault(); const username=document.getElementById('register-username').value.trim(); const password=document.getElementById('register-password').value; ['register-error','register-username-error','register-success'].forEach(id=>{const el=document.getElementById(id); if(el) el.style.display='none';}); if (allUsers[username]){ const ue=document.getElementById('register-username-error'); if(ue) ue.style.display='block'; return; } const saved=await saveUser(username,password); if (saved){ const rs=document.getElementById('register-success'); if(rs) rs.style.display='block'; setTimeout(()=>{ currentUser=username; localStorage.setItem(SESSION_KEY,currentUser); checkAuth(); closeAuthModal(); }, 1000); } else { const re=document.getElementById('register-error'); if(re) re.style.display='block'; } }
     function logout(){ currentUser=null; localStorage.removeItem(SESSION_KEY); checkAuth(); }
 
-    document.addEventListener("DOMContentLoaded", async () => { document.body.classList.add("fade-in"); await loadUsers(); hydrateSessionFromStorage(); await loadEvents(); startCountdowns(); });
+    document.addEventListener("DOMContentLoaded", async () => {
+      document.body.classList.add("fade-in");
+      await loadUsers();
+      hydrateSessionFromStorage();
+      await loadEvents();
+      startCountdowns();
+
+      // Toggle menú móvil + autocierre al elegir opción
+      const hamburger = document.getElementById('hamburger');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const toggleMenu = () => {
+        const open = !mobileMenu.classList.contains('show');
+        mobileMenu.classList.toggle('show', open);
+        hamburger.setAttribute('aria-expanded', String(open));
+      };
+      hamburger.addEventListener('click', toggleMenu);
+      mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        mobileMenu.classList.remove('show');
+        hamburger.setAttribute('aria-expanded', 'false');
+      }));
+      // Cerrar al tocar fuera
+      document.addEventListener('click', (e)=>{
+        if (!mobileMenu.classList.contains('show')) return;
+        const within = e.target.closest('#mobileMenu') || e.target.closest('#hamburger');
+        if (!within){
+          mobileMenu.classList.remove('show');
+          hamburger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
 
     // ====== CALENDARIO ======
     const monthLabel = document.getElementById('monthLabel');
@@ -428,7 +484,35 @@
     }
 
     function sameDay(a, b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
-    function startCountdowns(){ const nodes=document.querySelectorAll('[data-countdown-dt]'); function fmt(diffMs){ if(diffMs<=0){ const sec=Math.abs(Math.floor(diffMs/1000)); const d=Math.floor(sec/86400); const h=Math.floor((sec%86400)/3600); const m=Math.floor((sec%3600)/60); const s=sec%60; return `T+ ${d>0? d+'d':'0d'} ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`; } const sec=Math.floor(diffMs/1000); const d=Math.floor(sec/86400); const h=Math.floor((sec%86400)/3600); const m=Math.floor((sec%3600)/60); const s=sec%60; return `T- ${d>0? d+'d':'0d'} ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`; } function tick(){ const now=new Date(); nodes.forEach(el=>{ const target=new Date(el.getAttribute('data-countdown-dt')); el.textContent=fmt(target-now); }); } tick(); clearInterval(window.__countdownInterval); window.__countdownInterval=setInterval(tick,1000); }
+    function startCountdowns(){
+      const nodes=document.querySelectorAll('[data-countdown-dt]');
+      function fmt(diffMs){
+        if(diffMs<=0){
+          const sec=Math.abs(Math.floor(diffMs/1000));
+          const d=Math.floor(sec/86400);
+          const h=Math.floor((sec%86400)/3600);
+          const m=Math.floor((sec%3600)/60);
+          const s=sec%60;
+          return `T+ ${d>0? d+'d':'0d'} ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+        }
+        const sec=Math.floor(diffMs/1000);
+        const d=Math.floor(sec/86400);
+        const h=Math.floor((sec%86400)/3600);
+        const m=Math.floor((sec%3600)/60);
+        const s=sec%60;
+        return `T- ${d>0? d+'d':'0d'} ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+      }
+      function tick(){
+        const now=new Date();
+        nodes.forEach(el=>{
+          const target=new Date(el.getAttribute('data-countdown-dt'));
+          el.textContent=fmt(target-now);
+        });
+      }
+      tick();
+      clearInterval(window.__countdownInterval);
+      window.__countdownInterval=setInterval(tick,1000);
+    }
 
     let current = new Date(); current.setDate(1);
     const MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -437,7 +521,7 @@
     function isToday(d){ const t=new Date(); return d.getFullYear()===t.getFullYear() && d.getMonth()===t.getMonth() && d.getDate()===t.getDate(); }
 
     function render(){
-      if(!monthLabel) return; // por si se llama antes de montar
+      if(!monthLabel) return;
       const year = current.getFullYear();
       const month = current.getMonth();
       monthLabel.textContent = `${MES[month]} ${year}`;
