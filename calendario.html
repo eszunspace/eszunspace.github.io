@@ -26,7 +26,7 @@
       --tile: #141416;
       --tile-border: rgba(255,255,255,.12);
       --danger: #ff6b6b;
-      --safe-touch: 44px; /* tamaño recomendado de objetivo táctil */
+      --safe-touch: 44px; /* tamaño objetivo táctil */
     }
     *{box-sizing:border-box}
     html,body{margin:0}
@@ -134,7 +134,23 @@
     .form-grid .full{ grid-column:1/-1; }
     .form-group{ display:flex; flex-direction:column; gap:6px; }
     .form-group label{ font-weight:600; font-size:14px; }
-    .form-group input, .form-group textarea{ padding:12px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); color:var(--fg); font-size:15px; font-family:inherit; }
+
+    /* Inputs y selects táctiles */
+    .form-group input, .form-group textarea, .form-group select{
+      min-height: var(--safe-touch);
+      padding: 12px;
+      border-radius:10px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.18);
+      color:var(--fg);
+      font-size:15px; font-family:inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .form-group select{
+      appearance:none; /* estiliza en iOS/Android/desktop */
+      background-image: linear-gradient(45deg, rgba(255,255,255,.7) 0 0);
+      background-size: 0 0; /* sin icono extra, simple */
+    }
     .form-group textarea{ min-height:96px; resize:vertical; }
     .help{ color:var(--muted); font-size:12px; }
 
@@ -304,48 +320,65 @@
 
       <form id="event-form" onsubmit="submitEventForm(event)">
         <div class="form-grid">
+
+          <!-- Vehículo: SELECT -->
           <div class="form-group">
             <label for="ev-vehicle">Vehículo</label>
-            <input id="ev-vehicle" required placeholder="Neutron, Falcon 9..." />
+            <select id="ev-vehicle" required>
+              <option value="Neutron" selected>Neutron</option>
+            </select>
           </div>
+
           <div class="form-group">
             <label for="ev-title">Título</label>
             <input id="ev-title" required placeholder="Cohete X — Lanzamiento" />
           </div>
+
           <div class="form-group full">
             <label for="ev-datetime">Fecha y hora</label>
             <input id="ev-datetime" type="datetime-local" required />
             <div class="help">Se guardará con tu zona horaria (incluyendo offset).</div>
           </div>
+
           <div class="form-group full">
             <label for="ev-stream">URL de transmisión (opcional)</label>
             <input id="ev-stream" placeholder="https://..." />
           </div>
+
           <div class="form-group full">
             <label for="ev-description">Descripción corta</label>
             <textarea id="ev-description" placeholder="Resumen del lanzamiento"></textarea>
           </div>
+
           <div class="form-group">
             <label for="ev-mission">Misión</label>
             <input id="ev-mission" placeholder="Nombre de la misión" />
           </div>
+
+          <!-- Lugar: SELECT -->
           <div class="form-group">
             <label for="ev-site">Lugar</label>
-            <input id="ev-site" placeholder="Plataforma, Centro, Ciudad, País" />
+            <select id="ev-site" required>
+              <option value="LC39A de Cabo Cañaveral" selected>LC39A de Cabo Cañaveral</option>
+            </select>
           </div>
+
           <div class="form-group">
             <label for="ev-vehicleFull">Vehículo (completo)</label>
             <input id="ev-vehicleFull" placeholder="Neutron (EsZunSpace)" />
           </div>
+
           <div class="form-group">
             <label for="ev-payload">Carga útil</label>
             <input id="ev-payload" placeholder="Nombre del satélite / carga" />
           </div>
+
           <div class="form-group full">
             <label for="ev-orbit">Órbita objetivo</label>
             <input id="ev-orbit" placeholder="LEO, GTO, 140x140 km..." />
           </div>
         </div>
+
         <div class="modal-actions" style="margin-top:10px;">
           <button type="submit" class="btn primary">Guardar</button>
           <button type="button" class="btn ghost" onclick="closeEditorModal()">Cancelar</button>
@@ -671,14 +704,15 @@
     async function submitEventForm(e){
       e.preventDefault();
       if(!isAdmin()) return alert('No tienes permisos para crear lanzamientos.');
-      const vehicle = document.getElementById('ev-vehicle').value.trim();
+
+      const vehicle = document.getElementById('ev-vehicle').value;        // ahora SELECT
       const title = document.getElementById('ev-title').value.trim();
       const dtLocal = document.getElementById('ev-datetime').value;
       const datetimeISO = localDatetimeToISOWithTZ(dtLocal);
       const streamUrl = document.getElementById('ev-stream').value.trim();
       const description = document.getElementById('ev-description').value.trim();
       const mission = document.getElementById('ev-mission').value.trim();
-      const site = document.getElementById('ev-site').value.trim();
+      const site = document.getElementById('ev-site').value;              // ahora SELECT
       const vehicleFull = document.getElementById('ev-vehicleFull').value.trim();
       const payload = document.getElementById('ev-payload').value.trim();
       const orbit = document.getElementById('ev-orbit').value.trim();
