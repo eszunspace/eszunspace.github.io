@@ -381,7 +381,7 @@
             <span class="time">T- 00:04:00</span>
             <span class="event">Go no Go</span>
           </div>
-          <div class="timeline-item active">
+          <div class="timeline-item" data-seconds="1">
             <span class="time">T+ 00:00:01</span>
             <span class="event">Lifftof</span>
           </div>
@@ -427,11 +427,11 @@
       <div class="stream-section">
         <!-- YouTube Frame -->
         <div class="video-frame">
-<iframe src="https://www.youtube-nocookie.com/embed/ZA-RB3gltpo?autoplay=1&rel=0" title="Live Stream"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-  allowfullscreen>
-</iframe>
+          <iframe src="https://www.youtube-nocookie.com/embed/ZA-RB3gltpo?autoplay=1&rel=0" title="Live Stream"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+          </iframe>
         </div>
 
         <!-- Telemetry Dashboard -->
@@ -591,26 +591,56 @@
   </style>
 
   <script>
-    // Countdown Logic
+    // Countdown & Timeline Logic
     (function () {
       const target = Date.UTC(2025, 10, 22, 22, 0, 0);
       const timerEl = document.getElementById('timer');
+      const timelineItems = document.querySelectorAll('.timeline-item');
 
       function update() {
         const now = new Date();
         const diff = target - now.getTime();
+        const secondsToLaunch = diff / 1000; // Positive = T-, Negative = T+
 
-        if (diff <= 0) {
-          timerEl.textContent = "T+ 00:00:00";
-          return;
+        // Update Timer Text
+        const absSeconds = Math.abs(secondsToLaunch);
+        const hrs = Math.floor(absSeconds / 3600);
+        const mins = Math.floor((absSeconds % 3600) / 60);
+        const secs = Math.floor(absSeconds % 60);
+
+        const timeString = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        if (secondsToLaunch > 0) {
+          timerEl.textContent = `T- ${timeString}`;
+        } else {
+          timerEl.textContent = `T+ ${timeString}`;
         }
 
-        const totalSeconds = Math.floor(diff / 1000);
-        const hrs = Math.floor(totalSeconds / 3600);
-        const mins = Math.floor((totalSeconds % 3600) / 60);
-        const secs = totalSeconds % 60;
+        // Update Timeline
+        const currentMissionTime = -secondsToLaunch;
 
-        timerEl.textContent = `T- ${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        // Reset all first
+        timelineItems.forEach(item => {
+          item.classList.remove('active', 'passed');
+          const eventTime = parseFloat(item.getAttribute('data-seconds'));
+          if (currentMissionTime >= eventTime) {
+            item.classList.add('passed');
+          }
+        });
+
+        // Find the active item
+        let lastPassedIndex = -1;
+        for (let i = 0; i < timelineItems.length; i++) {
+          const eventTime = parseFloat(timelineItems[i].getAttribute('data-seconds'));
+          if (currentMissionTime >= eventTime) {
+            lastPassedIndex = i;
+          }
+        }
+
+        if (lastPassedIndex >= 0) {
+          timelineItems[lastPassedIndex].classList.remove('passed');
+          timelineItems[lastPassedIndex].classList.add('active');
+        }
       }
 
       setInterval(update, 1000);
