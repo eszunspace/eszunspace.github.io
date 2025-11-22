@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta name="title" content="STREAM – EsZunSpace">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>STREAM – EsZunSpace</title>
+  <meta name="description" content="Sigue el lanzamiento en directo.">
+  <link rel="canonical" href="https://eszunspace.es/stream.html">
+  <meta name="theme-color" content="#0b0b0f">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@500;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logoarriba.jpg">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-image: url('background.jpg');
+      --header-h: 64px;
+      --primary: #00f0ff;
+      --secondary: #ff00d4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Poppins', system-ui, sans-serif;
+      color: #fff;
+      background: #000;
+      overflow-x: hidden;
+    }
+
+    /* ===== Header ===== */
+    header.topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+      padding: 12px 12px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, .65) 0%, rgba(0, 0, 0, 0) 100%);
+      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(2px);
+      pointer-events: none;
+    }
+
+    .nav-shell {
+      pointer-events: auto;
+      width: min(1200px, 94vw);
+      margin: 0 auto;
+      height: var(--header-h);
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-shell::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: conic-gradient(from 0deg, var(--primary), var(--secondary), var(--primary));
+      filter: blur(22px);
+      opacity: .14;
+      pointer-events: none;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .brand img {
+      height: 36px;
+      width: 36px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(255, 255, 255, .1)
+    }
+
+    .brand .title {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 18px
+    }
+
+    .menu a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 10px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12px;
+      opacity: .9;
+      transition: opacity .2s ease;
+    }
+
+    .menu a:hover {
+      opacity: 1
+    }
+
+    .menu a::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 6px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .25s ease;
+      border-radius: 2px;
+    }
+
+    .menu a:hover::after,
+    .menu a[aria-current="page"]::after {
+      transform: scaleX(1);
+    }
+
+    .menu a[aria-current="page"] {
+      opacity: 1
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .18);
+      color: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all .2s ease;
+    }
+
+    .btn.primary {
+      border: 0;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    /* ===== Main Layout ===== */
+    .main-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: calc(var(--header-h) + 40px);
+      padding-bottom: 40px;
+      background-image: var(--bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      position: relative;
+    }
+
+    .main-container::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.85));
+      pointer-events: none;
+    }
+
+    /* Stream Frame */
+    .stream-section {
+      position: relative;
+      z-index: 10;
+      width: min(1100px, 94vw);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .video-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      background: #000;
+    }
+
+    .video-frame iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Glow border */
+    .video-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.1);
+      pointer-events: none;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Telemetry Section */
+    .telemetry-bar {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 20px;
+      padding: 20px;
+      background: rgba(10, 10, 12, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      align-items: center;
+    }
+
+    .telemetry-group {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .telemetry-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .telemetry-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .telemetry-value {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    }
+
+    .telemetry-unit {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
+      margin-left: 2px;
+    }
+
+    /* Countdown Center */
+    .countdown-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 30px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .mission-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      background: linear-gradient(90deg, #fff, #ccc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .countdown-timer {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(180deg, #fff, #ddd);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .mission-status {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 800px) {
+      .telemetry-bar {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .countdown-center {
+        border: 0;
+        padding: 10px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        order: -1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="nav-shell">
+      <a class="brand" href="index.html">
+        <img src="logoarriba.jpg" alt="EsZunSpace">
+        <span class="title">EsZunSpace</span>
+      </a>
+      <nav class="menu">
+        <a href="calendario.html">Calendario</a>
+        <a href="cohetes.html">Cohetes</a>
+        <a href="motores.html">Motores</a>
+        <a href="satelites.html">Satélites</a>
+        <a href="lanzamientos.html">Lanzamientos</a>
+        <a href="stream.html" aria-current="page">Stream</a>
+      </nav>
+      <a href="#" class="btn primary">Iniciar sesión</a>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <div class="content-grid">
+
+      <!-- Timeline Sidebar -->
+      <div class="timeline-sidebar">
+        <h3 class="timeline-title">Cronograma</h3>
+        <div class="timeline-list">
+          <div class="timeline-item">
+            <span class="time">T- 00:04:00</span>
+            <span class="event">Go no Go</span>
+          </div>
+          <div class="timeline-item active">
+            <span class="time">T+ 00:00:01</span>
+            <span class="event">Lifftof</span>
+          </div>
+          <div class="timeline-item">
+            <span class="time">T+ 00:00:55</span>
+            <span class="event">Max Q</span>
+          </div>
+          <div class="timeline-item">
+            <span class="time">T+ 00:02:18</span>
+            <span class="event">MECO</span>
+          </div>
+          <div class="timeline-item">
+            <span class="time">T+ 00:02:21</span>
+            <span class="event">Stage separation</span>
+          </div>
+          <div class="timeline-item">
+            <span class="time">T+ 00:02:22</span>
+            <span class="event">Second stage ignition</span>
+          </div>
+          <div class="timeline-item">
+            <span class="time">T+ 00:02:30</span>
+            <span class="event">Karman line</span>
+          </div>
+          <div class="timeline-item">
+            <span class="time">T+ 00:07:23</span>
+            <span class="event">reentry burn 1rt stage</span>
+          </div>
+          <div class="timeline-item">
+            <span class="time">T+ 00:08:00</span>
+            <span class="event">reentry engines cut off</span>
+          </div>
+          <div class="timeline-item">
+            <span class="time">T+ 00:09:30</span>
+            <span class="event">Landing burn</span>
+          </div>
+          <div class="timeline-item">
+            <span class="time">T+ 00:09:45</span>
+            <span class="event">Landing complete</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stream-section">
+        <!-- YouTube Frame -->
+        <div class="video-frame">
+          <iframe src="https://www.youtube.com/live/mf9tjB9GSd4" title="Live Stream"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <!-- Telemetry Dashboard -->
+        <div class="telemetry-bar">
+
+          <!-- Center: Countdown -->
+          <div class="countdown-center">
+            <div class="mission-name">EZS-V01</div>
+            <div class="countdown-timer" id="timer">T- 00:00:00</div>
+            <div class="mission-status">EN ESPERA</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <style>
+    /* Layout Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 30px;
+      width: min(1400px, 96vw);
+      align-items: start;
+    }
+
+    /* Timeline Styles */
+    .timeline-sidebar {
+      background: rgba(10, 10, 12, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      height: 100%;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .timeline-title {
+      margin: 0 0 16px 0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 8px;
+    }
+
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    .timeline-list::before {
+      content: "";
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: 5px;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .timeline-item {
+      display: flex;
+      flex-direction: column;
+      padding-left: 20px;
+      position: relative;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #333;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s;
+    }
+
+    .timeline-item.active {
+      opacity: 1;
+    }
+
+    .timeline-item.active::before {
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary);
+      border-color: #fff;
+    }
+
+    .timeline-item.passed {
+      opacity: 0.7;
+    }
+
+    .timeline-item.passed::before {
+      background: var(--secondary);
+      border-color: var(--secondary);
+    }
+
+    .timeline-item .time {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .timeline-item .event {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Stream Section Adjustments */
+    .stream-section {
+      width: 100%;
+      /* Take remaining space */
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-sidebar {
+        display: none;
+        /* Hide on mobile for now or move below */
+      }
+    }
+
+    /* Override/Update telemetry bar for single item */
+    .telemetry-bar {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(10, 10, 12, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .countdown-center {
+      border: none;
+      /* Remove borders since it's alone */
+      padding: 0;
+    }
+  </style>
+
+  <script>
+    // Countdown Logic
+    (function () {
+      const target = Date.UTC(2025, 10, 22, 22, 0, 0);
+      const timerEl = document.getElementById('timer');
+
+      function update() {
+        const now = new Date();
+        const diff = target - now.getTime();
+
+        if (diff <= 0) {
+          timerEl.textContent = "T+ 00:00:00";
+          return;
+        }
+
+        const totalSeconds = Math.floor(diff / 1000);
+        const hrs = Math.floor(totalSeconds / 3600);
+        const mins = Math.floor((totalSeconds % 3600) / 60);
+        const secs = totalSeconds % 60;
+
+        timerEl.textContent = `T- ${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+
+      setInterval(update, 1000);
+      update();
+    })();
+  </script>
+
+</body>
+
+</html>

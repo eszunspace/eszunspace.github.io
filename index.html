@@ -352,6 +352,7 @@
         <a href="motores.html">Motores</a>
         <a href="satelites.html">Satélites</a>
         <a href="lanzamientos.html">Lanzamientos</a>
+        <a href="stream.html">Stream</a>        
         <div id="mobile-logout-section" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,.12);">
           <button class="btn ghost" onclick="logout()" style="width:100%; justify-content:center;">Cerrar sesión</button>
         </div>
@@ -375,10 +376,10 @@
     <div class="overlay" aria-hidden="true"></div>
     <h1 class="brand-name"></h1>
 
-    <!-- EZS-VO1 Countdown -->
+    <!-- VORTIC-1 Countdown -->
     <div id="vortic-countdown" aria-live="polite" role="timer">
-      <div class="vortic-card" role="region" aria-label="Contador de la misión EZS-VO1">
-        <div class="vortic-mission">Misión <span id="vortic-name">EZS-VO1</span></div>
+      <div class="vortic-card" role="region" aria-label="Contador de la misión VORTIC-1">
+        <div class="vortic-mission">Misión <span id="vortic-name">VORTIC-1</span></div>
         <div class="vortic-t">T-</div>
         <div id="vortic-time" class="vortic-time" aria-atomic="true">00:00:00</div>
         <div id="vortic-status" class="vortic-status" aria-hidden="true"></div>
@@ -428,7 +429,7 @@
       const timeEl = document.getElementById('vortic-time');
       const statusEl = document.getElementById('vortic-status');
       const nameEl = document.getElementById('vortic-name');
-      nameEl.textContent = "EZS-VO1";
+      nameEl.textContent = "VORTIC-1";
 
       function pad(n){ return String(n).padStart(2,'0'); }
 
