@@ -41,7 +41,16 @@
       font-family: 'Poppins', system-ui, sans-serif;
       color: #fff;
       background: #000;
-      overflow-x: hidden;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    body.fade-in {
+      opacity: 1;
+    }
+
+    body.fade-out {
+      opacity: 0;
     }
 
     /* ===== Header ===== */
@@ -55,11 +64,9 @@
       background: linear-gradient(180deg, rgba(0, 0, 0, .65) 0%, rgba(0, 0, 0, 0) 100%);
       -webkit-backdrop-filter: blur(2px);
       backdrop-filter: blur(2px);
-      pointer-events: none;
     }
 
     .nav-shell {
-      pointer-events: auto;
       width: min(1200px, 94vw);
       margin: 0 auto;
       height: var(--header-h);
@@ -91,6 +98,7 @@
       gap: 10px;
       text-decoration: none;
       color: #fff;
+      min-width: 0;
     }
 
     .brand img {
@@ -104,6 +112,25 @@
       font-family: 'Space Grotesk', system-ui, sans-serif;
       font-weight: 800;
       letter-spacing: .02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* === Toggle (mobile) === */
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+    }
+
+    .menu-toggle:focus-visible {
+      outline: 2px solid #00f0ff;
+      outline-offset: 2px;
     }
 
     .menu {
@@ -125,6 +152,7 @@
       font-size: 12px;
       opacity: .9;
       transition: opacity .2s ease;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .menu a:hover {
@@ -154,32 +182,83 @@
       opacity: 1
     }
 
+    /* User section */
+    .user-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .18);
+      cursor: pointer;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .user-info:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .1);
+      border-color: rgba(255, 255, 255, .3);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00f0ff, #ff00d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       height: 32px;
-      padding: 0 14px;
+      min-width: 32px;
+      padding: 0 10px;
       border-radius: 10px;
       background: rgba(255, 255, 255, .06);
       border: 1px solid rgba(255, 255, 255, .18);
       color: #fff;
       cursor: pointer;
+      user-select: none;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease;
       text-decoration: none;
-      font-weight: 600;
+      gap: 8px;
+      font-family: inherit;
       font-size: 13px;
-      transition: all .2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .1);
+      border-color: rgba(255, 255, 255, .3)
     }
 
     .btn.primary {
       border: 0;
       background: linear-gradient(90deg, var(--primary), var(--secondary));
-      box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
     }
 
-    .btn:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.1);
+    .btn.ghost {
+      background: rgba(255, 255, 255, .06);
     }
 
     /* ===== Main Layout ===== */
@@ -332,7 +411,239 @@
       letter-spacing: 0.05em;
     }
 
-    @media (max-width: 800px) {
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 18px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .modal-card {
+      width: min(680px, 96vw);
+      border-radius: 18px;
+      background: radial-gradient(1200px 1200px at -10% -20%, rgba(0, 240, 255, .08), transparent 35%), #111113;
+      border: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .06);
+      padding: 18px 18px 16px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    }
+
+    .modal-overlay.show .modal-card {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: .2px;
+      font-weight: 700;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .18);
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #00f0ff;
+      background: rgba(255, 255, 255, .08);
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    .success-msg {
+      color: #51cf66;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .success-msg.show {
+      display: block;
+    }
+
+    .toggle-form {
+      text-align: center;
+      margin-top: 16px;
+      color: rgba(255, 255, 255, .72);
+      font-size: 14px;
+    }
+
+    .toggle-form a {
+      color: #00f0ff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity .2s ease;
+    }
+
+    .toggle-form a:hover {
+      opacity: .8
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* =========================
+       Responsive
+       ========================= */
+    @media (max-width: 900px) {
+      :root {
+        --header-h: 56px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .nav-shell {
+        padding: 0 10px;
+        border-radius: 14px;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu {
+        position: fixed;
+        inset: calc(var(--header-h) + 8px) 8px auto 8px;
+        right: 8px;
+        left: 8px;
+        top: calc(var(--header-h) + 12px);
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 10px;
+        background: rgba(18, 18, 18, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
+        backdrop-filter: blur(8px);
+      }
+
+      .menu.open {
+        display: flex;
+      }
+
+      .menu a {
+        padding: 14px 12px;
+        font-size: 13px;
+        letter-spacing: .12em;
+        border-radius: 10px;
+      }
+
+      .menu a::after {
+        display: none;
+      }
+
+      .brand .title {
+        font-size: 16px;
+      }
+
+      .user-section {
+        display: flex;
+      }
+
+      .user-section .btn.ghost {
+        display: none;
+      }
+
+      .user-section #user-display .user-info {
+        padding: 4px 8px;
+      }
+
+      .user-section #user-display .user-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+
+      .user-section #user-display .user-name {
+        display: none;
+      }
+
+      .user-section #login-btn {
+        padding: 0 12px;
+        font-size: 12px;
+        height: 36px;
+      }
+
       .telemetry-bar {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -346,6 +657,24 @@
         order: -1;
       }
     }
+
+    @media (hover:none) {
+      .menu a:hover::after {
+        transform: none;
+      }
+
+      .menu a:hover {
+        opacity: 1;
+      }
+    }
+
+    /* Accesibilidad: respetar reduce-motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
   </style>
 </head>
 
@@ -353,19 +682,42 @@
 
   <header class="topbar">
     <div class="nav-shell">
-      <a class="brand" href="index.html">
-        <img src="logoarriba.jpg" alt="EsZunSpace">
+      <a class="brand" href="index.html" aria-label="Ir a inicio">
+        <img src="logoarriba.jpg" alt="Logo de EsZunSpace">
         <span class="title">EsZunSpace</span>
       </a>
-      <nav class="menu">
+
+      <!-- Toggle sólo visible en móvil -->
+      <button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false" aria-label="Abrir menú">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <nav id="primary-menu" class="menu" role="navigation" aria-label="Menú principal">
         <a href="calendario.html">Calendario</a>
         <a href="cohetes.html">Cohetes</a>
         <a href="motores.html">Motores</a>
         <a href="satelites.html">Satélites</a>
         <a href="lanzamientos.html">Lanzamientos</a>
         <a href="stream.html" aria-current="page">Stream</a>
+        <div id="mobile-logout-section"
+          style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,.12);">
+          <button class="btn ghost" onclick="logout()" style="width:100%; justify-content:center;">Cerrar
+            sesión</button>
+        </div>
       </nav>
-      <a href="#" class="btn primary">Iniciar sesión</a>
+
+      <div class="user-section">
+        <div id="user-display" style="display:none;">
+          <div class="user-info" onclick="showProfileModal()" role="button" tabindex="0" aria-label="Ver perfil">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <span class="user-name" id="user-name">Usuario</span>
+          </div>
+          <button class="btn ghost" onclick="logout()">Salir</button>
+        </div>
+        <button id="login-btn" class="btn primary" onclick="showLoginModal()">Iniciar sesión</button>
+      </div>
     </div>
   </header>
 
@@ -373,62 +725,16 @@
 
     <div class="content-grid">
 
-      <!-- Timeline Sidebar -->
-      <div class="timeline-sidebar">
-        <h3 class="timeline-title">Cronograma</h3>
-        <div class="timeline-list">
-          <div class="timeline-item">
-            <span class="time">T- 00:04:00</span>
-            <span class="event">Go no Go</span>
-          </div>
-          <div class="timeline-item" data-seconds="1">
-            <span class="time">T+ 00:00:01</span>
-            <span class="event">Lifftof</span>
-          </div>
-          <div class="timeline-item">
-            <span class="time">T+ 00:00:55</span>
-            <span class="event">Max Q</span>
-          </div>
-          <div class="timeline-item">
-            <span class="time">T+ 00:02:18</span>
-            <span class="event">MECO</span>
-          </div>
-          <div class="timeline-item">
-            <span class="time">T+ 00:02:21</span>
-            <span class="event">Stage separation</span>
-          </div>
-          <div class="timeline-item">
-            <span class="time">T+ 00:02:22</span>
-            <span class="event">Second stage ignition</span>
-          </div>
-          <div class="timeline-item">
-            <span class="time">T+ 00:02:30</span>
-            <span class="event">Karman line</span>
-          </div>
-          <div class="timeline-item">
-            <span class="time">T+ 00:07:23</span>
-            <span class="event">reentry burn 1rt stage</span>
-          </div>
-          <div class="timeline-item">
-            <span class="time">T+ 00:08:00</span>
-            <span class="event">reentry engines cut off</span>
-          </div>
-          <div class="timeline-item">
-            <span class="time">T+ 00:09:30</span>
-            <span class="event">Landing burn</span>
-          </div>
-          <div class="timeline-item">
-            <span class="time">T+ 00:09:45</span>
-            <span class="event">Landing complete</span>
-          </div>
-        </div>
-      </div>
-
       <div class="stream-section">
         <!-- YouTube Frame -->
         <div class="video-frame">
-          <iframe src="https://www.youtube-nocookie.com/embed/ZA-RB3gltpo?autoplay=1&rel=0" title="Live Stream"
-            frameborder="0"
+          <!-- Admin Edit Button (Only visible to Esstor) -->
+          <button id="admin-edit-stream" class="btn ghost" onclick="showStreamEditor()"
+            style="position:absolute; top:10px; right:10px; z-index:10; display:none;">
+            ✏️ Editar Stream
+          </button>
+          <iframe id="stream-iframe" src="https://www.youtube-nocookie.com/embed/ZA-RB3gltpo?autoplay=1&rel=0"
+            title="Live Stream" frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen>
           </iframe>
@@ -448,126 +754,28 @@
       </div>
     </div>
 
+    <footer>© <span id="year"></span> EsZunSpace – Todos los derechos reservados</footer>
   </main>
 
   <style>
     /* Layout Grid */
     .content-grid {
-      display: grid;
-      grid-template-columns: 240px 1fr;
-      gap: 30px;
+      display: flex;
+      justify-content: center;
       width: min(1400px, 96vw);
-      align-items: start;
-    }
-
-    /* Timeline Styles */
-    .timeline-sidebar {
-      background: rgba(10, 10, 12, 0.6);
-      backdrop-filter: blur(8px);
-      border-radius: 16px;
-      padding: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      height: 100%;
-      max-height: 600px;
-      overflow-y: auto;
-    }
-
-    .timeline-title {
-      margin: 0 0 16px 0;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: rgba(255, 255, 255, 0.5);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 8px;
-    }
-
-    .timeline-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      position: relative;
-    }
-
-    .timeline-list::before {
-      content: "";
-      position: absolute;
-      top: 6px;
-      bottom: 6px;
-      left: 5px;
-      width: 2px;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .timeline-item {
-      display: flex;
-      flex-direction: column;
-      padding-left: 20px;
-      position: relative;
-      opacity: 0.5;
-      transition: opacity 0.3s;
-    }
-
-    .timeline-item::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 6px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #333;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s;
-    }
-
-    .timeline-item.active {
-      opacity: 1;
-    }
-
-    .timeline-item.active::before {
-      background: var(--primary);
-      box-shadow: 0 0 10px var(--primary);
-      border-color: #fff;
-    }
-
-    .timeline-item.passed {
-      opacity: 0.7;
-    }
-
-    .timeline-item.passed::before {
-      background: var(--secondary);
-      border-color: var(--secondary);
-    }
-
-    .timeline-item .time {
-      font-family: 'Space Grotesk', monospace;
-      font-size: 13px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .timeline-item .event {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.8);
+      margin: 0 auto;
     }
 
     /* Stream Section Adjustments */
     .stream-section {
       width: 100%;
-      /* Take remaining space */
+      max-width: 1200px;
     }
 
     /* Responsive */
     @media (max-width: 900px) {
       .content-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .timeline-sidebar {
-        display: none;
-        /* Hide on mobile for now or move below */
+        display: block;
       }
     }
 
@@ -591,18 +799,126 @@
   </style>
 
   <script>
-    // Countdown & Timeline Logic
+    // Dynamic Launch Countdown
     (function () {
-      const target = Date.UTC(2025, 10, 22, 22, 0, 0);
       const timerEl = document.getElementById('timer');
-      const timelineItems = document.querySelectorAll('.timeline-item');
+      const missionNameEl = document.querySelector('.mission-name');
+      const missionStatusEl = document.querySelector('.mission-status');
 
-      function update() {
+      let currentLaunch = null;
+      let allLaunches = [];
+      let countdownInterval = null;
+
+      function waitForFirebase() {
+        return new Promise((resolve) => {
+          if (typeof firebase !== 'undefined' && firebase.database) {
+            resolve();
+          } else {
+            const checkInterval = setInterval(() => {
+              if (typeof firebase !== 'undefined' && firebase.database) {
+                clearInterval(checkInterval);
+                resolve();
+              }
+            }, 100);
+          }
+        });
+      }
+
+      async function loadLaunches() {
+        try {
+          await waitForFirebase();
+          const db = firebase.database();
+
+          const snapshot = await db.ref('events').once('value');
+          const data = snapshot.val() || {};
+          allLaunches = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+
+          // Sort by date
+          allLaunches.sort((a, b) => new Date(a.datetimeISO) - new Date(b.datetimeISO));
+
+          selectCurrentLaunch();
+          startCountdown();
+        } catch (error) {
+          console.error('Error loading launches:', error);
+          missionNameEl.textContent = 'ERROR';
+          missionStatusEl.textContent = 'No se pudo cargar lanzamientos';
+          timerEl.textContent = 'T- --:--:--';
+        }
+      }
+
+      function selectCurrentLaunch() {
         const now = new Date();
-        const diff = target - now.getTime();
-        const secondsToLaunch = diff / 1000; // Positive = T-, Negative = T+
+        const fiveHoursInMs = 5 * 60 * 60 * 1000;
 
-        // Update Timer Text
+        // Find the "active" launch:
+        // - If there's a launch in the past but within T+5h, use that
+        // - Otherwise, use the next future launch
+        let activeLaunch = null;
+
+        for (const launch of allLaunches) {
+          const launchTime = new Date(launch.datetimeISO);
+          const timeSinceLaunch = now - launchTime;
+
+          // If launch is in the past but less than 5 hours ago
+          if (timeSinceLaunch > 0 && timeSinceLaunch < fiveHoursInMs) {
+            activeLaunch = launch;
+            break;
+          }
+
+          // If launch is in the future
+          if (launchTime > now) {
+            activeLaunch = launch;
+            break;
+          }
+        }
+
+        currentLaunch = activeLaunch;
+
+        if (currentLaunch) {
+          missionNameEl.textContent = currentLaunch.mission || currentLaunch.vehicle || 'Lanzamiento';
+          updateStatus();
+        } else {
+          missionNameEl.textContent = 'SIN LANZAMIENTOS';
+          missionStatusEl.textContent = 'ESPERANDO';
+          timerEl.textContent = 'T- --:--:--';
+        }
+      }
+
+      function updateStatus() {
+        if (!currentLaunch) return;
+
+        const now = new Date();
+        const launchTime = new Date(currentLaunch.datetimeISO);
+        const diff = launchTime - now;
+
+        if (diff > 0) {
+          missionStatusEl.textContent = 'EN ESPERA';
+        } else if (diff > -3600000) { // Within 1 hour after launch
+          missionStatusEl.textContent = 'LANZAMIENTO';
+        } else {
+          missionStatusEl.textContent = 'COMPLETADO';
+        }
+      }
+
+      function updateCountdown() {
+        if (!currentLaunch) {
+          timerEl.textContent = 'T- --:--:--';
+          return;
+        }
+
+        const now = new Date();
+        const launchTime = new Date(currentLaunch.datetimeISO);
+        const diff = launchTime - now;
+        const fiveHoursInMs = 5 * 60 * 60 * 1000;
+
+        // Check if we need to switch to next launch
+        if (diff < -fiveHoursInMs) {
+          console.log('Launch passed T+5h, switching to next...');
+          selectCurrentLaunch();
+          return;
+        }
+
+        const secondsToLaunch = diff / 1000;
         const absSeconds = Math.abs(secondsToLaunch);
         const hrs = Math.floor(absSeconds / 3600);
         const mins = Math.floor((absSeconds % 3600) / 60);
@@ -616,36 +932,722 @@
           timerEl.textContent = `T+ ${timeString}`;
         }
 
-        // Update Timeline
-        const currentMissionTime = -secondsToLaunch;
-
-        // Reset all first
-        timelineItems.forEach(item => {
-          item.classList.remove('active', 'passed');
-          const eventTime = parseFloat(item.getAttribute('data-seconds'));
-          if (currentMissionTime >= eventTime) {
-            item.classList.add('passed');
-          }
-        });
-
-        // Find the active item
-        let lastPassedIndex = -1;
-        for (let i = 0; i < timelineItems.length; i++) {
-          const eventTime = parseFloat(timelineItems[i].getAttribute('data-seconds'));
-          if (currentMissionTime >= eventTime) {
-            lastPassedIndex = i;
-          }
-        }
-
-        if (lastPassedIndex >= 0) {
-          timelineItems[lastPassedIndex].classList.remove('passed');
-          timelineItems[lastPassedIndex].classList.add('active');
-        }
+        updateStatus();
       }
 
-      setInterval(update, 1000);
-      update();
+      function startCountdown() {
+        if (countdownInterval) {
+          clearInterval(countdownInterval);
+        }
+        updateCountdown();
+        countdownInterval = setInterval(updateCountdown, 1000);
+      }
+
+      // Load launches when page loads
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadLaunches);
+      } else {
+        loadLaunches();
+      }
     })();
+  </script>
+
+  <!-- Login/Register Modal -->
+  <div id="auth-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h3 id="auth-modal-title" class="modal-title">Iniciar sesión</h3>
+        <button class="btn ghost" onclick="closeAuthModal()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-username">Usuario</label>
+          <input type="text" id="login-username" name="username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" name="password" required autocomplete="current-password">
+          <div id="login-error" class="error-msg">Usuario o contraseña incorrectos</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Entrar</button>
+          <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+        </div>
+        <div class="toggle-form">
+          ¿No tienes cuenta? <a href="#" onclick="showRegisterForm(event)">Crear cuenta</a>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="login-form" style="display:none;" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="register-username">Usuario</label>
+          <input type="text" id="register-username" name="username" required autocomplete="username">
+          <div id="register-username-error" class="error-msg">Este nombre de usuario ya está en uso</div>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Contraseña</label>
+          <input type="password" id="register-password" name="password" required autocomplete="new-password"
+            minlength="6">
+          <div id="register-error" class="error-msg">Error al crear la cuenta</div>
+          <div id="register-success" class="success-msg">¡Cuenta creada! Iniciando sesión...</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Crear cuenta</button>
+          <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+        </div>
+        <div class="toggle-form">
+          ¿Ya tienes cuenta? <a href="#" onclick="showLoginForm(event)">Iniciar sesión</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profile-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h3 class="modal-title">Mi Perfil</h3>
+        <button class="btn ghost" onclick="closeProfileModal()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="user-info" style="justify-content:center; padding:16px; cursor:default;">
+          <div class="user-avatar" id="profile-avatar" style="width:48px; height:48px; font-size:20px;">U</div>
+          <span class="user-name" id="profile-username" style="font-size:18px;">Usuario</span>
+        </div>
+
+        <!-- Change Username Form -->
+        <form id="change-username-form" class="login-form" style="margin-top:24px;"
+          onsubmit="handleChangeUsername(event)">
+          <div class="form-group">
+            <label for="new-username">Nuevo nombre de usuario</label>
+            <input type="text" id="new-username" name="username" required autocomplete="username">
+            <div id="username-change-error" class="error-msg">Este nombre de usuario ya está en uso</div>
+            <div id="username-change-success" class="success-msg">¡Nombre de usuario actualizado!</div>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn primary">Cambiar nombre</button>
+          </div>
+        </form>
+
+        <!-- Change Password Form -->
+        <form id="change-password-form" class="login-form" style="margin-top:16px;"
+          onsubmit="handleChangePassword(event)">
+          <div class="form-group">
+            <label for="current-password">Contraseña actual</label>
+            <input type="password" id="current-password" name="current-password" required
+              autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label for="new-password">Nueva contraseña</label>
+            <input type="password" id="new-password" name="new-password" required autocomplete="new-password"
+              minlength="6">
+            <div id="password-change-error" class="error-msg">Contraseña actual incorrecta</div>
+            <div id="password-change-success" class="success-msg">¡Contraseña actualizada!</div>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn primary">Cambiar contraseña</button>
+          </div>
+        </form>
+
+        <div style="margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,.12);">
+          <button class="btn ghost" onclick="deleteAccount()" style="color:#ff6b6b; width:100%;">Eliminar
+            cuenta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stream Editor Modal (Admin Only) -->
+  <div id="stream-editor-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h3 class="modal-title">Editar Stream URL</h3>
+        <button class="btn ghost" onclick="closeStreamEditor()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <form id="stream-url-form" class="login-form" style="margin-top:20px;" onsubmit="saveStreamUrl(event)">
+        <div class="form-group">
+          <label for="stream-url-input">YouTube URL o Video ID</label>
+          <input type="text" id="stream-url-input" name="stream-url" required
+            placeholder="https://youtube.com/watch?v=... o solo el ID">
+          <div style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:4px;">
+            Puedes pegar la URL completa o solo el ID del video
+          </div>
+          <div id="stream-url-error" class="error-msg">Error al guardar URL</div>
+          <div id="stream-url-success" class="success-msg">¡URL actualizada correctamente!</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Guardar</button>
+          <button type="button" class="btn ghost" onclick="closeStreamEditor()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ===== VARIABLES GLOBALES =====
+    let currentUser = null;
+    let allUsers = {};
+    const SESSION_KEY = 'esz_user';
+    let database = null;
+
+    // ===== FUNCIONES DE UI (Definidas primero para evitar errores si Firebase falla) =====
+    function showLoginModal() {
+      console.log('Abriendo modal de login...');
+      showLoginForm();
+      const modal = document.getElementById('auth-modal-overlay');
+      if (modal) {
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => {
+          modal.classList.add('show');
+        });
+      } else {
+        console.error('No se encontró el modal de login');
+      }
+    }
+
+    function closeAuthModal() {
+      const modal = document.getElementById('auth-modal-overlay');
+      if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 300);
+      }
+      document.getElementById('login-error')?.classList.remove('show');
+      document.getElementById('register-error')?.classList.remove('show');
+      document.getElementById('register-username-error')?.classList.remove('show');
+      document.getElementById('register-success')?.classList.remove('show');
+    }
+
+    function showLoginForm(e) {
+      if (e) e.preventDefault();
+      const title = document.getElementById('auth-modal-title');
+      if (title) title.textContent = 'Iniciar sesión';
+
+      document.getElementById('login-form').style.display = 'flex';
+      document.getElementById('register-form').style.display = 'none';
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+      document.getElementById('login-error')?.classList.remove('show');
+    }
+
+    function showRegisterForm(e) {
+      if (e) e.preventDefault();
+      const title = document.getElementById('auth-modal-title');
+      if (title) title.textContent = 'Crear cuenta';
+
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('register-form').style.display = 'flex';
+      document.getElementById('register-username').value = '';
+      document.getElementById('register-password').value = '';
+      document.getElementById('register-error')?.classList.remove('show');
+      document.getElementById('register-username-error')?.classList.remove('show');
+      document.getElementById('register-success')?.classList.remove('show');
+    }
+
+    function checkAuth() {
+      const loginBtn = document.getElementById('login-btn');
+      const userDisplay = document.getElementById('user-display');
+      const userName = document.getElementById('user-name');
+      const userAvatar = document.getElementById('user-avatar');
+
+      if (!loginBtn || !userDisplay) return;
+
+      if (currentUser) {
+        loginBtn.style.display = 'none';
+        userDisplay.style.display = 'flex';
+        if (userName) userName.textContent = currentUser;
+        if (userAvatar) userAvatar.textContent = currentUser.charAt(0).toUpperCase();
+      } else {
+        loginBtn.style.display = 'inline-flex';
+        userDisplay.style.display = 'none';
+      }
+
+      // Check admin access whenever auth state changes
+      checkAdminAccess();
+    }
+
+    function hydrateSessionFromStorage() {
+      try {
+        const saved = localStorage.getItem(SESSION_KEY);
+        currentUser = (saved && saved.trim()) ? saved : null;
+        checkAuth();
+      } catch (e) {
+        console.error('Error accediendo a localStorage', e);
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem(SESSION_KEY);
+      checkAuth();
+      checkAdminAccess(); // Hide admin button on logout
+    }
+
+    // ===== STREAM EDITOR FUNCTIONS (Admin Only) =====
+    function checkAdminAccess() {
+      const editBtn = document.getElementById('admin-edit-stream');
+      if (editBtn && currentUser === 'Esstor') {
+        editBtn.style.display = 'inline-flex';
+      } else if (editBtn) {
+        editBtn.style.display = 'none';
+      }
+    }
+
+    async function loadStreamUrl() {
+      if (!database) return;
+
+      try {
+        const snapshot = await database.ref('config/streamUrl').once('value');
+        const savedUrl = snapshot.val();
+
+        if (savedUrl) {
+          updateIframeUrl(savedUrl);
+        }
+      } catch (error) {
+        console.error('Error loading stream URL:', error);
+      }
+    }
+
+    function extractVideoId(input) {
+      // If it's just a video ID (11 chars alphanumeric with - and _)
+      if (/^[a-zA-Z0-9_-]{11}$/.test(input)) {
+        return input;
+      }
+
+      // Extract from various YouTube URL formats
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+        /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/
+      ];
+
+      for (const pattern of patterns) {
+        const match = input.match(pattern);
+        if (match) return match[1];
+      }
+
+      return null;
+    }
+
+    function updateIframeUrl(videoIdOrUrl) {
+      const videoId = extractVideoId(videoIdOrUrl);
+      if (!videoId) {
+        console.error('Invalid YouTube URL or ID');
+        return;
+      }
+
+      const iframe = document.getElementById('stream-iframe');
+      if (iframe) {
+        iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
+      }
+    }
+
+    function showStreamEditor() {
+      if (currentUser !== 'Esstor') {
+        alert('Solo el administrador puede editar el stream');
+        return;
+      }
+
+      const modal = document.getElementById('stream-editor-modal');
+      const input = document.getElementById('stream-url-input');
+
+      // Clear previous messages
+      document.getElementById('stream-url-error').classList.remove('show');
+      document.getElementById('stream-url-success').classList.remove('show');
+
+      // Pre-fill with current iframe src if possible
+      const iframe = document.getElementById('stream-iframe');
+      if (iframe) {
+        const match = iframe.src.match(/embed\/([a-zA-Z0-9_-]{11})/);
+        if (match) input.value = match[1];
+      }
+
+      modal.style.display = 'flex';
+      requestAnimationFrame(() => {
+        modal.classList.add('show');
+      });
+    }
+
+    function closeStreamEditor() {
+      const modal = document.getElementById('stream-editor-modal');
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+
+    async function saveStreamUrl(e) {
+      e.preventDefault();
+
+      console.log('saveStreamUrl called, currentUser:', currentUser);
+      console.log('database initialized:', !!database);
+
+      if (currentUser !== 'Esstor') {
+        alert('Solo el usuario Esstor puede editar el stream');
+        return;
+      }
+
+      if (!database) {
+        alert('Error: Firebase no está inicializado');
+        return;
+      }
+
+      const input = document.getElementById('stream-url-input').value.trim();
+      console.log('Input URL:', input);
+
+      const videoId = extractVideoId(input);
+      console.log('Extracted video ID:', videoId);
+
+      document.getElementById('stream-url-error').classList.remove('show');
+      document.getElementById('stream-url-success').classList.remove('show');
+
+      if (!videoId) {
+        document.getElementById('stream-url-error').textContent = 'URL o ID de YouTube inválido';
+        document.getElementById('stream-url-error').classList.add('show');
+        return;
+      }
+
+      try {
+        console.log('Attempting to save to Firebase...');
+        // Save to Firebase
+        await database.ref('config/streamUrl').set(videoId);
+        console.log('Successfully saved to Firebase');
+
+        // Update iframe
+        updateIframeUrl(videoId);
+
+        // Show success
+        document.getElementById('stream-url-success').classList.add('show');
+
+        // Close modal after 1.5s
+        setTimeout(() => {
+          closeStreamEditor();
+        }, 1500);
+      } catch (error) {
+        console.error('Error saving stream URL:', error);
+        console.error('Error details:', error.message, error.code);
+        document.getElementById('stream-url-error').textContent = 'Error al guardar la URL: ' + (error.message || 'Error desconocido');
+        document.getElementById('stream-url-error').classList.add('show');
+      }
+    }
+
+
+    // ===== PROFILE FUNCTIONS =====
+    function showProfileModal() {
+      if (!currentUser) return;
+
+      const pName = document.getElementById('profile-username');
+      const pAvatar = document.getElementById('profile-avatar');
+
+      if (pName) pName.textContent = currentUser;
+      if (pAvatar) pAvatar.textContent = currentUser.charAt(0).toUpperCase();
+
+      document.getElementById('new-username').value = '';
+      document.getElementById('current-password').value = '';
+      document.getElementById('new-password').value = '';
+
+      // Clear messages
+      document.getElementById('username-change-error')?.classList.remove('show');
+      document.getElementById('username-change-success')?.classList.remove('show');
+      document.getElementById('password-change-error')?.classList.remove('show');
+      document.getElementById('password-change-success')?.classList.remove('show');
+
+      const modal = document.getElementById('profile-modal-overlay');
+      if (modal) {
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => {
+          modal.classList.add('show');
+        });
+      }
+    }
+
+    function closeProfileModal() {
+      const modal = document.getElementById('profile-modal-overlay');
+      if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    // ===== CONFIGURACIÓN DE FIREBASE =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyDKvGLsd1jKfsSlzgTjBas-8WvbFqV1xU",
+      authDomain: "eszunspace-bc900.firebaseapp.com",
+      databaseURL: "https://eszunspace-bc900-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "eszunspace-bc900",
+      storageBucket: "eszunspace-bc900.firebasestorage.app",
+      messagingSenderId: "105651684829",
+      appId: "1:105651684829:web:5c8fd5051c8c2daf24f744",
+      measurementId: "G-ZDM5GF0MBW"
+    };
+
+    try {
+      if (typeof firebase !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+        database = firebase.database();
+        console.log('Firebase inicializado correctamente');
+      } else {
+        console.error('Firebase SDK no cargado');
+      }
+    } catch (e) {
+      console.error('Error inicializando Firebase:', e);
+    }
+
+    // ===== ASYNC FUNCTIONS (Dependen de Firebase) =====
+    async function loadUsers() {
+      if (!database) return;
+      try {
+        const snapshot = await database.ref('users').once('value');
+        allUsers = snapshot.val() || {};
+      } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        allUsers = {};
+      }
+    }
+
+    async function saveUser(username, password) {
+      if (!database) {
+        alert('Error de conexión con la base de datos');
+        return false;
+      }
+      try {
+        const snapshot = await database.ref('users/' + username).once('value');
+        if (snapshot.exists()) {
+          return false;
+        }
+        await database.ref('users/' + username).set(password);
+        allUsers[username] = password;
+        return true;
+      } catch (error) {
+        console.error('Error al guardar usuario:', error);
+        return false;
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (allUsers[username] && allUsers[username] === password) {
+        currentUser = username;
+        localStorage.setItem(SESSION_KEY, currentUser);
+        checkAuth();
+        closeAuthModal();
+      } else {
+        document.getElementById('login-error').classList.add('show');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('register-username').value.trim();
+      const password = document.getElementById('register-password').value;
+
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+
+      if (allUsers[username]) {
+        document.getElementById('register-username-error').classList.add('show');
+        return;
+      }
+
+      const saved = await saveUser(username, password);
+
+      if (saved) {
+        document.getElementById('register-success').classList.add('show');
+        setTimeout(() => {
+          currentUser = username;
+          localStorage.setItem(SESSION_KEY, currentUser);
+          checkAuth();
+          closeAuthModal();
+        }, 1500);
+      } else {
+        document.getElementById('register-error').classList.add('show');
+      }
+    }
+
+    async function handleChangeUsername(e) {
+      e.preventDefault();
+      if (!database) return;
+
+      const newUsername = document.getElementById('new-username').value.trim();
+
+      document.getElementById('username-change-error').classList.remove('show');
+      document.getElementById('username-change-success').classList.remove('show');
+
+      if (newUsername === currentUser) {
+        document.getElementById('username-change-error').textContent = 'El nombre es el mismo que el actual';
+        document.getElementById('username-change-error').classList.add('show');
+        return;
+      }
+
+      if (allUsers[newUsername]) {
+        document.getElementById('username-change-error').textContent = 'Este nombre de usuario ya está en uso';
+        document.getElementById('username-change-error').classList.add('show');
+        return;
+      }
+
+      try {
+        const oldPassword = allUsers[currentUser];
+
+        // Delete old username
+        await database.ref('users/' + currentUser).remove();
+        delete allUsers[currentUser];
+
+        // Create new username with same password
+        await database.ref('users/' + newUsername).set(oldPassword);
+        allUsers[newUsername] = oldPassword;
+
+        // Update session
+        currentUser = newUsername;
+        localStorage.setItem(SESSION_KEY, currentUser);
+
+        document.getElementById('username-change-success').classList.add('show');
+
+        setTimeout(() => {
+          checkAuth();
+          closeProfileModal();
+        }, 1500);
+      } catch (error) {
+        console.error('Error al cambiar nombre:', error);
+        document.getElementById('username-change-error').textContent = 'Error al cambiar el nombre';
+        document.getElementById('username-change-error').classList.add('show');
+      }
+    }
+
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      if (!database) return;
+
+      const currentPassword = document.getElementById('current-password').value;
+      const newPassword = document.getElementById('new-password').value;
+
+      document.getElementById('password-change-error').classList.remove('show');
+      document.getElementById('password-change-success').classList.remove('show');
+
+      if (allUsers[currentUser] !== currentPassword) {
+        document.getElementById('password-change-error').classList.add('show');
+        return;
+      }
+
+      try {
+        await database.ref('users/' + currentUser).set(newPassword);
+        allUsers[currentUser] = newPassword;
+
+        document.getElementById('password-change-success').classList.add('show');
+        document.getElementById('current-password').value = '';
+        document.getElementById('new-password').value = '';
+
+        setTimeout(() => {
+          document.getElementById('password-change-success').classList.remove('show');
+        }, 3000);
+      } catch (error) {
+        console.error('Error al cambiar contraseña:', error);
+        document.getElementById('password-change-error').textContent = 'Error al cambiar la contraseña';
+        document.getElementById('password-change-error').classList.add('show');
+      }
+    }
+
+    async function deleteAccount() {
+      if (!database) return;
+
+      if (!confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+        return;
+      }
+
+      try {
+        await database.ref('users/' + currentUser).remove();
+        delete allUsers[currentUser];
+
+        currentUser = null;
+        localStorage.removeItem(SESSION_KEY);
+
+        closeProfileModal();
+        checkAuth();
+
+        alert('Tu cuenta ha sido eliminada correctamente');
+      } catch (error) {
+        console.error('Error al eliminar cuenta:', error);
+        alert('Error al eliminar la cuenta. Inténtalo de nuevo.');
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      document.body.classList.add("fade-in");
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      await loadUsers();
+      hydrateSessionFromStorage();
+
+      // Load stream URL from Firebase
+      await loadStreamUrl();
+
+      // Check if user is admin (Esstor)
+      checkAdminAccess();
+
+      // Marca activo
+      const path = location.pathname.split("/").pop() || "index.html";
+      document.querySelectorAll(".menu a").forEach(a => {
+        const href = a.getAttribute("href");
+        if ((path === "" && href === "index.html") || href === path) {
+          a.setAttribute("aria-current", "page");
+        }
+      });
+
+      // Transición suave entre páginas internas
+      document.querySelectorAll('a[href]').forEach(link => {
+        const url = new URL(link.href, location.href);
+        if (url.origin === location.origin && !link.target) {
+          link.addEventListener("click", e => {
+            if (url.pathname === location.pathname && url.hash) return;
+            const menu = document.querySelector('.menu');
+            if (menu && menu.classList.contains('open')) return;
+            e.preventDefault();
+            document.body.classList.add("fade-out");
+            setTimeout(() => location.href = url.href, 600);
+          });
+        }
+      });
+
+      // Toggle del menú en móvil
+      const toggle = document.querySelector('.menu-toggle');
+      const menu = document.getElementById('primary-menu');
+      function setOpen(open) {
+        menu.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      }
+      toggle.addEventListener('click', () => setOpen(!menu.classList.contains('open')));
+      menu.addEventListener('click', (e) => {
+        if (e.target.closest('a')) setOpen(false);
+      });
+      document.addEventListener('click', (e) => {
+        if (menu.classList.contains('open')) {
+          const within = e.target.closest('.nav-shell');
+          if (!within) setOpen(false);
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setOpen(false);
+      });
+
+      // Keyboard support for user-info
+      document.querySelector('.user-info')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          showProfileModal();
+        }
+      });
+    });
   </script>
 
 </body>
