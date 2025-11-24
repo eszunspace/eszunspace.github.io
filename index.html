@@ -1,11 +1,12 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta name="title" content="INICIO – EsZunSpace">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>INICIO – EsZunSpace</title>
-    <!-- Social preview -->
+  <!-- Social preview -->
   <meta name="description" content="Descubre EsZunSpace: cohetes, motores, satélites y lanzamientos.">
   <link rel="canonical" href="https://eszunspace.es/">
   <meta property="og:type" content="website">
@@ -21,165 +22,313 @@
   <meta name="theme-color" content="#0b0b0f">
 
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet">
   <link rel="icon" type="image/jpeg" href="logoarriba.jpg">
-  
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  
+
   <style>
     :root {
       --bg-image: url('background.jpg');
       --header-h: 64px;
     }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
     body {
       font-family: 'Poppins', system-ui, sans-serif;
-      color: #fff; background: #000;
-      opacity: 0; transition: opacity 0.6s ease;
+      color: #fff;
+      background: #000;
+      opacity: 0;
+      transition: opacity 0.6s ease;
     }
-    body.fade-in { opacity: 1; }
-    body.fade-out { opacity: 0; }
+
+    body.fade-in {
+      opacity: 1;
+    }
+
+    body.fade-out {
+      opacity: 0;
+    }
 
     /* ===== Header cápsula con marcador activo ===== */
-    header.topbar{
-      position:fixed; top:0; left:0; right:0; z-index:1000;
-      padding:12px 12px;
-      background:linear-gradient(180deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,0) 100%);
+    header.topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 12px 12px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, .65) 0%, rgba(0, 0, 0, 0) 100%);
       -webkit-backdrop-filter: blur(2px);
       backdrop-filter: blur(2px);
     }
-    .nav-shell{
-      width:min(1200px, 94vw);
-      margin:0 auto;
-      height:var(--header-h);
-      padding:0 14px;
-      display:flex; align-items:center; justify-content:space-between;
-      border-radius:18px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
-      border:1px solid rgba(255,255,255,0.12);
-      box-shadow:0 10px 30px rgba(0,0,0,.6);
-      position:relative; overflow:hidden;
+
+    .nav-shell {
+      width: min(1200px, 94vw);
+      margin: 0 auto;
+      height: var(--header-h);
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
+      position: relative;
+      overflow: hidden;
     }
-    .nav-shell::before{
-      content:""; position:absolute; inset:-1px;
+
+    .nav-shell::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
       background: conic-gradient(from 0deg, #00f0ff, #ff00d4, #00f0ff);
-      filter: blur(22px); opacity:.14; pointer-events:none;
+      filter: blur(22px);
+      opacity: .14;
+      pointer-events: none;
     }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      text-decoration:none; color:#fff;
-      min-width:0;
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+      min-width: 0;
     }
-    .brand img{height:36px; width:36px; border-radius:50%; box-shadow:0 0 8px rgba(255,255,255,.1)}
-    .brand .title{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:800; letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+    .brand img {
+      height: 36px;
+      width: 36px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(255, 255, 255, .1)
+    }
+
+    .brand .title {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-weight: 800;
+      letter-spacing: .02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     /* === Toggle (mobile) === */
-    .menu-toggle{
-      display:none;
-      background:transparent; border:0; color:#fff;
-      width:44px; height:44px; border-radius:12px;
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
     }
-    .menu-toggle:focus-visible{ outline:2px solid #00f0ff; outline-offset:2px; }
 
-    .menu{display:flex; align-items:center; gap:18px}
-    .menu a{
-      position:relative; display:inline-flex; align-items:center;
-      padding:10px 10px; text-decoration:none; color:#fff;
-      font-weight:700; text-transform:uppercase; letter-spacing:.08em; font-size:12px; opacity:.9;
-      transition:opacity .2s ease;
+    .menu-toggle:focus-visible {
+      outline: 2px solid #00f0ff;
+      outline-offset: 2px;
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 18px
+    }
+
+    .menu a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 10px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12px;
+      opacity: .9;
+      transition: opacity .2s ease;
       -webkit-tap-highlight-color: transparent;
     }
-    .menu a:hover{opacity:1}
-    .menu a::after{
-      content:""; position:absolute; left:12px; right:12px; bottom:6px; height:2px;
-      background:linear-gradient(90deg, #00f0ff, #ff00d4);
-      transform:scaleX(0); transform-origin:left; transition:transform .25s ease;
-      border-radius:2px;
+
+    .menu a:hover {
+      opacity: 1
     }
-    .menu a:hover::after{ transform:scaleX(1); }
-    .menu a[aria-current="page"]{opacity:1}
-    .menu a[aria-current="page"]::after{ transform:scaleX(1); }
+
+    .menu a::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 6px;
+      height: 2px;
+      background: linear-gradient(90deg, #00f0ff, #ff00d4);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .25s ease;
+      border-radius: 2px;
+    }
+
+    .menu a:hover::after {
+      transform: scaleX(1);
+    }
+
+    .menu a[aria-current="page"] {
+      opacity: 1
+    }
+
+    .menu a[aria-current="page"]::after {
+      transform: scaleX(1);
+    }
 
     /* User section */
-    .user-section{display:flex; align-items:center; gap:10px;}
-    .user-info{
-      display:flex; align-items:center; gap:8px;
-      padding:6px 12px; border-radius:10px;
-      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
-      cursor:pointer;
-      transition:transform .15s ease, background .2s ease, border-color .2s ease;
+    .user-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .user-info:hover{
-      transform:translateY(-1px); 
-      background:rgba(255,255,255,.1); 
-      border-color:rgba(255,255,255,.3);
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .18);
+      cursor: pointer;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease;
     }
-    .user-avatar{
-      width:28px; height:28px; border-radius:50%;
-      background:linear-gradient(135deg, #00f0ff, #ff00d4);
-      display:flex; align-items:center; justify-content:center;
-      font-weight:700; font-size:12px;
+
+    .user-info:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .1);
+      border-color: rgba(255, 255, 255, .3);
     }
-    .user-name{font-weight:600; font-size:13px;}
-    
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00f0ff, #ff00d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
     /* Mobile: user section in header */
-    @media (max-width: 900px){
-      .user-section #user-display .user-info{
-        padding:4px 8px;
+    @media (max-width: 900px) {
+      .user-section #user-display .user-info {
+        padding: 4px 8px;
       }
-      .user-section #user-display .user-avatar{
-        width:32px; height:32px; font-size:14px;
+
+      .user-section #user-display .user-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
       }
-      .user-section #user-display .user-name{
-        display:none;
+
+      .user-section #user-display .user-name {
+        display: none;
       }
-      .user-section #login-btn{
-        padding:0 12px; font-size:12px; height:36px;
+
+      .user-section #login-btn {
+        padding: 0 12px;
+        font-size: 12px;
+        height: 36px;
       }
     }
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      height:32px; min-width:32px; padding:0 10px; border-radius:10px;
-      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
-      color:#fff; cursor:pointer; user-select:none;
-      transition:transform .15s ease, background .2s ease, border-color .2s ease;
-      text-decoration:none; gap:8px; font-family:inherit; font-size:13px;
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+      min-width: 32px;
+      padding: 0 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .18);
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease;
+      text-decoration: none;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 13px;
     }
-    .btn:hover{transform:translateY(-1px); background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3)}
-    .btn.primary{
-      border:0;
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .1);
+      border-color: rgba(255, 255, 255, .3)
+    }
+
+    .btn.primary {
+      border: 0;
       background: linear-gradient(90deg, #00f0ff, #ff00d4);
-      font-weight:700;
-      box-shadow:0 8px 24px rgba(0,0,0,.35);
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
     }
-    .btn.ghost{ background:rgba(255,255,255,.06); }
+
+    .btn.ghost {
+      background: rgba(255, 255, 255, .06);
+    }
 
     /* ===== Hero ===== */
     .hero {
-      position: relative; min-height: 100svh;
-      display: grid; place-items: center;
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
       overflow: hidden;
       padding-top: calc(var(--header-h) + 24px);
       padding-bottom: max(16px, env(safe-area-inset-bottom));
     }
-    .bg { position: absolute; inset: 0;
+
+    .bg {
+      position: absolute;
+      inset: 0;
       background-image: var(--bg-image);
-      background-size: cover; background-position: center;
+      background-size: cover;
+      background-position: center;
       filter: brightness(0.7) saturate(1.1);
       transform: translateZ(0);
     }
-    .overlay { position: absolute; inset: 0;
-      background: radial-gradient(80% 60% at 50% 20%, rgba(0,0,0,0), rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.85));
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(80% 60% at 50% 20%, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.65) 60%, rgba(0, 0, 0, 0.85));
     }
 
     /* Título central animado */
     .brand-name {
       position: relative;
       margin: 0 16px;
-      text-align:center;
+      text-align: center;
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 800;
       font-size: clamp(36px, 11vw, 120px);
@@ -187,7 +336,7 @@
       background: linear-gradient(180deg, #e7f9ff, #bfe4ff 40%, #a6a6a6 60%, #ffffff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(255,255,255,0.15);
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
       animation: fadeZoom 1.5s ease forwards;
       overflow: hidden;
       line-height: 1.05;
@@ -197,29 +346,55 @@
     .brand-name::after {
       content: "";
       position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.6) 50%, transparent 100%);
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, .6) 50%, transparent 100%);
       animation: sheen 4s infinite;
     }
 
     @keyframes fadeZoom {
-      0% { opacity: 0; transform: scale(0.9); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-    @keyframes sheen {
-      0% { left: -100%; }
-      40% { left: 100%; }
-      100% { left: 100%; }
+      0% {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
-    footer{ position:absolute; bottom:16px; left:0; right:0; text-align:center; font-size:12px; opacity:.85; }
+    @keyframes sheen {
+      0% {
+        left: -100%;
+      }
+
+      40% {
+        left: 100%;
+      }
+
+      100% {
+        left: 100%;
+      }
+    }
+
+    footer {
+      position: absolute;
+      bottom: 16px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 12px;
+      opacity: .85;
+    }
 
     /* Modal */
-    .modal-overlay{
+    .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.65);
+      background: rgba(0, 0, 0, .65);
       display: none;
       align-items: center;
       justify-content: center;
@@ -228,109 +403,227 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-    .modal-overlay.show{ 
-      display:flex; 
+
+    .modal-overlay.show {
+      display: flex;
       animation: fadeIn 0.3s ease forwards;
     }
-    .modal-card{
-      width:min(680px, 96vw);
-      border-radius:18px;
-      background: radial-gradient(1200px 1200px at -10% -20%, rgba(0,240,255,.08), transparent 35%) , #111113;
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow: 0 28px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.06);
-      padding:18px 18px 16px;
+
+    .modal-card {
+      width: min(680px, 96vw);
+      border-radius: 18px;
+      background: radial-gradient(1200px 1200px at -10% -20%, rgba(0, 240, 255, .08), transparent 35%), #111113;
+      border: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .06);
+      padding: 18px 18px 16px;
       max-height: 90vh;
       overflow-y: auto;
       transform: scale(0.9) translateY(20px);
       opacity: 0;
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
     }
-    .modal-overlay.show .modal-card{
+
+    .modal-overlay.show .modal-card {
       transform: scale(1) translateY(0);
       opacity: 1;
     }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .modal-title{ margin:0; font-family:'Space Grotesk', system-ui, sans-serif; font-size:1.15rem; letter-spacing:.2px; font-weight:700; }
 
-    .login-form{
-      display:flex; flex-direction:column; gap:16px; margin-top:20px;
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
-    .form-group{display:flex; flex-direction:column; gap:6px;}
-    .form-group label{font-weight:600; font-size:14px;}
-    .form-group input{
-      padding:12px 14px; border-radius:10px;
-      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18);
-      color:#fff; font-size:14px; font-family:inherit;
-      transition:border-color .2s ease, background .2s ease;
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
-    .form-group input:focus{
-      outline:none; border-color:#00f0ff;
-      background:rgba(255,255,255,.08);
+
+    .modal-title {
+      margin: 0;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: .2px;
+      font-weight: 700;
     }
-    .error-msg{
-      color:#ff6b6b; font-size:13px; margin-top:4px; display:none;
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
     }
-    .error-msg.show{display:block;}
-    .success-msg{
-      color:#51cf66; font-size:13px; margin-top:4px; display:none;
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
-    .success-msg.show{display:block;}
-    .toggle-form{
-      text-align:center; margin-top:16px; color:rgba(255,255,255,.72); font-size:14px;
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 14px;
     }
-    .toggle-form a{
-      color:#00f0ff; text-decoration:none; font-weight:600;
-      transition:opacity .2s ease;
+
+    .form-group input {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .18);
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color .2s ease, background .2s ease;
     }
-    .toggle-form a:hover{opacity:.8}
-    .modal-actions{ display:flex; gap:10px; justify-content:flex-end; }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #00f0ff;
+      background: rgba(255, 255, 255, .08);
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    .success-msg {
+      color: #51cf66;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .success-msg.show {
+      display: block;
+    }
+
+    .toggle-form {
+      text-align: center;
+      margin-top: 16px;
+      color: rgba(255, 255, 255, .72);
+      font-size: 14px;
+    }
+
+    .toggle-form a {
+      color: #00f0ff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity .2s ease;
+    }
+
+    .toggle-form a:hover {
+      opacity: .8
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
 
     /* =========================
        Responsive
        ========================= */
-    @media (max-width: 900px){
-      :root{ --header-h: 56px; }
-      .brand img{ width:32px; height:32px; }
-      .nav-shell{ padding:0 10px; border-radius:14px; }
-      .menu-toggle{ display:inline-flex; align-items:center; justify-content:center; }
-      .menu{
-        position: fixed; inset: calc(var(--header-h) + 8px) 8px auto 8px;
-        right: 8px; left: 8px; top: calc(var(--header-h) + 12px);
-        display: none; flex-direction: column; align-items: stretch; gap: 6px;
+    @media (max-width: 900px) {
+      :root {
+        --header-h: 56px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .nav-shell {
+        padding: 0 10px;
+        border-radius: 14px;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu {
+        position: fixed;
+        inset: calc(var(--header-h) + 8px) 8px auto 8px;
+        right: 8px;
+        left: 8px;
+        top: calc(var(--header-h) + 12px);
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
         padding: 10px;
-        background: rgba(18,18,18,0.92);
-        border:1px solid rgba(255,255,255,0.12);
-        border-radius:16px;
-        box-shadow: 0 20px 50px rgba(0,0,0,.6);
+        background: rgba(18, 18, 18, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
         backdrop-filter: blur(8px);
       }
-      .menu.open{ display:flex; }
-      .menu a{
-        padding:14px 12px; font-size:13px; letter-spacing:.12em;
-        border-radius:10px;
+
+      .menu.open {
+        display: flex;
       }
-      .menu a::after{ display:none; }
-      .brand .title{ font-size:16px; }
-      .user-section{ display:flex; }
-      .user-section .btn.ghost{ display:none; }
+
+      .menu a {
+        padding: 14px 12px;
+        font-size: 13px;
+        letter-spacing: .12em;
+        border-radius: 10px;
+      }
+
+      .menu a::after {
+        display: none;
+      }
+
+      .brand .title {
+        font-size: 16px;
+      }
+
+      .user-section {
+        display: flex;
+      }
+
+      .user-section .btn.ghost {
+        display: none;
+      }
     }
 
-    @media (hover:none){
-      .menu a:hover::after{ transform:none; }
-      .menu a:hover{ opacity:1; }
+    @media (hover:none) {
+      .menu a:hover::after {
+        transform: none;
+      }
+
+      .menu a:hover {
+        opacity: 1;
+      }
     }
 
     /* Accesibilidad: respetar reduce-motion */
     @media (prefers-reduced-motion: reduce) {
-      * { animation: none !important; transition: none !important; }
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
     }
   </style>
 </head>
+
 <body>
   <header class="topbar">
     <div class="nav-shell">
@@ -342,7 +635,7 @@
       <!-- Toggle sólo visible en móvil -->
       <button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false" aria-label="Abrir menú">
         <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
       </button>
 
@@ -352,9 +645,11 @@
         <a href="motores.html">Motores</a>
         <a href="satelites.html">Satélites</a>
         <a href="lanzamientos.html">Lanzamientos</a>
-        <a href="stream.html">Stream</a>        
-        <div id="mobile-logout-section" style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,.12);">
-          <button class="btn ghost" onclick="logout()" style="width:100%; justify-content:center;">Cerrar sesión</button>
+        <a href="stream.html">Stream</a>
+        <div id="mobile-logout-section"
+          style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,.12);">
+          <button class="btn ghost" onclick="logout()" style="width:100%; justify-content:center;">Cerrar
+            sesión</button>
         </div>
       </nav>
 
@@ -376,108 +671,582 @@
     <div class="overlay" aria-hidden="true"></div>
     <h1 class="brand-name"></h1>
 
-    <!-- VORTIC-1 Countdown -->
-    <div id="vortic-countdown" aria-live="polite" role="timer">
-      <div class="vortic-card" role="region" aria-label="Contador de la misión VORTIC-1">
-        <div class="vortic-mission">Misión <span id="vortic-name">VORTIC-1</span></div>
-        <div class="vortic-t">T-</div>
-        <div id="vortic-time" class="vortic-time" aria-atomic="true">00:00:00</div>
-        <div id="vortic-status" class="vortic-status" aria-hidden="true"></div>
+    <!-- Dynamic Upcoming Launches -->
+    <section class="launches-section">
+      <div class="launches-container">
+        <h2 class="launches-title">Próximos Lanzamientos</h2>
+        <div id="launches-list" class="launches-list">
+          <!-- Launch cards will be inserted here by JavaScript -->
+          <div class="loading">Cargando lanzamientos...</div>
+        </div>
       </div>
-    </div>
+    </section>
 
     <style>
-    /* Countdown styles - modern glass card */
-    #vortic-countdown{ position: fixed; inset: auto 18px 18px auto; z-index:1200; display:flex; align-items:center; justify-content:center; pointer-events:none; }
-    .vortic-card{
-      pointer-events:auto;
-      min-width:220px; max-width:380px;
-      display:flex; flex-direction:column; align-items:center; gap:8px;
-      padding:14px 16px;
-      border-radius:14px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
-      backdrop-filter: blur(8px) saturate(1.1);
-      color: #fff; font-family: 'Space Grotesk', system-ui, sans-serif; text-align:center;
-    }
-    .vortic-mission{ font-weight:700; letter-spacing:0.04em; font-size:14px; color: #cfeeff; }
-    .vortic-mission #vortic-name{ font-weight:900; color: #fff; display:inline-block; margin-left:6px; }
-    .vortic-t{ font-weight:700; font-size:12px; color:#9fdcff; opacity:0.95; margin-top:2px;}
-    .vortic-time{
-      font-weight:800; font-size:28px; line-height:1; letter-spacing:0.02em;
-      padding:6px 12px; border-radius:8px;
-      background: linear-gradient(90deg, rgba(0,240,255,0.06), rgba(255,0,212,0.03));
-      border:1px solid rgba(255,255,255,0.06);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-      min-width:160px;
-    }
-    .vortic-status{ font-size:12px; opacity:0.9; margin-top:2px; color:#ffd6a5; font-weight:700; }
+      /* Launches section */
+      .launches-section {
+        position: relative;
+        z-index: 1;
+        width: min(1200px, 92vw);
+        margin: 60px auto 80px;
+      }
 
-    /* Small screens */
-    @media (max-width:700px){
-      #vortic-countdown{ inset: auto 12px 12px 12px; }
-      .vortic-card{ max-width:320px; padding:12px; }
-      .vortic-time{ font-size:22px; min-width:140px; }
-    }
+      .launches-container {
+        padding: 0;
+      }
+
+      .launches-title {
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-size: clamp(24px, 4vw, 36px);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin: 0 0 24px;
+        background: linear-gradient(180deg, #e7f9ff, #bfe4ff 55%, #ffffff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 18px rgba(255, 255, 255, 0.15);
+      }
+
+      .launches-list {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      }
+
+      .loading {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 14px;
+      }
+
+      /* Launch card */
+      .launch-card {
+        position: relative;
+        padding: 20px;
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px) saturate(1.1);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        overflow: hidden;
+      }
+
+      .launch-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #00f0ff, #ff00d4);
+        opacity: 0.75;
+      }
+
+      .launch-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 50px rgba(0, 0, 0, 0.65);
+        border-color: rgba(255, 255, 255, 0.22);
+      }
+
+      /* Card content */
+      .launch-vehicle {
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-size: 22px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 6px;
+        color: #ffffff;
+      }
+
+      .launch-site {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.75);
+        margin-bottom: 16px;
+        font-weight: 600;
+      }
+
+      .launch-mission {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.65);
+        margin-bottom: 4px;
+        font-style: italic;
+      }
+
+      /* Countdown display */
+      .launch-countdown {
+        margin: 16px 0 12px;
+        padding: 14px;
+        border-radius: 12px;
+        background: linear-gradient(90deg, rgba(0, 240, 255, 0.08), rgba(255, 0, 212, 0.04));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: center;
+      }
+
+      .launch-t {
+        font-size: 11px;
+        font-weight: 700;
+        color: #9fdcff;
+        margin-bottom: 4px;
+        letter-spacing: 0.1em;
+      }
+
+      .launch-time {
+        font-family: 'Space Grotesk', system-ui, sans-serif;
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        color: #ffffff;
+        line-height: 1;
+      }
+
+      /* Launch date */
+      .launch-date {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 600;
+        margin-top: 8px;
+        text-align: center;
+      }
+
+      /* Empty state */
+      .no-launches {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px 20px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .no-launches-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .launches-section {
+          margin: 40px auto 60px;
+        }
+
+        .launches-list {
+          grid-template-columns: 1fr;
+        }
+
+        .launch-vehicle {
+          font-size: 20px;
+        }
+
+        .launch-time {
+          font-size: 22px;
+        }
+      }
     </style>
 
     <script>
-    (function(){
-      // Target UTC time: 2025-11-22 22:00:00 UTC
-      const target = Date.UTC(2025, 10, 22, 22, 0, 0); // months are 0-based -> 10 = November
-      const timeEl = document.getElementById('vortic-time');
-      const statusEl = document.getElementById('vortic-status');
-      const nameEl = document.getElementById('vortic-name');
-      nameEl.textContent = "VORTIC-1";
+      // Firebase initialization (must be included before this script)
+      // Assumes Firebase SDK is already loaded
 
-      function pad(n){ return String(n).padStart(2,'0'); }
+      (function () {
+        const firebaseConfig = {
+          apiKey: "AIzaSyDKvGLsd1jKfsSlzgTjBas-8WvbFqV1xU",
+          authDomain: "eszunspace-bc900.firebaseapp.com",
+          databaseURL: "https://eszunspace-bc900-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "eszunspace-bc900",
+          storageBucket: "eszunspace-bc900.firebasestorage.app",
+          messagingSenderId: "105651684829",
+          appId: "1:105651684829:web:5c8fd5051c8c2daf24f744",
+          measurementId: "G-ZDM5GF0MBW"
+        };
 
-      function update(){
-        const now = new Date();
-        const nowUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
-        let diff = target - nowUtc; // milliseconds
+        // Initialize Firebase if not already initialized
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
 
-        // If negative or zero, show T- 00:00:00 and launch message
-        if (diff <= 0) {
-          timeEl.textContent = "00:00:00";
-          statusEl.textContent = "¡LANZAMIENTO!";
-          // small pulse animation
-          statusEl.style.animation = 'vortic-pulse 1s infinite';
+        let upcomingLaunches = [];
+        let countdownInterval = null;
+
+        // Load launches from Firebase
+        async function loadLaunches() {
+          try {
+            const snapshot = await database.ref('events').once('value');
+            const data = snapshot.val() || {};
+            const events = Object.values(data);
+
+            // Filter upcoming launches (future dates only)
+            const now = new Date();
+            upcomingLaunches = events
+              .filter(event => new Date(event.datetimeISO) > now)
+              .sort((a, b) => new Date(a.datetimeISO) - new Date(b.datetimeISO))
+              .slice(0, 6); // Show max 6 launches
+
+            renderLaunches();
+            startCountdowns();
+          } catch (error) {
+            console.error('Error loading launches:', error);
+            document.getElementById('launches-list').innerHTML =
+              '<div class="no-launches"><div class="no-launches-icon">🚀</div><div>Error al cargar lanzamientos</div></div>';
+          }
+        }
+
+        // Render launch cards
+        function renderLaunches() {
+          const container = document.getElementById('launches-list');
+
+          if (upcomingLaunches.length === 0) {
+            container.innerHTML =
+              '<div class="no-launches"><div class="no-launches-icon">🚀</div><div>No hay lanzamientos programados</div></div>';
+            return;
+          }
+
+          container.innerHTML = upcomingLaunches.map(launch => {
+            const launchDate = new Date(launch.datetimeISO);
+            const dateStr = launchDate.toLocaleString('es-ES', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZoneName: 'short'
+            });
+
+            return `
+            <div class="launch-card" data-launch-id="${launch.id}" onclick="showEventModal('${launch.id}')" style="cursor:pointer;">
+              <div class="launch-vehicle">${launch.vehicle || 'Vehículo'}</div>
+              ${launch.mission ? `<div class="launch-mission">${launch.mission}</div>` : ''}
+              <div class="launch-site">${launch.site || 'Lugar no especificado'}</div>
+              <div class="launch-countdown">
+                <div class="launch-t">CUENTA ATRÁS</div>
+                <div class="launch-time" data-target="${launch.datetimeISO}">--:--:--</div>
+              </div>
+              <div class="launch-date">${dateStr}</div>
+            </div>
+          `;
+          }).join('');
+
+          // Add click event listeners (alternative approach)
+          // Not needed since we use onclick in template
+        }
+
+        // Start countdown timers
+        function startCountdowns() {
+          if (countdownInterval) {
+            clearInterval(countdownInterval);
+          }
+
+          function update() {
+            const now = new Date();
+            document.querySelectorAll('.launch-time').forEach(timeEl => {
+              const targetStr = timeEl.getAttribute('data-target');
+              if (!targetStr) return;
+
+              const target = new Date(targetStr);
+              const diff = target - now;
+
+              if (diff <= 0) {
+                timeEl.textContent = '¡LANZADO!';
+                timeEl.style.color = '#51cf66';
+                return;
+              }
+
+              // Calculate time remaining
+              const totalSeconds = Math.floor(diff / 1000);
+              const days = Math.floor(totalSeconds / 86400);
+              const hours = Math.floor((totalSeconds % 86400) / 3600);
+              const minutes = Math.floor((totalSeconds % 3600) / 60);
+              const seconds = totalSeconds % 60;
+
+              // Format: "Xd HH:MM:SS" or "HH:MM:SS" if < 1 day
+              if (days > 0) {
+                timeEl.textContent = `${days}d ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+              } else {
+                timeEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+              }
+            });
+          }
+
+          update();
+          countdownInterval = setInterval(update, 1000);
+        }
+
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', loadLaunches);
+        } else {
+          loadLaunches();
+        }
+      })();
+    </script>
+
+    <script>
+      // Event Modal Functions (global scope for onclick)
+      let modalCountdownInterval = null;
+      let currentLaunchData = null;
+
+      function showEventModal(launchId) {
+        // Find the launch data
+        const launch = upcomingLaunches.find(l => l.id === launchId);
+        if (!launch) {
+          console.error('Launch not found:', launchId);
           return;
         }
 
-        // compute h:m:s
-        const totalSeconds = Math.floor(diff / 1000);
-        const hrs = Math.floor(totalSeconds / 3600);
-        const mins = Math.floor((totalSeconds % 3600) / 60);
-        const secs = totalSeconds % 60;
+        currentLaunchData = launch;
 
-        // Show format HH:MM:SS (can show more than 24h)
-        timeEl.textContent = pad(hrs) + ":" + pad(mins) + ":" + pad(secs);
-        statusEl.textContent = "";
+        // Update modal title
+        document.getElementById('modal-title').textContent = launch.vehicle || 'Lanzamiento';
+
+        // Update goal pill
+        const launchDate = new Date(launch.datetimeISO);
+        const dateStr = launchDate.toLocaleString('es-ES', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZoneName: 'short'
+        });
+        document.getElementById('modal-goal').innerHTML = `
+          <span class="goal-dot"></span>
+          Ventana objetivo: ${dateStr}
+        `;
+
+        // Populate modal info
+        let infoHTML = '';
+        if (launch.vehicle) {
+          infoHTML += `<div class="modal-info-row"><div class="modal-info-label">Vehículo</div><div class="modal-info-value">${launch.vehicle}</div></div>`;
+        }
+        if (launch.mission) {
+          infoHTML += `<div class="modal-info-row"><div class="modal-info-label">Misión</div><div class="modal-info-value">${launch.mission}</div></div>`;
+        }
+        if (launch.site) {
+          infoHTML += `<div class="modal-info-row"><div class="modal-info-label">Lugar</div><div class="modal-info-value">${launch.site}</div></div>`;
+        }
+        if (launch.vehicleFull) {
+          infoHTML += `<div class="modal-info-row"><div class="modal-info-label">Vehículo Completo</div><div class="modal-info-value">${launch.vehicleFull}</div></div>`;
+        }
+        if (launch.payload) {
+          infoHTML += `<div class="modal-info-row"><div class="modal-info-label">Carga útil</div><div class="modal-info-value">${launch.payload}</div></div>`;
+        }
+        if (launch.orbit) {
+          infoHTML += `<div class="modal-info-row"><div class="modal-info-label">Órbita objetivo</div><div class="modal-info-value">${launch.orbit}</div></div>`;
+        }
+        document.getElementById('modal-info').innerHTML = infoHTML;
+
+        // Description
+        document.getElementById('modal-desc').textContent = launch.description || 'No hay descripción disponible.';
+
+        // Stream link
+        const watchBtn = document.getElementById('modal-watch');
+        if (launch.streamUrl) {
+          watchBtn.href = launch.streamUrl;
+          watchBtn.style.display = 'inline-flex';
+        } else {
+          watchBtn.style.display = 'none';
+        }
+
+        // Start modal countdown
+        const countdownEl = document.getElementById('modal-countdown');
+        countdownEl.setAttribute('data-countdown-dt', launch.datetimeISO);
+
+        function updateModalCountdown() {
+          const target = new Date(launch.datetimeISO);
+          const now = new Date();
+          const diff = target - now;
+
+          if (diff <= 0) {
+            countdownEl.textContent = '¡LANZADO!';
+            countdownEl.style.color = '#51cf66';
+            if (modalCountdownInterval) {
+              clearInterval(modalCountdownInterval);
+            }
+            return;
+          }
+
+          const totalSeconds = Math.floor(diff / 1000);
+          const days = Math.floor(totalSeconds / 86400);
+          const hours = Math.floor((totalSeconds % 86400) / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+
+          let timeStr = '';
+          if (days > 0) {
+            timeStr = `T- ${days}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+          } else if (hours > 0) {
+            timeStr = `T- ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+          } else {
+            timeStr = `T- ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+          }
+          countdownEl.textContent = timeStr;
+        }
+
+        updateModalCountdown();
+        if (modalCountdownInterval) {
+          clearInterval(modalCountdownInterval);
+        }
+        modalCountdownInterval = setInterval(updateModalCountdown, 1000);
+
+        // Show modal
+        document.getElementById('event-modal-overlay').classList.add('show');
       }
 
-      // initial update
-      update();
-      // update every 250ms to keep accurate around second boundaries
-      setInterval(update, 250);
-
-      // Add keyframes for the status pulse dynamically (keeps CSS localized)
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes vortic-pulse {
-          0%{ transform: scale(1); opacity:1; }
-          50%{ transform: scale(1.04); opacity:0.9; }
-          100%{ transform: scale(1); opacity:1; }
+      function closeEventModal() {
+        document.getElementById('event-modal-overlay').classList.remove('show');
+        if (modalCountdownInterval) {
+          clearInterval(modalCountdownInterval);
+          modalCountdownInterval = null;
         }
-      `;
-      document.head.appendChild(style);
-    })();
+        currentLaunchData = null;
+      }
+
+      // Close modal on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.getElementById('event-modal-overlay').classList.contains('show')) {
+          closeEventModal();
+        }
+      });
+
+      // Close modal when clicking outside
+      document.getElementById('event-modal-overlay')?.addEventListener('click', (e) => {
+        if (e.target.id === 'event-modal-overlay') {
+          closeEventModal();
+        }
+      });
     </script>
 
     <footer>© <span id="year"></span> EsZunSpace – Todos los derechos reservados</footer>
   </main>
+
+  <!-- Event Detail Modal -->
+  <div id="event-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h3 id="modal-title" class="modal-title">Lanzamiento</h3>
+        <button class="btn ghost" onclick="closeEventModal()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div id="modal-goal" class="goal-pill">
+        <span class="goal-dot"></span>
+        Ventana objetivo: —
+      </div>
+
+      <div class="countdown-hero"><span id="modal-countdown" data-countdown-dt=""></span></div>
+
+      <div id="modal-info" class="modal-info"></div>
+      <div id="modal-desc" class="modal-desc"></div>
+
+      <div class="timezone-note">La cuenta atrás se basa en la hora de <strong>Europa/Madrid</strong>.</div>
+
+      <div class="modal-actions">
+        <a id="modal-watch" class="btn primary" href="#" target="_blank" rel="noopener noreferrer"
+          style="display:none;">Ver transmisión</a>
+        <button class="btn ghost" onclick="closeEventModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Event modal styles */
+    .goal-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .goal-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #51cf66;
+    }
+
+    .countdown-hero {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-size: clamp(32px, 6vw, 56px);
+      font-weight: 900;
+      text-align: center;
+      margin: 20px 0;
+      background: linear-gradient(135deg, #00f0ff, #ff00d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.02em;
+    }
+
+    .modal-info {
+      display: grid;
+      gap: 12px;
+      margin: 20px 0;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .modal-info-row:last-child {
+      border-bottom: none;
+    }
+
+    .modal-info-label {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 600;
+    }
+
+    .modal-info-value {
+      font-size: 14px;
+      font-weight: 700;
+      text-align: right;
+      color: #fff;
+    }
+
+    .modal-desc {
+      margin: 16px 0;
+      padding: 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid #00f0ff;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .timezone-note {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+      text-align: center;
+      margin: 16px 0;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+  </style>
 
   <!-- Login/Register Modal -->
   <div id="auth-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
@@ -516,7 +1285,8 @@
         </div>
         <div class="form-group">
           <label for="register-password">Contraseña</label>
-          <input type="password" id="register-password" name="password" required autocomplete="new-password" minlength="6">
+          <input type="password" id="register-password" name="password" required autocomplete="new-password"
+            minlength="6">
           <div id="register-error" class="error-msg">Error al crear la cuenta</div>
           <div id="register-success" class="success-msg">¡Cuenta creada! Iniciando sesión...</div>
         </div>
@@ -546,7 +1316,8 @@
         </div>
 
         <!-- Change Username Form -->
-        <form id="change-username-form" class="login-form" style="margin-top:24px;" onsubmit="handleChangeUsername(event)">
+        <form id="change-username-form" class="login-form" style="margin-top:24px;"
+          onsubmit="handleChangeUsername(event)">
           <div class="form-group">
             <label for="new-username">Nuevo nombre de usuario</label>
             <input type="text" id="new-username" name="username" required autocomplete="username">
@@ -559,14 +1330,17 @@
         </form>
 
         <!-- Change Password Form -->
-        <form id="change-password-form" class="login-form" style="margin-top:16px;" onsubmit="handleChangePassword(event)">
+        <form id="change-password-form" class="login-form" style="margin-top:16px;"
+          onsubmit="handleChangePassword(event)">
           <div class="form-group">
             <label for="current-password">Contraseña actual</label>
-            <input type="password" id="current-password" name="current-password" required autocomplete="current-password">
+            <input type="password" id="current-password" name="current-password" required
+              autocomplete="current-password">
           </div>
           <div class="form-group">
             <label for="new-password">Nueva contraseña</label>
-            <input type="password" id="new-password" name="new-password" required autocomplete="new-password" minlength="6">
+            <input type="password" id="new-password" name="new-password" required autocomplete="new-password"
+              minlength="6">
             <div id="password-change-error" class="error-msg">Contraseña actual incorrecta</div>
             <div id="password-change-success" class="success-msg">¡Contraseña actualizada!</div>
           </div>
@@ -576,7 +1350,8 @@
         </form>
 
         <div style="margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,.12);">
-          <button class="btn ghost" onclick="deleteAccount()" style="color:#ff6b6b; width:100%;">Eliminar cuenta</button>
+          <button class="btn ghost" onclick="deleteAccount()" style="color:#ff6b6b; width:100%;">Eliminar
+            cuenta</button>
         </div>
       </div>
     </div>
@@ -601,7 +1376,7 @@
     let currentUser = null;
     const SESSION_KEY = 'esz_user';
 
-    function hydrateSessionFromStorage(){
+    function hydrateSessionFromStorage() {
       const saved = localStorage.getItem(SESSION_KEY);
       currentUser = (saved && saved.trim()) ? saved : null;
       checkAuth();
@@ -700,7 +1475,7 @@
       e.preventDefault();
       const username = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-password').value;
-      
+
       if (allUsers[username] && allUsers[username] === password) {
         currentUser = username;
         localStorage.setItem(SESSION_KEY, currentUser);
@@ -715,18 +1490,18 @@
       e.preventDefault();
       const username = document.getElementById('register-username').value.trim();
       const password = document.getElementById('register-password').value;
-      
+
       document.getElementById('register-error').classList.remove('show');
       document.getElementById('register-username-error').classList.remove('show');
       document.getElementById('register-success').classList.remove('show');
-      
+
       if (allUsers[username]) {
         document.getElementById('register-username-error').classList.add('show');
         return;
       }
-      
+
       const saved = await saveUser(username, password);
-      
+
       if (saved) {
         document.getElementById('register-success').classList.add('show');
         setTimeout(() => {
@@ -753,13 +1528,13 @@
       document.getElementById('new-username').value = '';
       document.getElementById('current-password').value = '';
       document.getElementById('new-password').value = '';
-      
+
       // Clear messages
       document.getElementById('username-change-error').classList.remove('show');
       document.getElementById('username-change-success').classList.remove('show');
       document.getElementById('password-change-error').classList.remove('show');
       document.getElementById('password-change-success').classList.remove('show');
-      
+
       const modal = document.getElementById('profile-modal-overlay');
       modal.style.display = 'flex';
       requestAnimationFrame(() => {
@@ -778,39 +1553,39 @@
     async function handleChangeUsername(e) {
       e.preventDefault();
       const newUsername = document.getElementById('new-username').value.trim();
-      
+
       document.getElementById('username-change-error').classList.remove('show');
       document.getElementById('username-change-success').classList.remove('show');
-      
+
       if (newUsername === currentUser) {
         document.getElementById('username-change-error').textContent = 'El nombre es el mismo que el actual';
         document.getElementById('username-change-error').classList.add('show');
         return;
       }
-      
+
       if (allUsers[newUsername]) {
         document.getElementById('username-change-error').textContent = 'Este nombre de usuario ya está en uso';
         document.getElementById('username-change-error').classList.add('show');
         return;
       }
-      
+
       try {
         const oldPassword = allUsers[currentUser];
-        
+
         // Delete old username
         await database.ref('users/' + currentUser).remove();
         delete allUsers[currentUser];
-        
+
         // Create new username with same password
         await database.ref('users/' + newUsername).set(oldPassword);
         allUsers[newUsername] = oldPassword;
-        
+
         // Update session
         currentUser = newUsername;
         localStorage.setItem(SESSION_KEY, currentUser);
-        
+
         document.getElementById('username-change-success').classList.add('show');
-        
+
         setTimeout(() => {
           checkAuth();
           closeProfileModal();
@@ -826,23 +1601,23 @@
       e.preventDefault();
       const currentPassword = document.getElementById('current-password').value;
       const newPassword = document.getElementById('new-password').value;
-      
+
       document.getElementById('password-change-error').classList.remove('show');
       document.getElementById('password-change-success').classList.remove('show');
-      
+
       if (allUsers[currentUser] !== currentPassword) {
         document.getElementById('password-change-error').classList.add('show');
         return;
       }
-      
+
       try {
         await database.ref('users/' + currentUser).set(newPassword);
         allUsers[currentUser] = newPassword;
-        
+
         document.getElementById('password-change-success').classList.add('show');
         document.getElementById('current-password').value = '';
         document.getElementById('new-password').value = '';
-        
+
         setTimeout(() => {
           document.getElementById('password-change-success').classList.remove('show');
         }, 3000);
@@ -857,17 +1632,17 @@
       if (!confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
         return;
       }
-      
+
       try {
         await database.ref('users/' + currentUser).remove();
         delete allUsers[currentUser];
-        
+
         currentUser = null;
         localStorage.removeItem(SESSION_KEY);
-        
+
         closeProfileModal();
         checkAuth();
-        
+
         alert('Tu cuenta ha sido eliminada correctamente');
       } catch (error) {
         console.error('Error al eliminar cuenta:', error);
@@ -878,7 +1653,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
       document.body.classList.add("fade-in");
       document.getElementById("year").textContent = new Date().getFullYear();
-      
+
       await loadUsers();
       hydrateSessionFromStorage();
 
@@ -892,16 +1667,16 @@
       });
 
       // Transición suave entre páginas internas
-      document.querySelectorAll('a[href]').forEach(link=>{
+      document.querySelectorAll('a[href]').forEach(link => {
         const url = new URL(link.href, location.href);
-        if(url.origin === location.origin && !link.target){
-          link.addEventListener("click", e=>{
-            if(url.pathname === location.pathname && url.hash) return;
+        if (url.origin === location.origin && !link.target) {
+          link.addEventListener("click", e => {
+            if (url.pathname === location.pathname && url.hash) return;
             const menu = document.querySelector('.menu');
-            if(menu && menu.classList.contains('open')) return;
+            if (menu && menu.classList.contains('open')) return;
             e.preventDefault();
             document.body.classList.add("fade-out");
-            setTimeout(()=> location.href=url.href,600);
+            setTimeout(() => location.href = url.href, 600);
           });
         }
       });
@@ -909,23 +1684,23 @@
       // Toggle del menú en móvil
       const toggle = document.querySelector('.menu-toggle');
       const menu = document.getElementById('primary-menu');
-      function setOpen(open){
+      function setOpen(open) {
         menu.classList.toggle('open', open);
         toggle.setAttribute('aria-expanded', String(open));
         toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
       }
-      toggle.addEventListener('click', ()=> setOpen(!menu.classList.contains('open')));
-      menu.addEventListener('click', (e)=>{
-        if(e.target.closest('a')) setOpen(false);
+      toggle.addEventListener('click', () => setOpen(!menu.classList.contains('open')));
+      menu.addEventListener('click', (e) => {
+        if (e.target.closest('a')) setOpen(false);
       });
-      document.addEventListener('click', (e)=>{
-        if(menu.classList.contains('open')){
+      document.addEventListener('click', (e) => {
+        if (menu.classList.contains('open')) {
           const within = e.target.closest('.nav-shell');
-          if(!within) setOpen(false);
+          if (!within) setOpen(false);
         }
       });
-      document.addEventListener('keydown', (e)=>{
-        if(e.key === 'Escape') setOpen(false);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setOpen(false);
       });
 
       // Keyboard support for user-info
@@ -940,45 +1715,46 @@
 
   <!-- 🔒 Protección reforzada anti-inspección -->
   <script>
-  (function(){
-    // Bloquear clic derecho
-    document.addEventListener('contextmenu', e => e.preventDefault());
+    (function () {
+      // Bloquear clic derecho
+      document.addEventListener('contextmenu', e => e.preventDefault());
 
-    // Bloquear combinaciones de teclas comunes
-    document.addEventListener('keydown', e => {
-      if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) ||
-        (e.ctrlKey && e.key === 'U')
-      ) e.preventDefault();
-    });
+      // Bloquear combinaciones de teclas comunes
+      document.addEventListener('keydown', e => {
+        if (
+          e.key === 'F12' ||
+          (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) ||
+          (e.ctrlKey && e.key === 'U')
+        ) e.preventDefault();
+      });
 
-    // Bloquear selección de texto y arrastre de imágenes
-    document.addEventListener('selectstart', e => e.preventDefault());
-    document.addEventListener('dragstart', e => e.preventDefault());
+      // Bloquear selección de texto y arrastre de imágenes
+      document.addEventListener('selectstart', e => e.preventDefault());
+      document.addEventListener('dragstart', e => e.preventDefault());
 
-    // Detección básica de DevTools abiertos
-    function detectDevTools(){
-      const threshold = 160;
-      if (window.outerWidth - window.innerWidth > threshold ||
-          window.outerHeight - window.innerHeight > threshold){
-        alert('⚠️ Herramientas de desarrollador detectadas. Cierre la consola.');
-        location.reload();
+      // Detección básica de DevTools abiertos
+      function detectDevTools() {
+        const threshold = 160;
+        if (window.outerWidth - window.innerWidth > threshold ||
+          window.outerHeight - window.innerHeight > threshold) {
+          alert('⚠️ Herramientas de desarrollador detectadas. Cierre la consola.');
+          location.reload();
+        }
       }
-    }
-    setInterval(detectDevTools, 1000);
+      setInterval(detectDevTools, 1000);
 
-    // Intento adicional: detectar debugger
-    setInterval(()=>{
-      const start = performance.now();
-      debugger;
-      if (performance.now() - start > 50){
-        alert('⚠️ No se permite inspeccionar esta página.');
-        location.reload();
-      }
-    }, 1500);
-  })();
+      // Intento adicional: detectar debugger
+      setInterval(() => {
+        const start = performance.now();
+        debugger;
+        if (performance.now() - start > 50) {
+          alert('⚠️ No se permite inspeccionar esta página.');
+          location.reload();
+        }
+      }, 1500);
+    })();
   </script>
 
 </body>
+
 </html>
