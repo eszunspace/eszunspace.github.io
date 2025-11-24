@@ -228,6 +228,98 @@
             height: 100%;
         }
 
+        /* Total Stats */
+        #total-stats {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(180deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+
+        /* Recent Launches Panel */
+        #recent-panel {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            width: 240px;
+            background: transparent;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .recent-header {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            text-align: right;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .recent-item {
+            background: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 2px solid var(--primary);
+            padding: 10px;
+            border-radius: 12px;
+            text-align: right;
+            transition: transform 0.3s ease;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .recent-item:hover {
+            transform: translateX(-5px);
+            background: rgba(18, 18, 18, 0.8);
+        }
+
+        .recent-name {
+            font-weight: 700;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .recent-time {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 11px;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .recent-meta {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
         /* ===== Modern Filter Panel ===== */
         .filter-panel {
             position: absolute;
@@ -320,6 +412,7 @@
         input[type=range] {
             width: 100%;
             -webkit-appearance: none;
+            appearance: none;
             background: transparent;
         }
 
@@ -332,6 +425,7 @@
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
+            appearance: none;
             height: 16px;
             width: 16px;
             border-radius: 50%;
@@ -394,6 +488,12 @@
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.03);
             font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sat-item:hover {
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .sat-info {
@@ -440,6 +540,7 @@
             cursor: pointer;
             padding: 4px;
             opacity: 0.6;
+            z-index: 2;
         }
 
         .delete-btn:hover {
@@ -471,6 +572,65 @@
             border-radius: 20px;
             width: 400px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Details Card */
+        .details-card {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            z-index: 10;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .details-card.show {
+            transform: translateX(0);
+        }
+
+        .details-card h2 {
+            margin: 0 0 16px 0;
+            font-size: 20px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .det-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .det-row .val {
+            color: #fff;
+            font-weight: 600;
+            font-family: 'Space Grotesk', monospace;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #fff;
         }
 
         .form-group {
@@ -565,6 +725,19 @@
     <main class="hero">
         <div id="earth-container"></div>
 
+        <div id="total-stats">
+            <div class="stat-number" id="total-sat-count">0</div>
+            <div class="stat-label">SATÉLITES EN ÓRBITA</div>
+        </div>
+
+        <!-- Recent Launches -->
+        <div id="recent-panel">
+            <div class="recent-header">Últimos Lanzamientos</div>
+            <div id="recent-list">
+                <!-- Items injected by JS -->
+            </div>
+        </div>
+
         <div class="filter-panel" id="filter-panel">
             <div class="tab-nav">
                 <button class="tab-btn active" onclick="switchTab('filters')">Filtros</button>
@@ -612,6 +785,15 @@
                 </div>
             </div>
         </div>
+
+        <!-- Details Panel -->
+        <div id="details-panel" class="details-card">
+            <button class="close-btn" onclick="closeDetails()">×</button>
+            <h2 id="det-name">Sat Name</h2>
+            <div class="det-row"><span>Empresa:</span> <span id="det-company" class="val">EsZun</span></div>
+            <div class="det-row"><span>Altitud:</span> <span id="det-alt" class="val">500 km</span></div>
+            <div class="det-row"><span>Inclinación:</span> <span id="det-inc" class="val">45°</span></div>
+        </div>
     </main>
 
     <!-- Add Satellite Modal -->
@@ -646,8 +828,7 @@
         </div>
     </div>
 
-    <!-- Reusing Auth Modals from previous code (Hidden for brevity but assumed present in full file) -->
-    <!-- I will include the minimal structure for Auth to work -->
+    <!-- Auth Modal -->
     <div id="auth-modal-overlay" class="modal-overlay">
         <div class="modal-card">
             <h3 id="auth-modal-title">Login</h3>
@@ -741,9 +922,46 @@
         }
 
         // ===== SATELLITE LOGIC =====
-        let satPoints, satGeometry;
+        let satPoints, satGeometry, orbitLine;
         let satellitesData = [];
         const MAX_SATS = 10000;
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        // Helper: Calculate 3D position
+        function calculateSatellitePosition(sat, phaseOffset = 0) {
+            const r = 1 + (sat.altitude / 6371);
+            const inc = sat.inclination * (Math.PI / 180);
+            // Base phase from ID + offset
+            const basePhase = (sat.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0) % 360) * (Math.PI / 180);
+            const phase = basePhase + phaseOffset;
+
+            const x = r * Math.cos(phase);
+            const y = r * Math.sin(phase) * Math.sin(inc);
+            const z = r * Math.sin(phase) * Math.cos(inc);
+
+            const raan = (basePhase * 2) % (Math.PI * 2); // RAAN linked to base phase for consistency
+
+            return {
+                x: x * Math.cos(raan) - z * Math.sin(raan),
+                y: y,
+                z: x * Math.sin(raan) + z * Math.cos(raan)
+            };
+        }
+
+        // Helper: Create Circle Texture
+        function createCircleTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32;
+            canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            ctx.arc(16, 16, 14, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            const texture = new THREE.CanvasTexture(canvas);
+            return texture;
+        }
 
         function initEarth() {
             const container = document.getElementById('earth-container');
@@ -759,6 +977,7 @@
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.autoRotate = false;
+            window.earthControls = controls; // Expose controls globally
 
             // Earth
             const earthGroup = new THREE.Group();
@@ -808,7 +1027,12 @@
             satGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
             satPoints = new THREE.Points(satGeometry, new THREE.PointsMaterial({
-                size: 0.025, vertexColors: true, transparent: true, opacity: 0.9
+                size: 0.05,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.9,
+                map: createCircleTexture(),
+                alphaTest: 0.5
             }));
             earthGroup.add(satPoints);
 
@@ -821,9 +1045,58 @@
                         satellitesData.push({ id: key, ...val[key] });
                     });
                 }
+
+                // Update Total Count
+                const totalEl = document.getElementById('total-sat-count');
+                if (totalEl) totalEl.textContent = satellitesData.length;
+
                 update3D();
                 updateFilters(); // Also updates list
+                updateRecentList();
             });
+
+            function updateRecentList() {
+                const list = document.getElementById('recent-list');
+                if (!list) return;
+
+                // Sort by created desc
+                const recent = [...satellitesData]
+                    .filter(s => s.created) // Only those with date
+                    .sort((a, b) => b.created - a.created)
+                    .slice(0, 5);
+
+                list.innerHTML = '';
+                const now = Date.now();
+
+                recent.forEach(sat => {
+                    const diff = now - sat.created;
+                    const timeStr = formatTimeAgo(diff);
+
+                    const div = document.createElement('div');
+                    div.className = 'recent-item';
+                    div.onclick = () => selectSatellite(sat.id);
+                    div.innerHTML = `
+                        <div class="recent-name" style="color:${sat.company === 'eszun' ? '#00f0ff' : '#ffae00'}">${sat.name}</div>
+                        <div class="recent-time">T+ ${timeStr}</div>
+                        <div class="recent-meta">${sat.altitude}km • ${sat.inclination}°</div>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+
+            function formatTimeAgo(ms) {
+                const sec = Math.floor(ms / 1000);
+                const min = Math.floor(sec / 60);
+                const hr = Math.floor(min / 60);
+                const day = Math.floor(hr / 24);
+
+                if (day > 0) return `${day}d ${hr % 24}h`;
+                if (hr > 0) return `${hr}h ${min % 60}m`;
+                if (min > 0) return `${min}m ${sec % 60}s`;
+                return `${sec}s`;
+            }
+
+            setInterval(updateRecentList, 1000);
 
             function animate() {
                 requestAnimationFrame(animate);
@@ -837,6 +1110,58 @@
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
+
+            // Click Handler
+            renderer.domElement.addEventListener('click', onMouseClick, false);
+
+            function onMouseClick(event) {
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                raycaster.params.Points.threshold = 0.05;
+
+                const intersects = raycaster.intersectObject(satPoints);
+
+                if (intersects.length > 0) {
+                    const index = intersects[0].index;
+                    if (index < satellitesData.length) {
+                        const sat = satellitesData[index];
+                        selectSatellite(sat.id); // Use the new selection function
+                    }
+                } else {
+                    // Clear if clicked empty space
+                    if (orbitLine) {
+                        earthGroup.remove(orbitLine);
+                        orbitLine = null;
+                    }
+                    closeDetails();
+                }
+            }
+
+            // Expose showOrbit
+            window.showOrbit = function (sat) {
+                if (orbitLine) earthGroup.remove(orbitLine);
+
+                const points = [];
+                const segments = 128;
+                for (let i = 0; i <= segments; i++) {
+                    const phaseOffset = (i / segments) * Math.PI * 2;
+                    const pos = calculateSatellitePosition(sat, phaseOffset);
+                    points.push(new THREE.Vector3(pos.x, pos.y, pos.z));
+                }
+
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const material = new THREE.LineBasicMaterial({
+                    color: 0x00ff00, // Green orbit
+                    opacity: 0.8,
+                    transparent: true
+                });
+
+                orbitLine = new THREE.Line(geometry, material);
+                earthGroup.add(orbitLine);
+            }
         }
 
         // ===== UPDATE LOGIC =====
@@ -850,25 +1175,11 @@
             satellitesData.forEach((sat, i) => {
                 if (i >= MAX_SATS) return;
 
-                // Calculate Position
-                const r = 1 + (sat.altitude / 6371);
-                const inc = sat.inclination * (Math.PI / 180);
-                // Random phase based on ID hash or random if not persistent
-                // We use a pseudo-random based on ID to keep it stable
-                const phase = (sat.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0) % 360) * (Math.PI / 180);
+                const pos = calculateSatellitePosition(sat);
 
-                const x = r * Math.cos(phase);
-                const y = r * Math.sin(phase) * Math.sin(inc);
-                const z = r * Math.sin(phase) * Math.cos(inc);
-
-                // Rotate for RAAN (also pseudo-random)
-                const raan = (phase * 2) % (Math.PI * 2);
-                const fx = x * Math.cos(raan) - z * Math.sin(raan);
-                const fz = x * Math.sin(raan) + z * Math.cos(raan);
-
-                positions[i * 3] = fx;
-                positions[i * 3 + 1] = y;
-                positions[i * 3 + 2] = fz;
+                positions[i * 3] = pos.x;
+                positions[i * 3 + 1] = pos.y;
+                positions[i * 3 + 2] = pos.z;
 
                 // Color
                 const c = sat.company === 'eszun' ? new THREE.Color('#00f0ff') : new THREE.Color('#ffae00');
@@ -879,6 +1190,7 @@
 
             satPoints.geometry.attributes.position.needsUpdate = true;
             satPoints.geometry.attributes.color.needsUpdate = true;
+            satPoints.geometry.computeBoundingSphere(); // Critical for Raycaster
         }
 
         window.updateFilters = function () {
@@ -907,32 +1219,15 @@
                 if (sat.inclination > maxInc) visible = false;
                 if (search && !sat.name.toLowerCase().includes(search)) visible = false;
 
-                // Update 3D visibility (hack: move to 0,0,0 if hidden)
-                // We need to restore position if visible. 
-                // Better: we just re-calculate or store original pos. 
-                // For simplicity, we re-calc here or just use the fact that update3D sets them.
-                // Actually update3D sets them all. We just need to hide them here.
-
                 if (!visible) {
                     positions[i * 3] = 0;
                     positions[i * 3 + 1] = 0;
                     positions[i * 3 + 2] = 0;
                 } else {
-                    // If visible, we need to ensure it's at the correct position.
-                    // Since update3D sets positions, we might have overwritten them with 0 in previous filter run?
-                    // No, update3D runs on data change. updateFilters runs on UI change.
-                    // We need to store "base positions" or re-calculate.
-                    // Let's re-calculate to be safe and simple.
-                    const r = 1 + (sat.altitude / 6371);
-                    const inc = sat.inclination * (Math.PI / 180);
-                    const phase = (sat.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0) % 360) * (Math.PI / 180);
-                    const x = r * Math.cos(phase);
-                    const y = r * Math.sin(phase) * Math.sin(inc);
-                    const z = r * Math.sin(phase) * Math.cos(inc);
-                    const raan = (phase * 2) % (Math.PI * 2);
-                    positions[i * 3] = x * Math.cos(raan) - z * Math.sin(raan);
-                    positions[i * 3 + 1] = y;
-                    positions[i * 3 + 2] = x * Math.sin(raan) + z * Math.cos(raan);
+                    const pos = calculateSatellitePosition(sat);
+                    positions[i * 3] = pos.x;
+                    positions[i * 3 + 1] = pos.y;
+                    positions[i * 3 + 2] = pos.z;
 
                     visibleCount++;
 
@@ -940,12 +1235,13 @@
                     if (visibleCount < 100) { // Limit list rendering for performance
                         const div = document.createElement('div');
                         div.className = 'sat-item';
+                        div.onclick = () => selectSatellite(sat.id); // Click to select
                         div.innerHTML = `
                     <div class="sat-info">
                         <span class="sat-name" style="color:${sat.company === 'eszun' ? '#00f0ff' : '#ffae00'}">${sat.name}</span>
                         <span class="sat-meta">${sat.altitude}km • ${sat.inclination}°</span>
                     </div>
-                    <button class="delete-btn admin-only" onclick="deleteSat('${sat.id}')">🗑</button>
+                    <button class="delete-btn admin-only" onclick="event.stopPropagation(); deleteSat('${sat.id}')">🗑</button>
                 `;
                         listContainer.appendChild(div);
                     }
@@ -953,8 +1249,32 @@
             });
 
             satPoints.geometry.attributes.position.needsUpdate = true;
+            satPoints.geometry.computeBoundingSphere(); // Update for raycaster
             document.getElementById('count-val').textContent = visibleCount;
             checkAdmin(); // Re-apply admin visibility to new list items
+        }
+
+        // ===== SELECTION & DETAILS =====
+        window.selectSatellite = function (id) {
+            const sat = satellitesData.find(s => s.id === id);
+            if (!sat) return;
+
+            // Show Orbit
+            if (window.showOrbit) window.showOrbit(sat);
+
+            // Show Details
+            const panel = document.getElementById('details-panel');
+            document.getElementById('det-name').textContent = sat.name;
+            document.getElementById('det-company').textContent = sat.company === 'eszun' ? 'EsZunSpace' : 'Contrato';
+            document.getElementById('det-alt').textContent = sat.altitude + ' km';
+            document.getElementById('det-inc').textContent = sat.inclination + '°';
+            panel.classList.add('show');
+
+            // Camera zoom removed as per request
+        }
+
+        window.closeDetails = function () {
+            document.getElementById('details-panel').classList.remove('show');
         }
 
         // ===== ADMIN ACTIONS =====
