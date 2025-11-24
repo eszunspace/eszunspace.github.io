@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MOTORES – EsZunSpace</title>
+  <meta name="description" content="Detalles técnicos de los motores de EsZunSpace.">
+  <link rel="icon" type="image/jpeg" href="logoarriba.jpg">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Firebase SDK (needed for header auth logic if we want to keep it working) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-image: url('background.jpg');
+      --header-h: 64px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Poppins', system-ui, sans-serif;
+      color: #fff;
+      background: #000;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      background-image: var(--bg-image);
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    body.fade-in {
+      opacity: 1;
+    }
+
+    body.fade-out {
+      opacity: 0;
+    }
+
+    /* ===== Header cápsula con marcador activo ===== */
+    header.topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 12px 12px;
+      background: linear-gradient(180deg, rgba(0, 0, 0, .65) 0%, rgba(0, 0, 0, 0) 100%);
+      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(2px);
+    }
+
+    .nav-shell {
+      width: min(1200px, 94vw);
+      margin: 0 auto;
+      height: var(--header-h);
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-shell::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: conic-gradient(from 0deg, #00f0ff, #ff00d4, #00f0ff);
+      filter: blur(22px);
+      opacity: .14;
+      pointer-events: none;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+      min-width: 0;
+    }
+
+    .brand img {
+      height: 36px;
+      width: 36px;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(255, 255, 255, .1)
+    }
+
+    .brand .title {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-weight: 800;
+      letter-spacing: .02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* === Toggle (mobile) === */
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+    }
+
+    .menu-toggle:focus-visible {
+      outline: 2px solid #00f0ff;
+      outline-offset: 2px;
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 18px
+    }
+
+    .menu a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 10px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 12px;
+      opacity: .9;
+      transition: opacity .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .menu a:hover {
+      opacity: 1
+    }
+
+    .menu a::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 6px;
+      height: 2px;
+      background: linear-gradient(90deg, #00f0ff, #ff00d4);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .25s ease;
+      border-radius: 2px;
+    }
+
+    .menu a:hover::after {
+      transform: scaleX(1);
+    }
+
+    .menu a[aria-current="page"] {
+      opacity: 1
+    }
+
+    .menu a[aria-current="page"]::after {
+      transform: scaleX(1);
+    }
+
+    /* User section */
+    .user-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .18);
+      cursor: pointer;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .user-info:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .1);
+      border-color: rgba(255, 255, 255, .3);
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00f0ff, #ff00d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    /* Mobile: user section in header */
+    @media (max-width: 900px) {
+      .user-section #user-display .user-info {
+        padding: 4px 8px;
+      }
+
+      .user-section #user-display .user-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+
+      .user-section #user-display .user-name {
+        display: none;
+      }
+
+      .user-section #login-btn {
+        padding: 0 12px;
+        font-size: 12px;
+        height: 36px;
+      }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+      min-width: 32px;
+      padding: 0 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .18);
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease;
+      text-decoration: none;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, .1);
+      border-color: rgba(255, 255, 255, .3)
+    }
+
+    .btn.primary {
+      border: 0;
+      background: linear-gradient(90deg, #00f0ff, #ff00d4);
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+    }
+
+    .btn.ghost {
+      background: rgba(255, 255, 255, .06);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 18px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .modal-card {
+      width: min(680px, 96vw);
+      border-radius: 18px;
+      background: radial-gradient(1200px 1200px at -10% -20%, rgba(0, 240, 255, .08), transparent 35%), #111113;
+      border: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .06);
+      padding: 18px 18px 16px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.9) translateY(20px);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    }
+
+    .modal-overlay.show .modal-card {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: .2px;
+      font-weight: 700;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-group input {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .18);
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color .2s ease, background .2s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #00f0ff;
+      background: rgba(255, 255, 255, .08);
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    .success-msg {
+      color: #51cf66;
+      font-size: 13px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .success-msg.show {
+      display: block;
+    }
+
+    .toggle-form {
+      text-align: center;
+      margin-top: 16px;
+      color: rgba(255, 255, 255, .72);
+      font-size: 14px;
+    }
+
+    .toggle-form a {
+      color: #00f0ff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity .2s ease;
+    }
+
+    .toggle-form a:hover {
+      opacity: .8
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* =========================
+       Responsive
+       ========================= */
+    @media (max-width: 900px) {
+      :root {
+        --header-h: 56px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .nav-shell {
+        padding: 0 10px;
+        border-radius: 14px;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu {
+        position: fixed;
+        inset: calc(var(--header-h) + 8px) 8px auto 8px;
+        right: 8px;
+        left: 8px;
+        top: calc(var(--header-h) + 12px);
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 10px;
+        background: rgba(18, 18, 18, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
+        backdrop-filter: blur(8px);
+      }
+
+      .menu.open {
+        display: flex;
+      }
+
+      .menu a {
+        padding: 14px 12px;
+        font-size: 13px;
+        letter-spacing: .12em;
+        border-radius: 10px;
+      }
+
+      .menu a::after {
+        display: none;
+      }
+
+      .brand .title {
+        font-size: 16px;
+      }
+
+      .user-section {
+        display: flex;
+      }
+
+      .user-section .btn.ghost {
+        display: none;
+      }
+    }
+
+    @media (hover:none) {
+      .menu a:hover::after {
+        transform: none;
+      }
+
+      .menu a:hover {
+        opacity: 1;
+      }
+    }
+
+    /* Accesibilidad: respetar reduce-motion */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    /* ===== Main Content ===== */
+    main {
+      padding-top: calc(var(--header-h) + 40px);
+      padding-bottom: 60px;
+      width: min(1200px, 94vw);
+      margin: 0 auto;
+    }
+
+    /* Vortic Style Panel Content */
+    .engine-panel {
+      /* Glassmorphism container - Darkened for readability */
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px) saturate(1.1);
+
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 32px;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    /* Left: Image */
+    .engine-visual {
+      flex: 0 0 300px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .engine-img-placeholder {
+      width: 100%;
+      aspect-ratio: 3/5;
+      /* Tall aspect ratio like the rocket image */
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+    }
+
+    /* Right: Content */
+    .engine-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .engine-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 32px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0;
+      color: #fff;
+    }
+
+    .engine-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 600px;
+    }
+
+    /* Pills / Stats */
+    .stats-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      backdrop-filter: blur(4px);
+    }
+
+    .stat-pill strong {
+      margin-right: 4px;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 400;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 24px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 16px;
+      width: fit-content;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .engine-panel {
+        flex-direction: column;
+        padding: 24px;
+      }
+
+      .engine-visual {
+        flex: 0 0 auto;
+        width: 100%;
+      }
+
+      .engine-img-placeholder {
+        aspect-ratio: 16/9;
+        max-width: 300px;
+      }
+    }
+
+    footer {
+      position: fixed;
+      bottom: 16px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 12px;
+      opacity: .85;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="nav-shell">
+      <a class="brand" href="index.html" aria-label="Ir a inicio">
+        <img src="logoarriba.jpg" alt="Logo de EsZunSpace">
+        <span class="title">EsZunSpace</span>
+      </a>
+
+      <!-- Toggle sólo visible en móvil -->
+      <button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false" aria-label="Abrir menú">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <nav id="primary-menu" class="menu" role="navigation" aria-label="Menú principal">
+        <a href="calendario.html">Calendario</a>
+        <a href="cohetes.html">Cohetes</a>
+        <a href="motores.html">Motores</a>
+        <a href="satelites.html">Satélites</a>
+        <a href="lanzamientos.html">Lanzamientos</a>
+        <a href="stream.html">Stream</a>
+        <div id="mobile-logout-section"
+          style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,.12);">
+          <button class="btn ghost" onclick="logout()" style="width:100%; justify-content:center;">Cerrar
+            sesión</button>
+        </div>
+      </nav>
+
+      <div class="user-section">
+        <div id="user-display" style="display:none;">
+          <div class="user-info" onclick="showProfileModal()" role="button" tabindex="0" aria-label="Ver perfil">
+            <div class="user-avatar" id="user-avatar">U</div>
+            <span class="user-name" id="user-name">Usuario</span>
+          </div>
+          <button class="btn ghost" onclick="logout()">Salir</button>
+        </div>
+        <button id="login-btn" class="btn primary" onclick="showLoginModal()">Iniciar sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="engine-panel">
+      <!-- Visual -->
+      <div class="engine-visual">
+        <div class="engine-img-placeholder">
+          <img id="engine-carousel-img" src="images/motores/EsZunEngine 1/rs25.png" alt="EsZunEngine 1"
+            style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="engine-content">
+        <h2 class="engine-title">EsZunEngine 1</h2>
+
+        <div class="engine-desc">
+          Motor de alto rendimiento diseñado para la primera etapa del cohete VORTIC. Optimizado para empuje a nivel del
+          mar con alta fiabilidad y capacidad de reutilización.
+        </div>
+
+        <div class="stats-container">
+          <div class="stat-pill"><strong>Masa:</strong> 3.5 t</div>
+          <div class="stat-pill"><strong>Empuje (ASL):</strong> 1845 kN</div>
+          <div class="stat-pill"><strong>Empuje (Vac):</strong> 2279 kN</div>
+          <div class="stat-pill"><strong>Isp (Vac):</strong> 452 s</div>
+          <div class="stat-pill"><strong>Propulsores:</strong> LH2 / Oxígeno Líquido</div>
+          <div class="stat-pill"><strong>Gimbal:</strong> 10.50°</div>
+        </div>
+
+        <button class="action-btn">Ver Especificaciones Completas</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const images = [
+        'images/motores/EsZunEngine 1/rs25.png',
+        'images/motores/EsZunEngine 1/RS25a.png',
+        'images/motores/EsZunEngine 1/Rs25b.png'
+      ];
+      let currentIndex = 0;
+      const imgEl = document.getElementById('engine-carousel-img');
+
+      // Preload images
+      images.forEach(src => {
+        const img = new Image();
+        img.src = src;
+      });
+
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % images.length;
+        // Simple fade out/in effect could be added here, but for now just switch
+        imgEl.style.opacity = 0;
+        setTimeout(() => {
+          imgEl.src = images[currentIndex];
+          imgEl.style.opacity = 1;
+        }, 500); // Wait for fade out
+      }, 5000);
+
+      // Add transition to image
+      imgEl.style.transition = 'opacity 5s ease-in-out';
+    })();
+  </script>
+
+  <footer>© <span id="year">2025</span> EsZunSpace – Todos los derechos reservados</footer>
+
+  <!-- Login/Register Modal -->
+  <div id="auth-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h3 id="auth-modal-title" class="modal-title">Iniciar sesión</h3>
+        <button class="btn ghost" onclick="closeAuthModal()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-username">Usuario</label>
+          <input type="text" id="login-username" name="username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" name="password" required autocomplete="current-password">
+          <div id="login-error" class="error-msg">Usuario o contraseña incorrectos</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Entrar</button>
+          <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+        </div>
+        <div class="toggle-form">
+          ¿No tienes cuenta? <a href="#" onclick="showRegisterForm(event)">Crear cuenta</a>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="login-form" style="display:none;" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="register-username">Usuario</label>
+          <input type="text" id="register-username" name="username" required autocomplete="username">
+          <div id="register-username-error" class="error-msg">Este nombre de usuario ya está en uso</div>
+        </div>
+        <div class="form-group">
+          <label for="register-password">Contraseña</label>
+          <input type="password" id="register-password" name="password" required autocomplete="new-password"
+            minlength="6">
+          <div id="register-error" class="error-msg">Error al crear la cuenta</div>
+          <div id="register-success" class="success-msg">¡Cuenta creada! Iniciando sesión...</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn primary">Crear cuenta</button>
+          <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+        </div>
+        <div class="toggle-form">
+          ¿Ya tienes cuenta? <a href="#" onclick="showLoginForm(event)">Iniciar sesión</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profile-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <h3 class="modal-title">Mi Perfil</h3>
+        <button class="btn ghost" onclick="closeProfileModal()" aria-label="Cerrar">✕</button>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="user-info" style="justify-content:center; padding:16px; cursor:default;">
+          <div class="user-avatar" id="profile-avatar" style="width:48px; height:48px; font-size:20px;">U</div>
+          <span class="user-name" id="profile-username" style="font-size:18px;">Usuario</span>
+        </div>
+
+        <!-- Change Username Form -->
+        <form id="change-username-form" class="login-form" style="margin-top:24px;"
+          onsubmit="handleChangeUsername(event)">
+          <div class="form-group">
+            <label for="new-username">Nuevo nombre de usuario</label>
+            <input type="text" id="new-username" name="username" required autocomplete="username">
+            <div id="username-change-error" class="error-msg">Este nombre de usuario ya está en uso</div>
+            <div id="username-change-success" class="success-msg">¡Nombre de usuario actualizado!</div>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn primary">Cambiar nombre</button>
+          </div>
+        </form>
+
+        <!-- Change Password Form -->
+        <form id="change-password-form" class="login-form" style="margin-top:16px;"
+          onsubmit="handleChangePassword(event)">
+          <div class="form-group">
+            <label for="current-password">Contraseña actual</label>
+            <input type="password" id="current-password" name="current-password" required
+              autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label for="new-password">Nueva contraseña</label>
+            <input type="password" id="new-password" name="new-password" required autocomplete="new-password"
+              minlength="6">
+            <div id="password-change-error" class="error-msg">Contraseña actual incorrecta</div>
+            <div id="password-change-success" class="success-msg">¡Contraseña actualizada!</div>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn primary">Cambiar contraseña</button>
+          </div>
+        </form>
+
+        <div style="margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,.12);">
+          <button class="btn ghost" onclick="deleteAccount()" style="color:#ff6b6b; width:100%;">Eliminar
+            cuenta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== CONFIGURACIÓN DE FIREBASE =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyDKvGLsd1jKfsSlzgTjBas-8WvbFqV1xU",
+      authDomain: "eszunspace-bc900.firebaseapp.com",
+      databaseURL: "https://eszunspace-bc900-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "eszunspace-bc900",
+      storageBucket: "eszunspace-bc900.firebasestorage.app",
+      messagingSenderId: "105651684829",
+      appId: "1:105651684829:web:5c8fd5051c8c2daf24f744",
+      measurementId: "G-ZDM5GF0MBW"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    let currentUser = null;
+    const SESSION_KEY = 'esz_user';
+
+    function hydrateSessionFromStorage() {
+      const saved = localStorage.getItem(SESSION_KEY);
+      currentUser = (saved && saved.trim()) ? saved : null;
+      checkAuth();
+    }
+
+    // Keep multiple tabs/pages in sync
+    window.addEventListener('storage', (e) => {
+      if (e.key === SESSION_KEY) {
+        hydrateSessionFromStorage();
+      }
+    });
+
+    let allUsers = {};
+
+    async function loadUsers() {
+      try {
+        const snapshot = await database.ref('users').once('value');
+        allUsers = snapshot.val() || {};
+      } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+        allUsers = {};
+      }
+    }
+
+    async function saveUser(username, password) {
+      try {
+        const snapshot = await database.ref('users/' + username).once('value');
+        if (snapshot.exists()) {
+          return false;
+        }
+        await database.ref('users/' + username).set(password);
+        allUsers[username] = password;
+        return true;
+      } catch (error) {
+        console.error('Error al guardar usuario:', error);
+        return false;
+      }
+    }
+
+    function checkAuth() {
+      if (currentUser) {
+        document.getElementById('login-btn').style.display = 'none';
+        document.getElementById('user-display').style.display = 'flex';
+        document.getElementById('user-name').textContent = currentUser;
+        document.getElementById('user-avatar').textContent = currentUser.charAt(0).toUpperCase();
+      } else {
+        document.getElementById('login-btn').style.display = 'inline-flex';
+        document.getElementById('user-display').style.display = 'none';
+      }
+    }
+
+    function showLoginModal() {
+      showLoginForm();
+      const modal = document.getElementById('auth-modal-overlay');
+      modal.style.display = 'flex';
+      requestAnimationFrame(() => {
+        modal.classList.add('show');
+      });
+    }
+
+    function closeAuthModal() {
+      const modal = document.getElementById('auth-modal-overlay');
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+      document.getElementById('login-error').classList.remove('show');
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+    }
+
+    function showLoginForm(e) {
+      if (e) e.preventDefault();
+      document.getElementById('auth-modal-title').textContent = 'Iniciar sesión';
+      document.getElementById('login-form').style.display = 'flex';
+      document.getElementById('register-form').style.display = 'none';
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+      document.getElementById('login-error').classList.remove('show');
+    }
+
+    function showRegisterForm(e) {
+      if (e) e.preventDefault();
+      document.getElementById('auth-modal-title').textContent = 'Crear cuenta';
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('register-form').style.display = 'flex';
+      document.getElementById('register-username').value = '';
+      document.getElementById('register-password').value = '';
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+
+      if (allUsers[username] && allUsers[username] === password) {
+        currentUser = username;
+        localStorage.setItem(SESSION_KEY, currentUser);
+        checkAuth();
+        closeAuthModal();
+      } else {
+        document.getElementById('login-error').classList.add('show');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('register-username').value.trim();
+      const password = document.getElementById('register-password').value;
+
+      document.getElementById('register-error').classList.remove('show');
+      document.getElementById('register-username-error').classList.remove('show');
+      document.getElementById('register-success').classList.remove('show');
+
+      if (allUsers[username]) {
+        document.getElementById('register-username-error').classList.add('show');
+        return;
+      }
+
+      const saved = await saveUser(username, password);
+
+      if (saved) {
+        document.getElementById('register-success').classList.add('show');
+        setTimeout(() => {
+          currentUser = username;
+          localStorage.setItem(SESSION_KEY, currentUser);
+          checkAuth();
+          closeAuthModal();
+        }, 1500);
+      } else {
+        document.getElementById('register-error').classList.add('show');
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem(SESSION_KEY);
+      checkAuth();
+    }
+
+    // ===== PROFILE FUNCTIONS =====
+    function showProfileModal() {
+      document.getElementById('profile-username').textContent = currentUser;
+      document.getElementById('profile-avatar').textContent = currentUser.charAt(0).toUpperCase();
+      document.getElementById('new-username').value = '';
+      document.getElementById('current-password').value = '';
+      document.getElementById('new-password').value = '';
+
+      // Clear messages
+      document.getElementById('username-change-error').classList.remove('show');
+      document.getElementById('username-change-success').classList.remove('show');
+      document.getElementById('password-change-error').classList.remove('show');
+      document.getElementById('password-change-success').classList.remove('show');
+
+      const modal = document.getElementById('profile-modal-overlay');
+      modal.style.display = 'flex';
+      requestAnimationFrame(() => {
+        modal.classList.add('show');
+      });
+    }
+
+    function closeProfileModal() {
+      const modal = document.getElementById('profile-modal-overlay');
+      modal.classList.remove('show');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+
+    async function handleChangeUsername(e) {
+      e.preventDefault();
+      const newUsername = document.getElementById('new-username').value.trim();
+
+      document.getElementById('username-change-error').classList.remove('show');
+      document.getElementById('username-change-success').classList.remove('show');
+
+      if (newUsername === currentUser) {
+        document.getElementById('username-change-error').textContent = 'El nombre es el mismo que el actual';
+        document.getElementById('username-change-error').classList.add('show');
+        return;
+      }
+
+      if (allUsers[newUsername]) {
+        document.getElementById('username-change-error').textContent = 'Este nombre de usuario ya está en uso';
+        document.getElementById('username-change-error').classList.add('show');
+        return;
+      }
+
+      try {
+        const oldPassword = allUsers[currentUser];
+
+        // Delete old username
+        await database.ref('users/' + currentUser).remove();
+        delete allUsers[currentUser];
+
+        // Create new username with same password
+        await database.ref('users/' + newUsername).set(oldPassword);
+        allUsers[newUsername] = oldPassword;
+
+        // Update session
+        currentUser = newUsername;
+        localStorage.setItem(SESSION_KEY, currentUser);
+
+        document.getElementById('username-change-success').classList.add('show');
+
+        setTimeout(() => {
+          checkAuth();
+          closeProfileModal();
+        }, 1500);
+      } catch (error) {
+        console.error('Error al cambiar nombre:', error);
+        document.getElementById('username-change-error').textContent = 'Error al cambiar el nombre';
+        document.getElementById('username-change-error').classList.add('show');
+      }
+    }
+
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      const currentPassword = document.getElementById('current-password').value;
+      const newPassword = document.getElementById('new-password').value;
+
+      document.getElementById('password-change-error').classList.remove('show');
+      document.getElementById('password-change-success').classList.remove('show');
+
+      if (allUsers[currentUser] !== currentPassword) {
+        document.getElementById('password-change-error').classList.add('show');
+        return;
+      }
+
+      try {
+        await database.ref('users/' + currentUser).set(newPassword);
+        allUsers[currentUser] = newPassword;
+
+        document.getElementById('password-change-success').classList.add('show');
+        document.getElementById('current-password').value = '';
+        document.getElementById('new-password').value = '';
+
+        setTimeout(() => {
+          document.getElementById('password-change-success').classList.remove('show');
+        }, 3000);
+      } catch (error) {
+        console.error('Error al cambiar contraseña:', error);
+        document.getElementById('password-change-error').textContent = 'Error al cambiar la contraseña';
+        document.getElementById('password-change-error').classList.add('show');
+      }
+    }
+
+    async function deleteAccount() {
+      if (!confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+        return;
+      }
+
+      try {
+        await database.ref('users/' + currentUser).remove();
+        delete allUsers[currentUser];
+
+        currentUser = null;
+        localStorage.removeItem(SESSION_KEY);
+
+        closeProfileModal();
+        checkAuth();
+
+        alert('Tu cuenta ha sido eliminada correctamente');
+      } catch (error) {
+        console.error('Error al eliminar cuenta:', error);
+        alert('Error al eliminar la cuenta. Inténtalo de nuevo.');
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      document.body.classList.add("fade-in");
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      await loadUsers();
+      hydrateSessionFromStorage();
+
+      // Marca activo
+      const path = location.pathname.split("/").pop() || "index.html";
+      document.querySelectorAll(".menu a").forEach(a => {
+        const href = a.getAttribute("href");
+        if ((path === "" && href === "index.html") || href === path) {
+          a.setAttribute("aria-current", "page");
+        }
+      });
+
+      // Transición suave entre páginas internas
+      document.querySelectorAll('a[href]').forEach(link => {
+        const url = new URL(link.href, location.href);
+        if (url.origin === location.origin && !link.target) {
+          link.addEventListener("click", e => {
+            if (url.pathname === location.pathname && url.hash) return;
+            const menu = document.querySelector('.menu');
+            if (menu && menu.classList.contains('open')) return;
+            e.preventDefault();
+            document.body.classList.add("fade-out");
+            setTimeout(() => location.href = url.href, 600);
+          });
+        }
+      });
+
+      // Toggle del menú en móvil
+      const toggle = document.querySelector('.menu-toggle');
+      const menu = document.getElementById('primary-menu');
+      function setOpen(open) {
+        menu.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      }
+      toggle.addEventListener('click', () => setOpen(!menu.classList.contains('open')));
+      menu.addEventListener('click', (e) => {
+        if (e.target.closest('a')) setOpen(false);
+      });
+      document.addEventListener('click', (e) => {
+        if (menu.classList.contains('open')) {
+          const within = e.target.closest('.nav-shell');
+          if (!within) setOpen(false);
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setOpen(false);
+      });
+
+      // Keyboard support for user-info
+      document.querySelector('.user-info')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          showProfileModal();
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
