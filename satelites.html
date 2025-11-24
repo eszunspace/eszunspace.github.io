@@ -789,10 +789,14 @@
         <!-- Details Panel -->
         <div id="details-panel" class="details-card">
             <button class="close-btn" onclick="closeDetails()">×</button>
+            <img id="det-img" src=""
+                style="width:100%; border-radius:10px; margin-bottom:15px; display:none; border: 1px solid var(--border);">
             <h2 id="det-name">Sat Name</h2>
             <div class="det-row"><span>Empresa:</span> <span id="det-company" class="val">EsZun</span></div>
             <div class="det-row"><span>Altitud:</span> <span id="det-alt" class="val">500 km</span></div>
             <div class="det-row"><span>Inclinación:</span> <span id="det-inc" class="val">45°</span></div>
+            <div class="det-row"><span>Peso:</span> <span id="det-weight" class="val">-</span></div>
+            <div class="det-row"><span>Función:</span> <span id="det-purpose" class="val">-</span></div>
         </div>
     </main>
 
@@ -819,6 +823,14 @@
                 <div class="form-group">
                     <label>Inclinación (grados)</label>
                     <input type="number" id="new-sat-inc" required min="0" max="180" value="45">
+                </div>
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="number" id="new-sat-weight" placeholder="Ej: 150">
+                </div>
+                <div class="form-group">
+                    <label>Función</label>
+                    <input type="text" id="new-sat-purpose" placeholder="Ej: Comunicaciones">
                 </div>
                 <div style="display:flex; justify-content:flex-end; gap:10px;">
                     <button type="button" class="btn" onclick="closeAddModal()">Cancelar</button>
@@ -1264,13 +1276,24 @@
 
             // Show Details
             const panel = document.getElementById('details-panel');
+            const img = document.getElementById('det-img');
+
+            // Image Logic
+            if (sat.name.startsWith('EsZunSat')) {
+                img.src = 'Eszunsat.png';
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+
             document.getElementById('det-name').textContent = sat.name;
             document.getElementById('det-company').textContent = sat.company === 'eszun' ? 'EsZunSpace' : 'Contrato';
             document.getElementById('det-alt').textContent = sat.altitude + ' km';
             document.getElementById('det-inc').textContent = sat.inclination + '°';
-            panel.classList.add('show');
+            document.getElementById('det-weight').textContent = (sat.weight || '-') + (sat.weight && sat.weight !== 'N/A' ? ' kg' : '');
+            document.getElementById('det-purpose').textContent = sat.purpose || '-';
 
-            // Camera zoom removed as per request
+            panel.classList.add('show');
         }
 
         window.closeDetails = function () {
@@ -1287,6 +1310,8 @@
             const company = document.getElementById('new-sat-company').value;
             const alt = parseInt(document.getElementById('new-sat-alt').value);
             const inc = parseInt(document.getElementById('new-sat-inc').value);
+            const weight = document.getElementById('new-sat-weight').value;
+            const purpose = document.getElementById('new-sat-purpose').value;
 
             const btn = e.target.querySelector('button[type="submit"]');
             if (btn) {
@@ -1299,6 +1324,8 @@
                 company: company,
                 altitude: alt,
                 inclination: inc,
+                weight: weight || 'N/A',
+                purpose: purpose || 'N/A',
                 created: Date.now()
             }).then(() => {
                 alert('¡Satélite añadido correctamente!');
