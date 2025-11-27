@@ -1278,9 +1278,11 @@
             const panel = document.getElementById('details-panel');
             const img = document.getElementById('det-img');
 
-            // Image Logic
             if (sat.name.startsWith('EsZunSat')) {
                 img.src = 'Eszunsat.png';
+                img.style.display = 'block';
+            } else if (sat.name === 'SAC-A' || sat.name.startsWith('SAC-A')) {
+                img.src = 'SAC-A.png';
                 img.style.display = 'block';
             } else {
                 img.style.display = 'none';
