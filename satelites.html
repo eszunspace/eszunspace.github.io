@@ -807,7 +807,21 @@
             <form onsubmit="handleAddSatellite(event)">
                 <div class="form-group">
                     <label>Nombre</label>
-                    <input type="text" id="new-sat-name" required placeholder="Ej: EsZun-1">
+                    <input type="text" id="new-sat-name" required placeholder="Ej: EsZunSat-1">
+                </div>
+                <div class="form-group" id="bulk-add-group"
+                    style="background: rgba(0,240,255,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(0,240,255,0.3);">
+                    <label style="color: var(--primary);">🚀 Añadir en lote (EsZunSat)</label>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                        <input type="checkbox" id="bulk-add-check"
+                            style="width: 18px; height: 18px; accent-color: var(--primary);">
+                        <span style="font-size: 13px;">Añadir</span>
+                        <input type="number" id="bulk-add-count" min="1" max="50" value="10"
+                            style="width: 60px; padding: 6px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: #fff; text-align: center;">
+                        <span style="font-size: 13px;">satélites consecutivos</span>
+                    </div>
+                    <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin: 8px 0 0 0;">Ej: Si escribes
+                        "EsZunSat-20" y marcas 10, se crearán del 20 al 29</p>
                 </div>
                 <div class="form-group">
                     <label>Empresa</label>
@@ -1309,7 +1323,7 @@
         function openAddModal() { document.getElementById('add-modal').classList.add('show'); }
         function closeAddModal() { document.getElementById('add-modal').classList.remove('show'); }
 
-        window.handleAddSatellite = function (e) {
+        window.handleAddSatellite = async function (e) {
             e.preventDefault();
             const name = document.getElementById('new-sat-name').value;
             const company = document.getElementById('new-sat-company').value;
@@ -1318,33 +1332,85 @@
             const weight = document.getElementById('new-sat-weight').value;
             const purpose = document.getElementById('new-sat-purpose').value;
 
-            const btn = e.target.querySelector('button[type="submit"]');
-            if (btn) {
-                btn.textContent = 'Guardando...';
-                btn.disabled = true;
-            }
+            const bulkCheck = document.getElementById('bulk-add-check').checked;
+            const bulkCount = parseInt(document.getElementById('bulk-add-count').value) || 10;
 
-            database.ref('satellites').push({
-                name: name,
-                company: company,
-                altitude: alt,
-                inclination: inc,
-                weight: weight || 'N/A',
-                purpose: purpose || 'N/A',
-                created: Date.now()
-            }).then(() => {
-                alert('¡Satélite añadido correctamente!');
-                closeAddModal();
-                e.target.reset();
-            }).catch((error) => {
-                console.error('Error Firebase:', error);
-                alert('ERROR al guardar: ' + error.message + '\n\nPosible causa: Permisos de Firebase (Rules).');
-            }).finally(() => {
+            const btn = e.target.querySelector('button[type="submit"]');
+
+            // Check if bulk add is enabled and name matches pattern
+            const match = name.match(/^(.+-)(\d+)$/);
+
+            if (bulkCheck && match) {
+                // Bulk add mode
+                const prefix = match[1]; // e.g., "EsZunSat-"
+                const startNum = parseInt(match[2]); // e.g., 20
+                const count = Math.min(bulkCount, 50); // Limit to 50 max
+
                 if (btn) {
-                    btn.textContent = 'Guardar';
-                    btn.disabled = false;
+                    btn.textContent = `Añadiendo 0/${count}...`;
+                    btn.disabled = true;
                 }
-            });
+
+                try {
+                    for (let i = 0; i < count; i++) {
+                        const satName = `${prefix}${startNum + i}`;
+                        await database.ref('satellites').push({
+                            name: satName,
+                            company: company,
+                            altitude: alt,
+                            inclination: inc,
+                            weight: weight || 'N/A',
+                            purpose: purpose || 'N/A',
+                            created: Date.now() + i // Slight offset to maintain order
+                        });
+
+                        if (btn) {
+                            btn.textContent = `Añadiendo ${i + 1}/${count}...`;
+                        }
+                    }
+
+                    alert(`¡${count} satélites añadidos correctamente!\n(${prefix}${startNum} hasta ${prefix}${startNum + count - 1})`);
+                    closeAddModal();
+                    e.target.reset();
+                    document.getElementById('bulk-add-check').checked = false;
+                } catch (error) {
+                    console.error('Error Firebase:', error);
+                    alert('ERROR al guardar: ' + error.message + '\n\nPosible causa: Permisos de Firebase (Rules).');
+                } finally {
+                    if (btn) {
+                        btn.textContent = 'Guardar';
+                        btn.disabled = false;
+                    }
+                }
+            } else {
+                // Single satellite mode (original behavior)
+                if (btn) {
+                    btn.textContent = 'Guardando...';
+                    btn.disabled = true;
+                }
+
+                database.ref('satellites').push({
+                    name: name,
+                    company: company,
+                    altitude: alt,
+                    inclination: inc,
+                    weight: weight || 'N/A',
+                    purpose: purpose || 'N/A',
+                    created: Date.now()
+                }).then(() => {
+                    alert('¡Satélite añadido correctamente!');
+                    closeAddModal();
+                    e.target.reset();
+                }).catch((error) => {
+                    console.error('Error Firebase:', error);
+                    alert('ERROR al guardar: ' + error.message + '\n\nPosible causa: Permisos de Firebase (Rules).');
+                }).finally(() => {
+                    if (btn) {
+                        btn.textContent = 'Guardar';
+                        btn.disabled = false;
+                    }
+                });
+            }
         }
 
         window.deleteSat = function (id) {
