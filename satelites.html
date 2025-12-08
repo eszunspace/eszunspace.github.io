@@ -670,9 +670,15 @@
                 --header-h: 56px;
             }
 
+            /* Fix for mobile touch events */
+            body {
+                overflow: visible;
+            }
+
             .nav-shell {
                 padding: 0 10px;
                 border-radius: 14px;
+                overflow: visible !important;
             }
 
             .brand img {
@@ -699,20 +705,22 @@
 
             .menu {
                 position: fixed;
-                top: 76px;
-                left: 8px;
+                inset: calc(var(--header-h) + 8px) 8px auto 8px;
                 right: 8px;
+                left: 8px;
+                top: calc(var(--header-h) + 12px);
                 display: none;
                 flex-direction: column;
                 align-items: stretch;
                 gap: 6px;
                 padding: 10px;
-                background: rgba(18, 18, 18, 0.95);
+                background: rgba(18, 18, 18, 0.92);
                 border: 1px solid rgba(255, 255, 255, 0.12);
                 border-radius: 16px;
                 box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
-                backdrop-filter: blur(12px);
-                z-index: 1001;
+                backdrop-filter: blur(8px);
+                z-index: 9999;
+                pointer-events: auto;
             }
 
             .menu.open {
@@ -723,6 +731,10 @@
                 padding: 14px 12px;
                 font-size: 13px;
                 border-radius: 10px;
+                cursor: pointer;
+                pointer-events: auto;
+                position: relative;
+                z-index: 1002;
             }
 
             .menu a::after {
@@ -1097,16 +1109,23 @@
             </a>
 
             <!-- Toggle visible on mobile -->
-            <button class="menu-toggle" aria-expanded="false" aria-label="Abrir menú">☰</button>
+            <button class="menu-toggle" aria-controls="main-menu" aria-expanded="false" aria-label="Abrir menú">
+                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </button>
 
             <nav class="menu" id="main-menu">
-                <a href="calendario.html">Calendario</a>
-                <a href="cohetes.html">Cohetes</a>
-                <a href="motores.html">Motores</a>
+                <a href="calendario.html" onclick="window.location.href='calendario.html'; return false;">Calendario</a>
+                <a href="cohetes.html" onclick="window.location.href='cohetes.html'; return false;">Cohetes</a>
+                <a href="motores.html" onclick="window.location.href='motores.html'; return false;">Motores</a>
                 <a href="satelites.html" aria-current="page">Satélites</a>
-                <a href="lanzamientos.html">Lanzamientos</a>
-                <a href="stream.html">Stream</a>
+                <a href="lanzamientos.html"
+                    onclick="window.location.href='lanzamientos.html'; return false;">Lanzamientos</a>
+                <a href="stream.html" onclick="window.location.href='stream.html'; return false;">Stream</a>
             </nav>
+
+
 
             <div class="user-section">
                 <div id="user-display" style="display:none;">
@@ -1119,6 +1138,8 @@
             </div>
         </div>
     </header>
+
+
 
     <!-- Menu overlay for mobile -->
     <div class="menu-overlay" id="menu-overlay"></div>
@@ -1998,23 +2019,32 @@
             checkAdmin();
             initEarth();
 
-            // Mobile menu toggle
-            const menuToggle = document.querySelector('.menu-toggle');
+            // Mobile menu toggle (index.html logic)
+            const toggle = document.querySelector('.menu-toggle');
             const menu = document.querySelector('.menu');
-            const menuOverlay = document.getElementById('menu-overlay');
 
-            if (menuToggle && menu) {
-                menuToggle.addEventListener('click', () => {
-                    const isOpen = menu.classList.toggle('open');
-                    menuToggle.setAttribute('aria-expanded', isOpen);
-                    menuOverlay.classList.toggle('show', isOpen);
+            if (toggle && menu) {
+                function setOpen(open) {
+                    menu.classList.toggle('open', open);
+                    toggle.setAttribute('aria-expanded', String(open));
+                    toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+                }
+
+                toggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setOpen(!menu.classList.contains('open'));
                 });
 
-                // Close menu when clicking overlay
-                menuOverlay.addEventListener('click', () => {
-                    menu.classList.remove('open');
-                    menuToggle.setAttribute('aria-expanded', 'false');
-                    menuOverlay.classList.remove('show');
+                menu.addEventListener('click', (e) => {
+                    if (e.target.closest('a')) setOpen(false);
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (menu.classList.contains('open')) {
+                        if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+                            setOpen(false);
+                        }
+                    }
                 });
             }
 
