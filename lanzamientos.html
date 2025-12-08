@@ -527,15 +527,157 @@
     }
 
     @media (max-width: 768px) {
-      .month-title {
-        font-size: 32px;
+      :root {
+        --header-h: 56px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .nav-shell {
+        padding: 0 10px;
+        border-radius: 14px;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
       }
 
       .menu {
+        position: fixed;
+        top: 76px;
+        left: 8px;
+        right: 8px;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 10px;
+        background: rgba(18, 18, 18, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
+        backdrop-filter: blur(12px);
+        z-index: 999;
+      }
+
+      .menu.open {
+        display: flex;
+      }
+
+      .menu a {
+        padding: 14px 12px;
+        font-size: 13px;
+        letter-spacing: .12em;
+        border-radius: 10px;
+      }
+
+      .menu a::after {
         display: none;
       }
 
-      /* Mobile toggle implementation assumed */
+      .menu a:hover,
+      .menu a[aria-current="page"] {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .brand .title {
+        font-size: 16px;
+      }
+
+      .month-title {
+        font-size: 28px;
+      }
+
+      .month-nav {
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .view-controls {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .toggle-group {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .toggle-btn {
+        flex: 1;
+        padding: 8px 10px;
+        font-size: 11px;
+      }
+
+      .filter-bar {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
+
+      .filter-item {
+        width: 100%;
+      }
+
+      .filter-select,
+      .search-input {
+        width: 100%;
+      }
+
+      .launch-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .card {
+        height: 400px;
+      }
+
+      .card-content {
+        padding: 18px;
+      }
+
+      .rocket-mission {
+        font-size: 18px;
+      }
+
+      .user-section #login-btn {
+        padding: 0 12px;
+        font-size: 12px;
+        height: 36px;
+      }
+    }
+
+    /* Extra small phones */
+    @media (max-width: 420px) {
+      .month-title {
+        font-size: 24px;
+      }
+
+      .card {
+        height: 360px;
+        border-radius: 10px;
+      }
+
+      .date-day {
+        font-size: 26px;
+      }
+
+      .rocket-mission {
+        font-size: 16px;
+      }
+
+      .toggle-btn {
+        padding: 6px 8px;
+        font-size: 10px;
+      }
     }
 
     /* Filters */
@@ -859,13 +1001,26 @@
         <img src="logoarriba.jpg" alt="Logo">
         <span class="title">EsZunSpace</span>
       </a>
-      <nav class="menu">
+
+      <!-- Toggle sólo visible en móvil -->
+      <button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false" aria-label="Abrir menú">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <nav id="primary-menu" class="menu">
         <a href="calendario.html">Calendario</a>
         <a href="cohetes.html">Cohetes</a>
         <a href="motores.html">Motores</a>
-        <a href="satelites.html">Satélites</a>
+        <a href="satélites.html">Satélites</a>
         <a href="lanzamientos.html" aria-current="page">Lanzamientos</a>
         <a href="stream.html">Stream</a>
+        <div id="mobile-logout-section"
+          style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,.12);">
+          <button class="btn ghost" onclick="logout()" style="width:100%; justify-content:center;">Cerrar
+            sesión</button>
+        </div>
       </nav>
       <div class="user-section">
         <a id="login-btn" class="btn primary" href="#">Login</a>
@@ -1205,6 +1360,23 @@
     document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.add('fade-in');
       checkUser();
+
+      // Mobile menu toggle
+      const menuToggle = document.querySelector('.menu-toggle');
+      const menu = document.querySelector('.menu');
+      if (menuToggle && menu) {
+        menuToggle.addEventListener('click', () => {
+          const isOpen = menu.classList.toggle('open');
+          menuToggle.setAttribute('aria-expanded', isOpen);
+        });
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!menu.contains(e.target) && !menuToggle.contains(e.target)) {
+            menu.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
 
       // Initialize view
       setViewMode('all');

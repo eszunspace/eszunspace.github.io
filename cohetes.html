@@ -568,21 +568,164 @@
       justify-content: flex-end;
     }
 
+    /* === Toggle (mobile) === */
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .menu-toggle:focus-visible {
+      outline: 2px solid var(--accent1);
+      outline-offset: 2px;
+    }
+
     @media (max-width: 880px) {
+      :root {
+        --header-h: 56px;
+      }
+
+      .brand img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .nav-shell {
+        height: 56px;
+        padding: 0 10px;
+        border-radius: 14px;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .menu {
+        position: fixed;
+        top: 76px;
+        left: 8px;
+        right: 8px;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 10px;
+        background: rgba(18, 18, 18, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
+        backdrop-filter: blur(12px);
+        z-index: 999;
+      }
+
+      .menu.open {
+        display: flex;
+      }
+
+      .menu a {
+        padding: 14px 12px;
+        font-size: 13px;
+        letter-spacing: .12em;
+        border-radius: 10px;
+      }
+
+      .menu a::after {
+        display: none;
+      }
+
+      .menu a:hover,
+      .menu a[aria-current="page"] {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .brand .title {
+        font-size: 16px;
+      }
+
       .poster {
         grid-template-columns: 1fr;
-        min-height: 420px;
+        min-height: 380px;
       }
 
       .poster .art {
-        height: 220px;
+        height: 200px;
         clip-path: none;
         border-left: 0;
         border-top: 1px solid rgba(255, 255, 255, .1);
       }
 
+      .k-name {
+        font-size: 22px;
+      }
+
+      .chips {
+        gap: 8px;
+      }
+
+      .chip {
+        padding: 8px 10px;
+        font-size: 11px;
+      }
+
       .user-section {
+        display: flex;
+      }
+
+      .user-section .btn-user.ghost {
         display: none;
+      }
+
+      .user-section #user-display .user-info {
+        padding: 4px 8px;
+      }
+
+      .user-section #user-display .user-name {
+        display: none;
+      }
+
+      .user-section #login-btn {
+        padding: 0 12px;
+        font-size: 12px;
+        height: 36px;
+      }
+
+      .page-title h1 {
+        font-size: clamp(28px, 8vw, 48px);
+      }
+
+      .wrap {
+        margin: 20px auto 40px;
+      }
+    }
+
+    /* Extra small phones */
+    @media (max-width: 420px) {
+      .brand .title {
+        font-size: 14px;
+      }
+
+      .poster {
+        min-height: 340px;
+        border-radius: 16px;
+      }
+
+      .poster .info {
+        padding: 16px;
+      }
+
+      .k-name {
+        font-size: 20px;
+      }
+
+      .k-sub {
+        font-size: 13px;
       }
     }
 
@@ -605,12 +748,26 @@
         <img src="logoarriba.jpg" alt="">
         <span class="title">EsZunSpace</span>
       </a>
-      <nav class="menu">
+
+      <!-- Toggle sólo visible en móvil -->
+      <button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false" aria-label="Abrir menú">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <nav id="primary-menu" class="menu">
         <a href="calendario.html">Calendario</a>
         <a href="cohetes.html" aria-current="page">Cohetes</a>
         <a href="motores.html">Motores</a>
         <a href="satelites.html">Satélites</a>
         <a href="lanzamientos.html">Lanzamientos</a>
+        <a href="stream.html">Stream</a>
+        <div id="mobile-logout-section"
+          style="display:none; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,.12);">
+          <button class="btn-user ghost" onclick="logout()" style="width:100%; justify-content:center;">Cerrar
+            sesión</button>
+        </div>
       </nav>
       <div class="user-section">
         <div id="user-display" style="display:none;">
@@ -907,6 +1064,23 @@
 
       await loadUsers();
       hydrateSessionFromStorage();
+
+      // Mobile menu toggle
+      const menuToggle = document.querySelector('.menu-toggle');
+      const menu = document.querySelector('.menu');
+      if (menuToggle && menu) {
+        menuToggle.addEventListener('click', () => {
+          const isOpen = menu.classList.toggle('open');
+          menuToggle.setAttribute('aria-expanded', isOpen);
+        });
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!menu.contains(e.target) && !menuToggle.contains(e.target)) {
+            menu.classList.remove('open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
 
       // Transición suave entre páginas
       const prefersReduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

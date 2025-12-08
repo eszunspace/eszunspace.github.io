@@ -666,26 +666,423 @@
 
         /* Mobile */
         @media (max-width: 768px) {
+            :root {
+                --header-h: 56px;
+            }
+
+            .nav-shell {
+                padding: 0 10px;
+                border-radius: 14px;
+            }
+
+            .brand img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .brand .title {
+                font-size: 16px;
+            }
+
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                cursor: pointer;
+            }
+
+            .menu {
+                position: fixed;
+                top: 76px;
+                left: 8px;
+                right: 8px;
+                display: none;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+                padding: 10px;
+                background: rgba(18, 18, 18, 0.95);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                border-radius: 16px;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
+                backdrop-filter: blur(12px);
+                z-index: 1001;
+            }
+
+            .menu.open {
+                display: flex;
+            }
+
+            .menu a {
+                padding: 14px 12px;
+                font-size: 13px;
+                border-radius: 10px;
+            }
+
+            .menu a::after {
+                display: none;
+            }
+
+            /* Hide recent panel on mobile */
+            #recent-panel {
+                display: none;
+            }
+
+            /* Reposition stats */
+            #total-stats {
+                top: 90px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .stat-number {
+                font-size: 36px;
+            }
+
+            .stat-label {
+                font-size: 10px;
+            }
+
+            /* Filter panel as collapsible drawer */
             .filter-panel {
+                position: fixed;
                 top: auto;
                 bottom: 0;
                 left: 0;
                 right: 0;
                 width: 100%;
+                max-height: 0;
+                overflow: hidden;
                 transform: none;
-                border-radius: 20px 20px 0 0;
-                max-height: 60vh;
+                border-radius: 24px 24px 0 0;
+                transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 100;
             }
 
-            .menu-toggle {
-                display: block;
+            .filter-panel.expanded {
+                max-height: 70vh;
+                overflow-y: auto;
             }
 
-            .menu {
+            .filter-panel .tab-nav {
+                position: sticky;
+                top: 0;
+                background: var(--glass);
+                z-index: 2;
+            }
+
+            /* Floating action button for filters */
+            .filter-fab {
+                display: flex;
+            }
+
+            /* Details card for mobile */
+            .details-card {
+                bottom: 80px;
+                right: 10px;
+                left: 10px;
+                width: auto;
+            }
+
+            /* User section mobile */
+            .user-section .user-name {
                 display: none;
             }
 
-            /* Mobile menu logic handled by JS */
+            .user-section #login-btn {
+                padding: 0 10px;
+                font-size: 11px;
+                height: 34px;
+            }
+
+            /* Make stats clickable on mobile */
+            #total-stats {
+                cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+
+            #total-stats:hover,
+            #total-stats:active {
+                transform: translateX(-50%) scale(1.05);
+                box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+            }
+
+            #total-stats .tap-hint {
+                display: block;
+            }
+        }
+
+        /* Extra small phones */
+        @media (max-width: 420px) {
+            #total-stats {
+                top: 80px;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            .filter-panel .panel-content {
+                padding: 16px;
+            }
+
+            .checkbox-item {
+                padding: 8px;
+            }
+        }
+
+        /* Floating Action Button */
+        .filter-fab {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+            z-index: 101;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .filter-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(0, 240, 255, 0.6);
+        }
+
+        .filter-fab.active {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            transform: rotate(45deg);
+        }
+
+        /* Mobile menu overlay */
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .menu-overlay.show {
+            display: block;
+        }
+
+        /* Mobile Fleet Button - Fixed at bottom */
+        .mobile-fleet-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(0, 240, 255, 0.4);
+            z-index: 100;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .mobile-fleet-btn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-fleet-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            /* Hide the old FAB in favor of the new button */
+            .filter-fab {
+                display: none !important;
+            }
+        }
+
+        /* Fleet Modal */
+        .fleet-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 0;
+        }
+
+        .fleet-modal.show {
+            display: flex;
+        }
+
+        .fleet-modal-content {
+            width: 100%;
+            max-height: 85vh;
+            background: rgba(20, 20, 30, 0.98);
+            border-radius: 24px 24px 0 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: none;
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .fleet-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .fleet-modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        .fleet-modal-header .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .fleet-modal-body {
+            padding: 16px;
+            max-height: calc(85vh - 80px);
+            overflow-y: auto;
+        }
+
+        .fleet-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .fleet-item-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .fleet-item-info {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .fleet-item.eszun .fleet-item-name {
+            color: var(--primary);
+        }
+
+        .fleet-item.contract .fleet-item-name {
+            color: #ffae00;
+        }
+
+        /* Fleet Detail View */
+        .fleet-detail-view {
+            display: none;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .fleet-detail-view.active {
+            display: block;
+        }
+
+        .fleet-detail-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+
+        .fleet-detail-img {
+            width: 100%;
+            max-width: 200px;
+            border-radius: 16px;
+            margin: 16px auto;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        }
+
+        .fleet-detail-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 12px 0;
+        }
+
+        .fleet-detail-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .fleet-stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .fleet-stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 4px;
+        }
+
+        .fleet-stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
         }
     </style>
 </head>
@@ -699,9 +1096,10 @@
                 <span class="title">EsZunSpace</span>
             </a>
 
-            <button class="menu-toggle" style="display:none;">☰</button> <!-- Simplified for brevity -->
+            <!-- Toggle visible on mobile -->
+            <button class="menu-toggle" aria-expanded="false" aria-label="Abrir menú">☰</button>
 
-            <nav class="menu">
+            <nav class="menu" id="main-menu">
                 <a href="calendario.html">Calendario</a>
                 <a href="cohetes.html">Cohetes</a>
                 <a href="motores.html">Motores</a>
@@ -722,12 +1120,17 @@
         </div>
     </header>
 
+    <!-- Menu overlay for mobile -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+
     <main class="hero">
         <div id="earth-container"></div>
 
-        <div id="total-stats">
+        <div id="total-stats" role="button" tabindex="0" onclick="openFlotaPanel()">
             <div class="stat-number" id="total-sat-count">0</div>
             <div class="stat-label">SATÉLITES EN ÓRBITA</div>
+            <div class="tap-hint" style="display:none; font-size:11px; opacity:0.7; margin-top:4px;">Toca para ver lista
+                →</div>
         </div>
 
         <!-- Recent Launches -->
@@ -798,7 +1201,56 @@
             <div class="det-row"><span>Peso:</span> <span id="det-weight" class="val">-</span></div>
             <div class="det-row"><span>Función:</span> <span id="det-purpose" class="val">-</span></div>
         </div>
+
+        <!-- Mobile Fleet Button -->
+        <button class="mobile-fleet-btn" id="mobile-fleet-btn" onclick="openFleetModal()">
+            🛰️ Ver Flota Completa
+        </button>
     </main>
+
+    <!-- Fleet Modal (Mobile) -->
+    <div class="fleet-modal" id="fleet-modal">
+        <div class="fleet-modal-content">
+            <div class="fleet-modal-header">
+                <h2 id="fleet-modal-title">🛰️ Satélites en Órbita</h2>
+                <button class="close-btn" onclick="closeFleetModal()">×</button>
+            </div>
+
+            <!-- List View -->
+            <div class="fleet-modal-body" id="fleet-modal-list">
+                <!-- Items injected by JS -->
+            </div>
+
+            <!-- Detail View -->
+            <div class="fleet-detail-view" id="fleet-detail-view">
+                <button class="fleet-detail-back" onclick="showFleetList()">← Volver a la lista</button>
+                <img class="fleet-detail-img" id="fleet-detail-img" src="" alt="Satélite">
+                <div class="fleet-detail-name" id="fleet-detail-name">Nombre</div>
+                <div class="fleet-detail-stats">
+                    <div class="fleet-stat-card">
+                        <div class="fleet-stat-label">Empresa</div>
+                        <div class="fleet-stat-value" id="fleet-detail-company">-</div>
+                    </div>
+                    <div class="fleet-stat-card">
+                        <div class="fleet-stat-label">Altitud</div>
+                        <div class="fleet-stat-value" id="fleet-detail-alt">-</div>
+                    </div>
+                    <div class="fleet-stat-card">
+                        <div class="fleet-stat-label">Inclinación</div>
+                        <div class="fleet-stat-value" id="fleet-detail-inc">-</div>
+                    </div>
+                    <div class="fleet-stat-card">
+                        <div class="fleet-stat-label">Peso</div>
+                        <div class="fleet-stat-value" id="fleet-detail-weight">-</div>
+                    </div>
+                </div>
+                <div class="fleet-stat-card" style="margin-top:12px; text-align:left;">
+                    <div class="fleet-stat-label">Función</div>
+                    <div class="fleet-stat-value" id="fleet-detail-purpose" style="font-size:14px;">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Add Satellite Modal -->
     <div id="add-modal" class="modal-overlay">
@@ -945,6 +1397,126 @@
 
             event.target.classList.add('active');
             document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // ===== FLEET MODAL (Mobile) =====
+        window.openFleetModal = function () {
+            const modal = document.getElementById('fleet-modal');
+            const listContainer = document.getElementById('fleet-modal-list');
+
+            // Clear previous content
+            listContainer.innerHTML = '';
+
+            // Sort satellites by name
+            const sortedSats = [...satellitesData].sort((a, b) => a.name.localeCompare(b.name));
+
+            // Count by type
+            const eszunCount = sortedSats.filter(s => s.company === 'eszun').length;
+            const contractCount = sortedSats.filter(s => s.company !== 'eszun').length;
+
+            // Add summary header
+            listContainer.innerHTML = `
+                <div style="display:flex; justify-content:space-around; margin-bottom:16px; padding:12px; background:rgba(255,255,255,0.05); border-radius:12px;">
+                    <div style="text-align:center;">
+                        <div style="font-size:24px; font-weight:bold; color:var(--primary);">${eszunCount}</div>
+                        <div style="font-size:11px; opacity:0.7;">EsZunSpace</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:24px; font-weight:bold; color:#ffae00;">${contractCount}</div>
+                        <div style="font-size:11px; opacity:0.7;">Contratos</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:24px; font-weight:bold; color:#fff;">${sortedSats.length}</div>
+                        <div style="font-size:11px; opacity:0.7;">Total</div>
+                    </div>
+                </div>
+            `;
+
+            // Add each satellite
+            sortedSats.forEach(sat => {
+                const isEszun = sat.company === 'eszun';
+                const item = document.createElement('div');
+                item.className = `fleet-item ${isEszun ? 'eszun' : 'contract'}`;
+                item.innerHTML = `
+                    <div>
+                        <div class="fleet-item-name">${sat.name}</div>
+                        <div class="fleet-item-info">${sat.altitude} km · ${sat.inclination}°</div>
+                    </div>
+                    <div style="font-size:20px;">${isEszun ? '🛰️' : '📡'}</div>
+                `;
+                item.onclick = () => showFleetDetail(sat);
+                listContainer.appendChild(item);
+            });
+
+            modal.classList.add('show');
+        }
+
+        window.showFleetDetail = function (sat) {
+            // Hide list, show detail
+            document.getElementById('fleet-modal-list').style.display = 'none';
+            document.getElementById('fleet-detail-view').classList.add('active');
+            document.getElementById('fleet-modal-title').textContent = sat.name;
+
+            // Set image based on satellite type
+            const img = document.getElementById('fleet-detail-img');
+            if (sat.name.startsWith('EsZunSat')) {
+                img.src = 'Eszunsat.png';
+                img.style.display = 'block';
+            } else if (sat.name === 'SAC-A' || sat.name.startsWith('SAC-A')) {
+                img.src = 'SAC-A.png';
+                img.style.display = 'block';
+            } else if (sat.name === 'NovaEscape' || sat.name.startsWith('NovaEscape')) {
+                img.src = 'NovaEscape.png';
+                img.style.display = 'block';
+            } else {
+                // Generic satellite image
+                img.src = 'Eszunsat.png';
+                img.style.display = 'block';
+            }
+
+            // Populate details
+            document.getElementById('fleet-detail-name').textContent = sat.name;
+            document.getElementById('fleet-detail-name').style.color = sat.company === 'eszun' ? 'var(--primary)' : '#ffae00';
+            document.getElementById('fleet-detail-company').textContent = sat.company === 'eszun' ? 'EsZunSpace' : 'Contrato';
+            document.getElementById('fleet-detail-alt').textContent = sat.altitude + ' km';
+            document.getElementById('fleet-detail-inc').textContent = sat.inclination + '°';
+            document.getElementById('fleet-detail-weight').textContent = (sat.weight && sat.weight !== 'N/A') ? sat.weight + ' kg' : '-';
+            document.getElementById('fleet-detail-purpose').textContent = sat.purpose || '-';
+        }
+
+        window.showFleetList = function () {
+            // Show list, hide detail
+            document.getElementById('fleet-modal-list').style.display = 'block';
+            document.getElementById('fleet-detail-view').classList.remove('active');
+            document.getElementById('fleet-modal-title').textContent = '🛰️ Satélites en Órbita';
+        }
+
+        window.closeFleetModal = function () {
+            document.getElementById('fleet-modal').classList.remove('show');
+            // Reset to list view when closing
+            showFleetList();
+        }
+
+        // Open Flota panel directly (for mobile click on stats)
+        window.openFlotaPanel = function () {
+            const filterPanel = document.getElementById('filter-panel');
+            const filterFab = document.getElementById('filter-fab');
+
+            // Expand the panel
+            filterPanel.classList.add('expanded');
+            if (filterFab) {
+                filterFab.classList.add('active');
+                filterFab.innerHTML = '✕';
+            }
+
+            // Switch to Flota tab
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+            // Activate Flota tab
+            const flotaBtn = document.querySelector('.tab-btn:nth-child(2)');
+            if (flotaBtn) flotaBtn.classList.add('active');
+            document.getElementById('tab-list').classList.add('active');
         }
 
         // ===== SATELLITE LOGIC =====
@@ -1425,6 +1997,51 @@
             document.body.classList.add('fade-in');
             checkAdmin();
             initEarth();
+
+            // Mobile menu toggle
+            const menuToggle = document.querySelector('.menu-toggle');
+            const menu = document.querySelector('.menu');
+            const menuOverlay = document.getElementById('menu-overlay');
+
+            if (menuToggle && menu) {
+                menuToggle.addEventListener('click', () => {
+                    const isOpen = menu.classList.toggle('open');
+                    menuToggle.setAttribute('aria-expanded', isOpen);
+                    menuOverlay.classList.toggle('show', isOpen);
+                });
+
+                // Close menu when clicking overlay
+                menuOverlay.addEventListener('click', () => {
+                    menu.classList.remove('open');
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                    menuOverlay.classList.remove('show');
+                });
+            }
+
+            // Filter panel FAB toggle (mobile)
+            const filterFab = document.getElementById('filter-fab');
+            const filterPanel = document.getElementById('filter-panel');
+
+            if (filterFab && filterPanel) {
+                filterFab.addEventListener('click', () => {
+                    const isExpanded = filterPanel.classList.toggle('expanded');
+                    filterFab.classList.toggle('active', isExpanded);
+                    filterFab.innerHTML = isExpanded ? '✕' : '🛰️';
+                });
+
+                // Close panel when clicking outside on mobile
+                document.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 768) {
+                        if (!filterPanel.contains(e.target) &&
+                            !filterFab.contains(e.target) &&
+                            filterPanel.classList.contains('expanded')) {
+                            filterPanel.classList.remove('expanded');
+                            filterFab.classList.remove('active');
+                            filterFab.innerHTML = '🛰️';
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>

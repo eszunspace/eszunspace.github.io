@@ -521,7 +521,70 @@
       }
 
       .menu-toggle {
-        display: flex
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--accent1);
+      }
+
+      /* Mobile menu dropdown */
+      .menu {
+        position: fixed;
+        top: 76px;
+        left: 8px;
+        right: 8px;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 10px;
+        background: rgba(18, 18, 18, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
+        backdrop-filter: blur(12px);
+        z-index: 1001;
+      }
+
+      .menu.open {
+        display: flex;
+      }
+
+      .menu a {
+        padding: 14px 12px;
+        font-size: 13px;
+        border-radius: 10px;
+      }
+
+      .menu a::after {
+        display: none;
+      }
+
+      .menu a:hover,
+      .menu a[aria-current="page"] {
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      /* User section mobile */
+      .user-section {
+        display: flex;
+        gap: 6px;
+      }
+
+      .user-section .user-name {
+        display: none;
+      }
+
+      .user-section #login-btn {
+        padding: 0 12px;
+        font-size: 11px;
+        height: 36px;
+      }
+
+      .user-section .btn.ghost {
+        padding: 0 10px;
+        font-size: 11px;
       }
     }
 
@@ -1143,6 +1206,26 @@
     }
 
     window.addEventListener('storage', (e) => { if (e.key === SESSION_KEY) hydrateSessionFromStorage(); });
+
+    // ===== Mobile menu toggle =====
+    (function initMobileMenu() {
+      const toggle = document.getElementById('hamburger');
+      const menu = document.getElementById('primary-menu');
+      if (!toggle || !menu) return;
+
+      toggle.addEventListener('click', () => {
+        const isOpen = menu.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', isOpen);
+      });
+
+      // Close when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target) && !toggle.contains(e.target) && menu.classList.contains('open')) {
+          menu.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
 
     let allUsers = {};
 
