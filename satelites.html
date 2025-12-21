@@ -117,6 +117,11 @@
         }
 
         /* Menu & User */
+        .menu-toggle {
+            display: none;
+            /* Hidden on desktop, shown via media query on mobile */
+        }
+
         .menu {
             display: flex;
             align-items: center;
@@ -231,7 +236,7 @@
         /* Total Stats */
         #total-stats {
             position: absolute;
-            top: 80px;
+            top: 110px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -327,56 +332,61 @@
             left: 20px;
             transform: translateY(-50%);
             width: 320px;
-            background: var(--glass);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
+            background: rgba(15, 15, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             z-index: 10;
             max-height: 80vh;
             transition: transform 0.3s ease;
+            overflow: hidden;
         }
 
         /* Tabs */
         .tab-nav {
             display: flex;
-            border-bottom: 1px solid var(--border);
-            padding: 0 4px;
+            padding: 6px;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .tab-btn {
             flex: 1;
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.6);
-            padding: 16px;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 12px 16px;
             font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-radius: 10px;
             cursor: pointer;
-            position: relative;
-            transition: color 0.2s;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .tab-btn.active {
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
         }
 
         .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary);
-            box-shadow: 0 -2px 10px var(--primary);
+            display: none;
         }
 
         /* Content Area */
         .panel-content {
-            padding: 20px;
+            padding: 24px;
             overflow-y: auto;
             flex: 1;
         }
@@ -387,26 +397,43 @@
 
         .tab-pane.active {
             display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Controls Styling */
         .filter-group {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .filter-group label {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.6);
+            align-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
-            margin-bottom: 10px;
+            letter-spacing: 0.1em;
+            margin-bottom: 14px;
         }
 
         .range-value {
-            color: var(--primary);
+            color: #fff;
             font-family: 'Space Grotesk', monospace;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         input[type=range] {
@@ -414,12 +441,13 @@
             -webkit-appearance: none;
             appearance: none;
             background: transparent;
+            margin: 8px 0;
         }
 
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
             height: 4px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 2px;
         }
 
@@ -431,62 +459,98 @@
             border-radius: 50%;
             background: #fff;
             margin-top: -6px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
         }
 
         .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.03);
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
             margin-bottom: 8px;
             cursor: pointer;
             transition: background 0.2s;
+            font-size: 14px;
         }
 
         .checkbox-item:hover {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .checkbox-item input {
             accent-color: var(--primary);
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input:checked+span {
+            color: #fff;
         }
 
         /* List View */
         .search-box {
             width: 100%;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
             color: #fff;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.4);
         }
 
         .search-box:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .sat-list {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .sat-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sat-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
+
+        .sat-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 2px;
         }
 
         .sat-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
             font-size: 13px;
             cursor: pointer;
             transition: background 0.2s;
@@ -499,17 +563,62 @@
         .sat-info {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
         }
 
         .sat-name {
-            font-weight: 600;
+            font-weight: 700;
             color: #fff;
+            font-size: 14px;
         }
 
         .sat-meta {
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.45);
+            font-family: 'Space Grotesk', monospace;
+        }
+
+        /* Fleet Filter Buttons */
+        .fleet-filter-buttons {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .fleet-filter-btn {
+            flex: 1;
+            padding: 10px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .fleet-filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .fleet-filter-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .fleet-filter-btn.eszun.active {
+            background: rgba(0, 180, 200, 0.15);
+            border-color: rgba(0, 180, 200, 0.4);
+            color: #00b4c8;
+        }
+
+        .fleet-filter-btn.contract.active {
+            background: rgba(200, 140, 0, 0.15);
+            border-color: rgba(200, 140, 0, 0.4);
+            color: #c88c00;
         }
 
         /* Admin Controls */
@@ -1096,6 +1205,100 @@
             font-weight: 600;
             color: #fff;
         }
+
+        /* Planet Navigation Buttons */
+        .planet-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+            padding: 10px 16px;
+            background: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .planet-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 30px;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .planet-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .planet-btn.active {
+            background: linear-gradient(135deg, var(--primary), #0099cc);
+            border-color: var(--primary);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        .planet-btn .icon {
+            font-size: 16px;
+        }
+
+        .planet-btn.earth:hover,
+        .planet-btn.earth.active {
+            border-color: #4da6ff;
+            box-shadow: 0 0 15px rgba(77, 166, 255, 0.4);
+        }
+
+        .planet-btn.moon:hover,
+        .planet-btn.moon.active {
+            border-color: #aaaaaa;
+            box-shadow: 0 0 15px rgba(200, 200, 200, 0.3);
+        }
+
+        .planet-btn.mars:hover,
+        .planet-btn.mars.active {
+            border-color: #ff6b4a;
+            box-shadow: 0 0 15px rgba(255, 107, 74, 0.4);
+        }
+
+        .planet-btn.free:hover,
+        .planet-btn.free.active {
+            border-color: #7cff6b;
+            box-shadow: 0 0 15px rgba(124, 255, 107, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .planet-nav {
+                bottom: 80px;
+                padding: 8px 12px;
+                gap: 8px;
+            }
+
+            .planet-btn {
+                padding: 8px 12px;
+                font-size: 10px;
+            }
+
+            .planet-btn .icon {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 
@@ -1147,6 +1350,26 @@
     <main class="hero">
         <div id="earth-container"></div>
 
+        <!-- Planet Navigation Buttons -->
+        <div class="planet-nav" id="planet-nav">
+            <button class="planet-btn earth active" onclick="navigateToPlanet('earth')" id="btn-earth">
+                <span class="icon">🌍</span>
+                <span>Tierra</span>
+            </button>
+            <button class="planet-btn moon" onclick="navigateToPlanet('moon')" id="btn-moon">
+                <span class="icon">🌙</span>
+                <span>Luna</span>
+            </button>
+            <button class="planet-btn mars" onclick="navigateToPlanet('mars')" id="btn-mars">
+                <span class="icon">🔴</span>
+                <span>Marte</span>
+            </button>
+            <button class="planet-btn free" onclick="navigateToPlanet('free')" id="btn-free">
+                <span class="icon">🎯</span>
+                <span>Libre</span>
+            </button>
+        </div>
+
         <div id="total-stats" role="button" tabindex="0" onclick="openFlotaPanel()">
             <div class="stat-number" id="total-sat-count">0</div>
             <div class="stat-label">SATÉLITES EN ÓRBITA</div>
@@ -1164,27 +1387,15 @@
 
         <div class="filter-panel" id="filter-panel">
             <div class="tab-nav">
-                <button class="tab-btn active" onclick="switchTab('filters')">Filtros</button>
-                <button class="tab-btn" onclick="switchTab('list')">Flota</button>
+                <button class="tab-btn active" onclick="switchTab('filters')">⚙️ Filtros</button>
+                <button class="tab-btn" onclick="switchTab('list')">🛰️ Flota</button>
             </div>
 
             <!-- Tab: Filters -->
             <div id="tab-filters" class="panel-content tab-pane active">
                 <div class="filter-group">
-                    <label>Empresa</label>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="check-eszun" checked onchange="updateFilters()">
-                        <span style="color:#00f0ff; font-weight:bold;">EsZunSpace</span>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="check-contracts" checked onchange="updateFilters()">
-                        <span style="color:#ffae00; font-weight:bold;">Contratos</span>
-                    </div>
-                </div>
-
-                <div class="filter-group">
                     <label>Altura Máx <span id="alt-val" class="range-value">36000 km</span></label>
-                    <input type="range" id="range-alt" min="300" max="36000" value="36000" step="100"
+                    <input type="range" id="range-alt" min="140" max="36000" value="36000" step="100"
                         oninput="updateFilters()">
                 </div>
 
@@ -1193,17 +1404,40 @@
                     <input type="range" id="range-inc" min="0" max="180" value="180" step="1" oninput="updateFilters()">
                 </div>
 
-                <div style="text-align:center; font-size:12px; opacity:0.5; margin-top:20px;">
-                    Satélites visibles: <span id="count-val" style="color:#fff; font-weight:bold;">0</span>
+                <div class="filter-group">
+                    <label>Mostrar</label>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="check-eszun" checked onchange="updateFilters()">
+                        <span>EsZunSpace</span>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="check-contracts" checked onchange="updateFilters()">
+                        <span>Contratos</span>
+                    </div>
+                </div>
+
+                <div style="text-align:center; font-size:12px; opacity:0.5; margin-top:16px;">
+                    Visibles: <span id="count-val" style="color:#fff; font-weight:bold;">0</span>
                 </div>
 
                 <button class="btn add-btn admin-only" onclick="openAddModal()">+ Añadir Satélite</button>
             </div>
 
-            <!-- Tab: List -->
+            <!-- Tab: Fleet List -->
             <div id="tab-list" class="panel-content tab-pane">
-                <input type="text" class="search-box" id="search-input" placeholder="Buscar satélite..."
+                <!-- Filter buttons -->
+                <div class="fleet-filter-buttons">
+                    <button class="fleet-filter-btn active" data-filter="all"
+                        onclick="filterFleet('all')">Todos</button>
+                    <button class="fleet-filter-btn eszun" data-filter="eszun"
+                        onclick="filterFleet('eszun')">EsZunSpace</button>
+                    <button class="fleet-filter-btn contract" data-filter="contract"
+                        onclick="filterFleet('contract')">Contratos</button>
+                </div>
+
+                <input type="text" class="search-box" id="search-input" placeholder="🔍 Buscar satélite..."
                     oninput="updateFilters()">
+
                 <div class="sat-list" id="sat-list-container">
                     <!-- Items injected by JS -->
                 </div>
@@ -1304,8 +1538,16 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label>Planeta</label>
+                    <select id="new-sat-planet">
+                        <option value="earth">🌍 Tierra</option>
+                        <option value="moon">🌙 Luna</option>
+                        <option value="mars">🔴 Marte</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Altitud (km)</label>
-                    <input type="number" id="new-sat-alt" required min="300" max="36000" value="500">
+                    <input type="number" id="new-sat-alt" required min="140" max="36000" value="500">
                 </div>
                 <div class="form-group">
                     <label>Inclinación (grados)</label>
@@ -1604,32 +1846,149 @@
             scene.add(earthGroup);
 
             const loader = new THREE.TextureLoader();
+
+            // Earth surface (day texture)
             const earth = new THREE.Mesh(
                 new THREE.SphereGeometry(1, 64, 64),
                 new THREE.MeshPhongMaterial({
                     map: loader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'),
                     bumpMap: loader.load('https://unpkg.com/three-globe/example/img/earth-topology.png'),
-                    bumpScale: 0.05, specular: new THREE.Color(0x000000), shininess: 0
+                    bumpScale: 0.05,
+                    specular: new THREE.Color(0x222222),
+                    shininess: 25
                 })
             );
             earthGroup.add(earth);
 
-            // Atmosphere
+            // City lights layer (night side - additive blend makes it visible only in dark areas)
+            const nightLights = new THREE.Mesh(
+                new THREE.SphereGeometry(1.001, 64, 64),
+                new THREE.MeshBasicMaterial({
+                    map: loader.load('https://unpkg.com/three-globe/example/img/earth-night.jpg'),
+                    blending: THREE.AdditiveBlending,
+                    transparent: true,
+                    opacity: 1.0
+                })
+            );
+            earthGroup.add(nightLights);
+
+            // Cloud layer (more visible)
+            const clouds = new THREE.Mesh(
+                new THREE.SphereGeometry(1.015, 64, 64),
+                new THREE.MeshPhongMaterial({
+                    map: loader.load('https://unpkg.com/three-globe/example/img/earth-clouds.png'),
+                    transparent: true,
+                    opacity: 0.65,
+                    depthWrite: false
+                })
+            );
+            earthGroup.add(clouds);
+
+            // Store cloud reference for animation
+            window.cloudLayer = clouds;
+
+            // Atmosphere glow
             const atmo = new THREE.Mesh(
-                new THREE.SphereGeometry(1.2, 64, 64),
+                new THREE.SphereGeometry(1.12, 64, 64),
                 new THREE.ShaderMaterial({
                     vertexShader: `varying vec3 vNormal; void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-                    fragmentShader: `varying vec3 vNormal; void main(){float i=pow(0.6-dot(vNormal,vec3(0,0,1.0)),4.0);gl_FragColor=vec4(0.0,0.6,1.0,1.0)*i;}`,
+                    fragmentShader: `varying vec3 vNormal; void main(){float i=pow(0.7-dot(vNormal,vec3(0,0,1.0)),3.0);gl_FragColor=vec4(0.4,0.7,1.0,1.0)*i;}`,
                     blending: THREE.AdditiveBlending, side: THREE.BackSide, transparent: true
                 })
             );
             scene.add(atmo);
 
+            // ===== MOON =====
+            const moonGroup = new THREE.Group();
+            scene.add(moonGroup);
+
+            const moonOrbitRadius = 2.8; // Closer orbit for better visibility
+
+            // Moon texture
+            const moonTexture = loader.load('https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Moonmap_from_clementine_data.png/1200px-Moonmap_from_clementine_data.png');
+
+            const moon = new THREE.Mesh(
+                new THREE.SphereGeometry(0.18, 64, 64), // Higher detail geometry
+                new THREE.MeshLambertMaterial({
+                    map: moonTexture,
+                    emissive: 0x555555, // Medium self-illumination
+                    emissiveIntensity: 0.5
+                })
+            );
+            moon.name = 'moon'; // For click detection
+            moon.position.set(moonOrbitRadius, 0, 0); // Start on the orbit
+            moonGroup.add(moon);
+
+            // Moon orbit line - perfect circle centered on Earth
+            const moonOrbitSegments = 128;
+            const moonOrbitPoints = [];
+            for (let i = 0; i <= moonOrbitSegments; i++) {
+                const angle = (i / moonOrbitSegments) * Math.PI * 2;
+                moonOrbitPoints.push(new THREE.Vector3(
+                    Math.cos(angle) * moonOrbitRadius,
+                    0,
+                    Math.sin(angle) * moonOrbitRadius
+                ));
+            }
+            const moonOrbitGeom = new THREE.BufferGeometry().setFromPoints(moonOrbitPoints);
+            const moonOrbitLine = new THREE.LineLoop(moonOrbitGeom, new THREE.LineBasicMaterial({
+                color: 0xaaaaaa,
+                transparent: true,
+                opacity: 0.4
+            }));
+            // No rotation - flat horizontal orbit
+            scene.add(moonOrbitLine);
+
+            // ===== MARS =====
+            const marsGroup = new THREE.Group();
+            scene.add(marsGroup);
+
+            const mars = new THREE.Mesh(
+                new THREE.SphereGeometry(0.4, 32, 32),
+                new THREE.MeshLambertMaterial({
+                    map: loader.load('https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg'),
+                    emissive: 0x442211, // Stronger self-illumination
+                    emissiveIntensity: 0.6
+                })
+            );
+            mars.name = 'mars'; // For click detection
+            mars.position.set(-8, 1, -12); // Repositioned: left and back
+            mars.rotation.z = 25.2 * Math.PI / 180;
+            marsGroup.add(mars);
+
+            // Mars atmosphere glow
+            const marsAtmo = new THREE.Mesh(
+                new THREE.SphereGeometry(0.45, 32, 32),
+                new THREE.ShaderMaterial({
+                    vertexShader: `varying vec3 vNormal; void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+                    fragmentShader: `varying vec3 vNormal; void main(){float i=pow(0.5-dot(vNormal,vec3(0,0,1.0)),3.0);gl_FragColor=vec4(0.9,0.4,0.2,1.0)*i;}`,
+                    blending: THREE.AdditiveBlending,
+                    side: THREE.BackSide,
+                    transparent: true
+                })
+            );
+            marsAtmo.position.copy(mars.position);
+            marsGroup.add(marsAtmo);
+
+            // Earth reference for click
+            earth.name = 'earth';
+
+            // Store references for animation and click detection
+            window.celestialBodies = {
+                moon, moonGroup, mars, marsGroup, earth, moonOrbitRadius,
+                camera, controls // Store for transitions
+            };
+
             // Lights
-            scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+            scene.add(new THREE.AmbientLight(0xffffff, 0.25));
             const sun = new THREE.DirectionalLight(0xffffff, 1.5);
             sun.position.set(5, 3, 5);
             scene.add(sun);
+
+            // Secondary light for Mars visibility
+            const marsLight = new THREE.PointLight(0xffffff, 0.5, 50);
+            marsLight.position.set(-10, 5, -10);
+            scene.add(marsLight);
 
             // Stars
             const starsGeo = new THREE.BufferGeometry();
@@ -1665,9 +2024,14 @@
                     });
                 }
 
-                // Update Total Count
-                const totalEl = document.getElementById('total-sat-count');
-                if (totalEl) totalEl.textContent = satellitesData.length;
+                // Update satellite count based on current planet view
+                if (window.updateSatelliteStats) {
+                    updateSatelliteStats();
+                } else {
+                    // Fallback to total count
+                    const totalEl = document.getElementById('total-sat-count');
+                    if (totalEl) totalEl.textContent = satellitesData.length;
+                }
 
                 update3D();
                 updateFilters(); // Also updates list
@@ -1717,8 +2081,61 @@
 
             setInterval(updateRecentList, 1000);
 
+            // Animation time tracker
+            let animationTime = 0;
+
+            // Camera transition state
+            let cameraTransition = null;
+
+            // Planet tracking state (global for access from button handlers)
+            window.trackingPlanet = null; // 'earth', 'moon', 'mars', or null
+            let trackingOffset = new THREE.Vector3();
+
             function animate() {
                 requestAnimationFrame(animate);
+
+                // Animate celestial bodies (PAUSE moon when focused on it)
+                animationTime += 0.005;
+
+                if (window.celestialBodies) {
+                    const { moon, mars, moonOrbitRadius } = window.celestialBodies;
+
+                    // Moon: COMPLETELY FREEZE when focused (no orbit, no rotation)
+                    if (window.trackingPlanet !== 'moon') {
+                        // Only move moon when NOT being viewed
+                        moon.position.x = Math.cos(animationTime * 0.3) * moonOrbitRadius;
+                        moon.position.z = Math.sin(animationTime * 0.3) * moonOrbitRadius;
+                        moon.position.y = 0;
+                        moon.rotation.y = animationTime * 0.01; // Very slow rotation
+                    }
+                    // When moon IS focused: do nothing (frozen in place)
+
+                    // Mars rotation (always)
+                    mars.rotation.y = animationTime * 0.08;
+                }
+
+                // Animate cloud layer (slow rotation)
+                if (window.cloudLayer) {
+                    window.cloudLayer.rotation.y = animationTime * 0.02;
+                }
+
+                // Handle camera transitions
+                if (cameraTransition) {
+                    const { startPos, endPos, startTarget, endTarget, progress, duration } = cameraTransition;
+                    cameraTransition.progress += 1 / (60 * duration);
+
+                    const t = Math.min(cameraTransition.progress, 1);
+                    const easeT = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+                    camera.position.lerpVectors(startPos, endPos, easeT);
+                    controls.target.lerpVectors(startTarget, endTarget, easeT);
+
+                    if (t >= 1) cameraTransition = null;
+                }
+
+                // After transition: allow free rotation
+                // (removed continuous tracking - user can now rotate freely)
+
                 controls.update();
                 renderer.render(scene, camera);
             }
@@ -1730,7 +2147,100 @@
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
 
-            // Click Handler
+            // ===== CAMERA FOCUS FUNCTION =====
+            window.focusOnPlanet = function (planetName) {
+                const bodies = window.celestialBodies;
+                if (!bodies) return;
+
+                let targetPos, cameraOffset, planetLabel;
+
+                switch (planetName) {
+                    case 'earth':
+                        targetPos = new THREE.Vector3(0, 0, 0);
+                        cameraOffset = new THREE.Vector3(0, 0.5, 2.5);
+                        planetLabel = '🌍 Tierra';
+                        break;
+                    case 'moon':
+                        targetPos = bodies.moon.position.clone();
+                        cameraOffset = new THREE.Vector3(0.5, 0.2, 0.8);
+                        planetLabel = '🌙 Luna';
+                        break;
+                    case 'mars':
+                        targetPos = bodies.mars.position.clone();
+                        cameraOffset = new THREE.Vector3(1.5, 0.5, 2);
+                        planetLabel = '🔴 Marte';
+                        break;
+                    default:
+                        return;
+                }
+
+                // Enable tracking for this planet
+                window.trackingPlanet = planetName;
+                trackingOffset.copy(cameraOffset);
+
+                // Start camera transition
+                cameraTransition = {
+                    startPos: camera.position.clone(),
+                    endPos: targetPos.clone().add(cameraOffset),
+                    startTarget: controls.target.clone(),
+                    endTarget: targetPos.clone(),
+                    progress: 0,
+                    duration: 1.2 // seconds
+                };
+
+                console.log(`📍 Siguiendo: ${planetLabel}`);
+            };
+
+            // ===== UPDATE SATELLITE STATS BASED ON PLANET =====
+            window.updateSatelliteStats = function () {
+                const countEl = document.getElementById('total-sat-count');
+                const labelEl = document.querySelector('#total-stats .stat-label');
+
+                let count = 0;
+                let label = 'SATÉLITES EN ÓRBITA';
+
+                if (window.trackingPlanet === 'earth') {
+                    count = satellitesData.filter(s => !s.planet || s.planet === 'earth').length;
+                    label = 'SATÉLITES DE LA TIERRA';
+                } else if (window.trackingPlanet === 'moon') {
+                    count = satellitesData.filter(s => s.planet === 'moon').length;
+                    label = 'SATÉLITES DE LA LUNA';
+                } else if (window.trackingPlanet === 'mars') {
+                    count = satellitesData.filter(s => s.planet === 'mars').length;
+                    label = 'SATÉLITES DE MARTE';
+                } else {
+                    // Free mode - show total
+                    count = satellitesData.length;
+                    label = 'SATÉLITES EN ÓRBITA';
+                }
+
+                if (countEl) countEl.textContent = count;
+                if (labelEl) labelEl.textContent = label;
+            };
+
+            // ===== NAVIGATE TO PLANET (Button Handler) =====
+            window.navigateToPlanet = function (planetName) {
+                // Update button active states
+                document.querySelectorAll('.planet-btn').forEach(btn => btn.classList.remove('active'));
+                const activeBtn = document.getElementById('btn-' + planetName);
+                if (activeBtn) activeBtn.classList.add('active');
+
+                // Handle free mode
+                if (planetName === 'free') {
+                    window.trackingPlanet = null; // Stop tracking
+                    console.log('🎯 Modo Libre - Control manual de cámara');
+                    updateSatelliteStats();
+                    return;
+                }
+
+                // Focus on the planet
+                window.focusOnPlanet(planetName);
+
+                // Update stats after focus (trackingPlanet is set in focusOnPlanet)
+                setTimeout(() => updateSatelliteStats(), 100);
+            };
+
+            // Click Handler - detect planets and satellites
             renderer.domElement.addEventListener('click', onMouseClick, false);
 
             function onMouseClick(event) {
@@ -1739,18 +2249,33 @@
                 mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
                 raycaster.setFromCamera(mouse, camera);
-                raycaster.params.Points.threshold = 0.05;
 
+                // First check for planet clicks
+                const bodies = window.celestialBodies;
+                if (bodies) {
+                    const planets = [bodies.earth, bodies.moon, bodies.mars];
+                    const planetIntersects = raycaster.intersectObjects(planets);
+
+                    if (planetIntersects.length > 0) {
+                        const planet = planetIntersects[0].object;
+                        window.focusOnPlanet(planet.name);
+                        return; // Don't check satellites if planet was clicked
+                    }
+                }
+
+                // Then check for satellite clicks
+                raycaster.params.Points.threshold = 0.05;
                 const intersects = raycaster.intersectObject(satPoints);
 
                 if (intersects.length > 0) {
                     const index = intersects[0].index;
                     if (index < satellitesData.length) {
                         const sat = satellitesData[index];
-                        selectSatellite(sat.id); // Use the new selection function
+                        selectSatellite(sat.id);
                     }
                 } else {
-                    // Clear if clicked empty space
+                    // Clear if clicked empty space - stop tracking
+                    trackingPlanet = null;
                     if (orbitLine) {
                         earthGroup.remove(orbitLine);
                         orbitLine = null;
@@ -1812,6 +2337,24 @@
             satPoints.geometry.computeBoundingSphere(); // Critical for Raycaster
         }
 
+        // Fleet filter state
+        let currentFleetFilter = 'all';
+
+        window.filterFleet = function (filter) {
+            currentFleetFilter = filter;
+
+            // Update button states
+            document.querySelectorAll('.fleet-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Update the list
+            updateFilters();
+        }
+
         window.updateFilters = function () {
             const showEsZun = document.getElementById('check-eszun').checked;
             const showContracts = document.getElementById('check-contracts').checked;
@@ -1850,15 +2393,20 @@
 
                     visibleCount++;
 
-                    // Add to List
-                    if (visibleCount < 100) { // Limit list rendering for performance
+                    // Add to List (with fleet filter applied)
+                    let showInList = true;
+                    if (currentFleetFilter === 'eszun' && sat.company !== 'eszun') showInList = false;
+                    if (currentFleetFilter === 'contract' && sat.company === 'eszun') showInList = false;
+
+                    if (showInList && visibleCount < 100) { // Limit list rendering for performance
                         const div = document.createElement('div');
                         div.className = 'sat-item';
                         div.onclick = () => selectSatellite(sat.id); // Click to select
+                        const isEszun = sat.company === 'eszun';
                         div.innerHTML = `
                     <div class="sat-info">
-                        <span class="sat-name" style="color:${sat.company === 'eszun' ? '#00f0ff' : '#ffae00'}">${sat.name}</span>
-                        <span class="sat-meta">${sat.altitude}km • ${sat.inclination}°</span>
+                        <span class="sat-name">${sat.name}</span>
+                        <span class="sat-meta">${isEszun ? '🛰️ EsZunSpace' : '📡 Contrato'} · ${sat.altitude}km</span>
                     </div>
                     <button class="delete-btn admin-only" onclick="event.stopPropagation(); deleteSat('${sat.id}')">🗑</button>
                 `;
@@ -1924,6 +2472,7 @@
             const inc = parseInt(document.getElementById('new-sat-inc').value);
             const weight = document.getElementById('new-sat-weight').value;
             const purpose = document.getElementById('new-sat-purpose').value;
+            const planet = document.getElementById('new-sat-planet').value;
 
             const bulkCheck = document.getElementById('bulk-add-check').checked;
             const bulkCount = parseInt(document.getElementById('bulk-add-count').value) || 10;
@@ -1950,6 +2499,7 @@
                         await database.ref('satellites').push({
                             name: satName,
                             company: company,
+                            planet: planet,
                             altitude: alt,
                             inclination: inc,
                             weight: weight || 'N/A',
@@ -1985,6 +2535,7 @@
                 database.ref('satellites').push({
                     name: name,
                     company: company,
+                    planet: planet,
                     altitude: alt,
                     inclination: inc,
                     weight: weight || 'N/A',
