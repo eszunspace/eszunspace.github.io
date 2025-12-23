@@ -996,7 +996,7 @@
           <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
         </div>
         <div class="toggle-form">
-          ¿No tienes cuenta? <a href="#" onclick="showRegisterForm(event)">Crear cuenta</a>
+          ¿No tienes cuenta? <a href="javascript:void(0)" onclick="showRegisterForm(event)">Crear cuenta</a>
         </div>
       </form>
 
@@ -1019,7 +1019,7 @@
           <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
         </div>
         <div class="toggle-form">
-          ¿Ya tienes cuenta? <a href="#" onclick="showLoginForm(event)">Iniciar sesión</a>
+          ¿Ya tienes cuenta? <a href="javascript:void(0)" onclick="showLoginForm(event)">Iniciar sesión</a>
         </div>
       </form>
     </div>
@@ -1420,6 +1420,15 @@
       console.error('Error inicializando Firebase:', e);
     }
 
+    // ===== SHA-256 HASHING HELPER =====
+    async function hashPassword(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+
     // ===== ASYNC FUNCTIONS (Dependen de Firebase) =====
     async function loadUsers() {
       if (!database) return;
@@ -1455,14 +1464,24 @@
       e.preventDefault();
       const username = document.getElementById('login-username').value.trim();
       const password = document.getElementById('login-password').value;
+      const errEl = document.getElementById('login-error');
 
-      if (allUsers[username] && allUsers[username] === password) {
+      if (!allUsers[username]) {
+        errEl.textContent = 'Usuario no encontrado';
+        errEl.classList.add('show');
+        return;
+      }
+
+      const storedPassword = allUsers[username];
+
+      if (storedPassword === password) {
         currentUser = username;
         localStorage.setItem(SESSION_KEY, currentUser);
         checkAuth();
         closeAuthModal();
       } else {
-        document.getElementById('login-error').classList.add('show');
+        errEl.textContent = 'Contraseña incorrecta';
+        errEl.classList.add('show');
       }
     }
 
@@ -1480,9 +1499,9 @@
         return;
       }
 
-      const saved = await saveUser(username, password);
+      const success = await saveUser(username, password);
 
-      if (saved) {
+      if (success) {
         document.getElementById('register-success').classList.add('show');
         setTimeout(() => {
           currentUser = username;

@@ -763,6 +763,77 @@
             color: #fff;
         }
 
+        /* Login/Register Form Styles */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .modal-head h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 16px;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 14px;
+        }
+
+        .toggle-form a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s ease;
+        }
+
+        .toggle-form a:hover {
+            opacity: 0.8;
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        .success-msg {
+            color: #51cf66;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .success-msg.show {
+            display: block;
+        }
+
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -1572,12 +1643,52 @@
     <!-- Auth Modal -->
     <div id="auth-modal-overlay" class="modal-overlay">
         <div class="modal-card">
-            <h3 id="auth-modal-title">Login</h3>
-            <form id="login-form" onsubmit="handleLogin(event)">
-                <div class="form-group"><label>Usuario</label><input id="login-username" required></div>
-                <div class="form-group"><label>Contraseña</label><input type="password" id="login-password" required>
-                </div><button class="btn primary">Entrar</button><button type="button" class="btn"
-                    onclick="closeAuthModal()">Cerrar</button>
+            <div class="modal-head">
+                <h3 id="auth-modal-title">Iniciar sesión</h3>
+                <button class="btn ghost" onclick="closeAuthModal()" aria-label="Cerrar">✕</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-username">Usuario</label>
+                    <input type="text" id="login-username" name="username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Contraseña</label>
+                    <input type="password" id="login-password" name="password" required autocomplete="current-password">
+                    <div id="login-error" class="error-msg">Usuario o contraseña incorrectos</div>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn primary">Entrar</button>
+                    <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+                </div>
+                <div class="toggle-form">
+                    ¿No tienes cuenta? <a href="javascript:void(0)" onclick="showRegisterForm(event)">Crear cuenta</a>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="login-form" style="display:none;" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="register-username">Usuario</label>
+                    <input type="text" id="register-username" name="username" required autocomplete="username">
+                    <div id="register-username-error" class="error-msg">Este nombre de usuario ya está en uso</div>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Contraseña</label>
+                    <input type="password" id="register-password" name="password" required autocomplete="new-password"
+                        minlength="6">
+                    <div id="register-error" class="error-msg">Error al crear la cuenta</div>
+                    <div id="register-success" class="success-msg">¡Cuenta creada! Iniciando sesión...</div>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn primary">Crear cuenta</button>
+                    <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
+                </div>
+                <div class="toggle-form">
+                    ¿Ya tienes cuenta? <a href="javascript:void(0)" onclick="showLoginForm(event)">Iniciar sesión</a>
+                </div>
             </form>
         </div>
     </div>
@@ -1604,6 +1715,15 @@
         const ADMINS = ['Esstor'];
         let currentUser = localStorage.getItem('esz_user');
         let allUsers = {};
+
+        // ===== SHA-256 HASHING HELPER =====
+        async function hashPassword(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
 
         // ===== AUTH & ADMIN =====
         function checkAdmin() {
@@ -1635,18 +1755,110 @@
             const snap = await database.ref('users').once('value');
             const users = snap.val() || {};
 
-            if (users[u] && users[u] === p) {
+            const storedPassword = users[u];
+            if (!storedPassword) {
+                alert('Usuario no encontrado');
+                return;
+            }
+
+            if (storedPassword === p) {
                 currentUser = u;
                 localStorage.setItem('esz_user', u);
                 checkAdmin();
                 closeAuthModal();
             } else {
-                alert('Credenciales incorrectas');
+                alert('Contraseña incorrecta');
             }
         }
 
-        function showLoginModal() { document.getElementById('auth-modal-overlay').classList.add('show'); }
-        function closeAuthModal() { document.getElementById('auth-modal-overlay').classList.remove('show'); }
+        function showLoginModal() {
+            showLoginForm();
+            document.getElementById('auth-modal-overlay').classList.add('show');
+        }
+        function closeAuthModal() {
+            document.getElementById('auth-modal-overlay').classList.remove('show');
+            const loginErr = document.getElementById('login-error');
+            const regErr = document.getElementById('register-error');
+            const regUserErr = document.getElementById('register-username-error');
+            const regSuccess = document.getElementById('register-success');
+            if (loginErr) loginErr.classList.remove('show');
+            if (regErr) regErr.classList.remove('show');
+            if (regUserErr) regUserErr.classList.remove('show');
+            if (regSuccess) regSuccess.classList.remove('show');
+        }
+        function showLoginForm(e) {
+            if (e) e.preventDefault();
+            document.getElementById('auth-modal-title').textContent = 'Iniciar sesión';
+            document.getElementById('login-form').style.display = 'flex';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            const loginErr = document.getElementById('login-error');
+            if (loginErr) loginErr.classList.remove('show');
+        }
+        function showRegisterForm(e) {
+            if (e) e.preventDefault();
+            document.getElementById('auth-modal-title').textContent = 'Crear cuenta';
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'flex';
+            document.getElementById('register-username').value = '';
+            document.getElementById('register-password').value = '';
+            const regErr = document.getElementById('register-error');
+            const regUserErr = document.getElementById('register-username-error');
+            const regSuccess = document.getElementById('register-success');
+            if (regErr) regErr.classList.remove('show');
+            if (regUserErr) regUserErr.classList.remove('show');
+            if (regSuccess) regSuccess.classList.remove('show');
+        }
+
+        async function saveUser(username, password) {
+            try {
+                const snapshot = await database.ref('users/' + username).once('value');
+                if (snapshot.exists()) return false;
+                await database.ref('users/' + username).set(password);
+                allUsers[username] = password;
+                return true;
+            } catch (error) {
+                console.error('Error al guardar usuario:', error);
+                return false;
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value;
+
+            const regErr = document.getElementById('register-error');
+            const regUserErr = document.getElementById('register-username-error');
+            const regSuccess = document.getElementById('register-success');
+            if (regErr) regErr.classList.remove('show');
+            if (regUserErr) regUserErr.classList.remove('show');
+            if (regSuccess) regSuccess.classList.remove('show');
+
+            // Refresh users list
+            const snap = await database.ref('users').once('value');
+            const users = snap.val() || {};
+
+            if (users[username]) {
+                if (regUserErr) regUserErr.classList.add('show');
+                return;
+            }
+
+            const success = await saveUser(username, password);
+            if (success) {
+                if (regSuccess) regSuccess.classList.add('show');
+                setTimeout(() => {
+                    currentUser = username;
+                    localStorage.setItem('esz_user', currentUser);
+                    checkAdmin();
+                    closeAuthModal();
+                }, 1500);
+            } else {
+                if (regErr) regErr.classList.add('show');
+            }
+        }
+
         function showProfileModal() {
             if (confirm('¿Cerrar sesión?')) {
                 currentUser = null; localStorage.removeItem('esz_user'); checkAdmin();

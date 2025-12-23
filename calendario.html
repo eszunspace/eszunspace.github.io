@@ -788,6 +788,44 @@
       font-size: 12px;
     }
 
+    /* ===== Login/Register Form Styles ===== */
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .success-msg {
+      color: #51cf66;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .toggle-form {
+      text-align: center;
+      margin-top: 16px;
+      color: rgba(255, 255, 255, .72);
+      font-size: 14px;
+    }
+
+    .toggle-form a {
+      color: var(--accent1);
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity .2s ease;
+    }
+
+    .toggle-form a:hover {
+      opacity: .8;
+    }
+
     @media (max-width:720px) {
       .form-grid {
         grid-template-columns: 1fr;
@@ -1039,7 +1077,7 @@
           <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
         </div>
         <div class="toggle-form">
-          ¿No tienes cuenta? <a href="#" onclick="showRegisterForm(event)">Crear cuenta</a>
+          ¿No tienes cuenta? <a href="javascript:void(0)" onclick="showRegisterForm(event)">Crear cuenta</a>
         </div>
       </form>
 
@@ -1062,7 +1100,7 @@
           <button type="button" class="btn ghost" onclick="closeAuthModal()">Cancelar</button>
         </div>
         <div class="toggle-form">
-          ¿Ya tienes cuenta? <a href="#" onclick="showLoginForm(event)">Iniciar sesión</a>
+          ¿Ya tienes cuenta? <a href="javascript:void(0)" onclick="showLoginForm(event)">Iniciar sesión</a>
         </div>
       </form>
     </div>
@@ -1197,6 +1235,15 @@
     const SESSION_KEY = 'esz_user';
     const ADMIN_USERS = ['Esstor', 'ZundakyGC'];
 
+    // ===== SHA-256 HASHING HELPER =====
+    async function hashPassword(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+    }
+
     function isAdmin() { return currentUser && ADMIN_USERS.includes(currentUser); }
 
     function hydrateSessionFromStorage() {
@@ -1272,8 +1319,57 @@
     function showLoginForm(e) { if (e) e.preventDefault(); document.getElementById('auth-modal-title').textContent = 'Iniciar sesión'; document.getElementById('login-form').style.display = 'flex'; document.getElementById('register-form').style.display = 'none'; document.getElementById('login-username').value = ''; document.getElementById('login-password').value = ''; const le = document.getElementById('login-error'); if (le) le.style.display = 'none'; }
     function showRegisterForm(e) { if (e) e.preventDefault(); document.getElementById('auth-modal-title').textContent = 'Crear cuenta'; document.getElementById('login-form').style.display = 'none'; document.getElementById('register-form').style.display = 'flex'; document.getElementById('register-username').value = ''; document.getElementById('register-password').value = '';['register-error', 'register-username-error', 'register-success'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; }); }
 
-    async function handleLogin(e) { e.preventDefault(); const username = document.getElementById('login-username').value.trim(); const password = document.getElementById('login-password').value; const le = document.getElementById('login-error'); if (allUsers[username] && allUsers[username] === password) { currentUser = username; localStorage.setItem(SESSION_KEY, currentUser); checkAuth(); closeAuthModal(); } else { if (le) le.style.display = 'block'; } }
-    async function handleRegister(e) { e.preventDefault(); const username = document.getElementById('register-username').value.trim(); const password = document.getElementById('register-password').value;['register-error', 'register-username-error', 'register-success'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; }); if (allUsers[username]) { const ue = document.getElementById('register-username-error'); if (ue) ue.style.display = 'block'; return; } const saved = await saveUser(username, password); if (saved) { const rs = document.getElementById('register-success'); if (rs) rs.style.display = 'block'; setTimeout(() => { currentUser = username; localStorage.setItem(SESSION_KEY, currentUser); checkAuth(); closeAuthModal(); }, 1000); } else { const re = document.getElementById('register-error'); if (re) re.style.display = 'block'; } }
+    async function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      const le = document.getElementById('login-error');
+
+      if (!allUsers[username]) {
+        if (le) { le.textContent = 'Usuario no encontrado'; le.style.display = 'block'; }
+        return;
+      }
+
+      const storedPassword = allUsers[username];
+
+      if (storedPassword === password) {
+        currentUser = username;
+        localStorage.setItem(SESSION_KEY, currentUser);
+        checkAuth();
+        closeAuthModal();
+      } else {
+        if (le) { le.textContent = 'Contraseña incorrecta'; le.style.display = 'block'; }
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('register-username').value.trim();
+      const password = document.getElementById('register-password').value;
+      ['register-error', 'register-username-error', 'register-success'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+
+      if (allUsers[username]) {
+        const ue = document.getElementById('register-username-error');
+        if (ue) ue.style.display = 'block';
+        return;
+      }
+
+      const success = await saveUser(username, password);
+      if (success) {
+        const rs = document.getElementById('register-success');
+        if (rs) rs.style.display = 'block';
+        setTimeout(() => {
+          currentUser = username;
+          localStorage.setItem(SESSION_KEY, currentUser);
+          checkAuth();
+          closeAuthModal();
+        }, 1000);
+      } else {
+        const re = document.getElementById('register-error');
+        if (re) re.style.display = 'block';
+      }
+    }
+
     function logout() { currentUser = null; localStorage.removeItem(SESSION_KEY); checkAuth(); }
 
     document.addEventListener("DOMContentLoaded", async () => {
