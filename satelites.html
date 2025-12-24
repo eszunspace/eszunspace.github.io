@@ -1585,11 +1585,11 @@
             <form onsubmit="handleAddSatellite(event)">
                 <div class="form-group">
                     <label>Nombre</label>
-                    <input type="text" id="new-sat-name" required placeholder="Ej: EsZunSat-1">
+                    <input type="text" id="new-sat-name" required placeholder="Ej: EsZunSat-1 o GeoNet-1">
                 </div>
                 <div class="form-group" id="bulk-add-group"
                     style="background: rgba(0,240,255,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(0,240,255,0.3);">
-                    <label style="color: var(--primary);">🚀 Añadir en lote (EsZunSat)</label>
+                    <label style="color: var(--primary);">🚀 Añadir en lote</label>
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
                         <input type="checkbox" id="bulk-add-check"
                             style="width: 18px; height: 18px; accent-color: var(--primary);">
@@ -1598,8 +1598,28 @@
                             style="width: 60px; padding: 6px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: #fff; text-align: center;">
                         <span style="font-size: 13px;">satélites consecutivos</span>
                     </div>
-                    <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin: 8px 0 0 0;">Ej: Si escribes
-                        "EsZunSat-20" y marcas 10, se crearán del 20 al 29</p>
+                    <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin: 8px 0 0 0;">Ej: "EsZunSat-20" →
+                        crea del 20 al 29</p>
+                </div>
+                <div class="form-group" id="geonet-group"
+                    style="background: rgba(255,180,0,0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,180,0,0.3);">
+                    <label style="color: #ffb400;">🌐 GeoNet con Shell</label>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">
+                        <input type="checkbox" id="geonet-bulk-check"
+                            style="width: 18px; height: 18px; accent-color: #ffb400;">
+                        <span style="font-size: 13px;">Añadir</span>
+                        <input type="number" id="geonet-bulk-count" min="1" max="50" value="10"
+                            style="width: 60px; padding: 6px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: #fff; text-align: center;">
+                        <span style="font-size: 13px;">satélites · Shell:</span>
+                        <select id="geonet-shell"
+                            style="padding: 6px 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 6px; color: #fff;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+                    <p style="font-size: 11px; color: rgba(255,255,255,0.5); margin: 8px 0 0 0;">Ej: "GeoNet-1" + Shell
+                        2 + 10 → crea GeoNet-1 (Shell2) hasta GeoNet-10 (Shell2)</p>
                 </div>
                 <div class="form-group">
                     <label>Empresa</label>
@@ -1936,6 +1956,9 @@
             const img = document.getElementById('fleet-detail-img');
             if (sat.name.startsWith('EsZunSat')) {
                 img.src = 'Eszunsat.png';
+                img.style.display = 'block';
+            } else if (sat.name.startsWith('GeoNet')) {
+                img.src = 'GeoNet.png';
                 img.style.display = 'block';
             } else if (sat.name === 'SAC-A' || sat.name.startsWith('SAC-A')) {
                 img.src = 'SAC-A.png';
@@ -2648,6 +2671,9 @@
             if (sat.name.startsWith('EsZunSat')) {
                 img.src = 'Eszunsat.png';
                 img.style.display = 'block';
+            } else if (sat.name.startsWith('GeoNet')) {
+                img.src = 'GeoNet.png';
+                img.style.display = 'block';
             } else if (sat.name === 'SAC-A' || sat.name.startsWith('SAC-A')) {
                 img.src = 'SAC-A.png';
                 img.style.display = 'block';
@@ -2689,10 +2715,66 @@
             const bulkCheck = document.getElementById('bulk-add-check').checked;
             const bulkCount = parseInt(document.getElementById('bulk-add-count').value) || 10;
 
+            // GeoNet bulk mode
+            const geonetCheck = document.getElementById('geonet-bulk-check').checked;
+            const geonetCount = parseInt(document.getElementById('geonet-bulk-count').value) || 10;
+            const geonetShell = document.getElementById('geonet-shell').value;
+
             const btn = e.target.querySelector('button[type="submit"]');
 
+            // GeoNet bulk mode - takes priority
+            if (geonetCheck) {
+                const geonetMatch = name.match(/^GeoNet-(\d+)$/i);
+                if (!geonetMatch) {
+                    alert('Para GeoNet en lote, el nombre debe tener formato "GeoNet-X" (ej: GeoNet-1)');
+                    return;
+                }
+
+                const startNum = parseInt(geonetMatch[1]);
+                const count = Math.min(geonetCount, 50);
+
+                if (btn) {
+                    btn.textContent = `Añadiendo 0/${count}...`;
+                    btn.disabled = true;
+                }
+
+                try {
+                    for (let i = 0; i < count; i++) {
+                        const satName = `GeoNet-${startNum + i} (Shell${geonetShell})`;
+                        await database.ref('satellites').push({
+                            name: satName,
+                            company: company,
+                            planet: planet,
+                            altitude: alt,
+                            inclination: inc,
+                            weight: weight || 'N/A',
+                            purpose: purpose || 'Comunicaciones',
+                            created: Date.now() + i
+                        });
+
+                        if (btn) {
+                            btn.textContent = `Añadiendo ${i + 1}/${count}...`;
+                        }
+                    }
+
+                    alert(`¡${count} satélites GeoNet añadidos!\n(GeoNet-${startNum} hasta GeoNet-${startNum + count - 1}, Shell${geonetShell})`);
+                    closeAddModal();
+                    e.target.reset();
+                    document.getElementById('geonet-bulk-check').checked = false;
+                } catch (error) {
+                    console.error('Error Firebase:', error);
+                    alert('ERROR al guardar: ' + error.message);
+                } finally {
+                    if (btn) {
+                        btn.textContent = 'Guardar';
+                        btn.disabled = false;
+                    }
+                }
+                return;
+            }
+
             // Check if bulk add is enabled and name matches pattern
-            const match = name.match(/^(.+-)(\d+)$/);
+            const match = name.match(/^(.+-?)(\d+)$/);
 
             if (bulkCheck && match) {
                 // Bulk add mode
