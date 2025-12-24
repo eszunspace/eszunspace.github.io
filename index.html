@@ -1681,174 +1681,197 @@
       <div class="launches-container">
         <h2 class="launches-title">Próximos Lanzamientos</h2>
         <div id="launches-list" class="launches-list">
-          <!-- Launch cards will be inserted here by JavaScript -->
-          <div class="loading">Cargando lanzamientos...</div>
+          <div class="loading">Cargando...</div>
         </div>
       </div>
     </section>
 
     <style>
-      /* Launches section */
+      /* Launches section - Minimal Design */
       .launches-section {
         position: relative;
         z-index: 1;
-        width: min(1200px, 92vw);
+        width: min(1000px, 92vw);
         margin: 60px auto 80px;
-      }
-
-      .launches-container {
-        padding: 0;
       }
 
       .launches-title {
         font-family: 'Space Grotesk', system-ui, sans-serif;
-        font-size: clamp(24px, 4vw, 36px);
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin: 0 0 24px;
-        background: linear-gradient(180deg, #e7f9ff, #bfe4ff 55%, #ffffff);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 18px rgba(255, 255, 255, 0.15);
+        font-size: clamp(20px, 4vw, 28px);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        margin: 0 0 32px;
+        color: rgba(255, 255, 255, 0.9);
+        text-align: center;
       }
 
       .launches-list {
-        display: grid;
-        gap: 18px;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
       }
 
       .loading {
-        grid-column: 1 / -1;
         text-align: center;
         padding: 40px;
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(255, 255, 255, 0.4);
         font-size: 14px;
       }
 
-      /* Launch card */
+      /* Launch card - Minimal */
       .launch-card {
-        position: relative;
-        padding: 20px;
-        border-radius: 18px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(8px) saturate(1.1);
-        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-        overflow: hidden;
-      }
-
-      .launch-card::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #00f0ff, #ff00d4);
-        opacity: 0.75;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px 24px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease;
       }
 
       .launch-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 16px 50px rgba(0, 0, 0, 0.65);
-        border-color: rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.07);
+        border-color: rgba(255, 255, 255, 0.15);
       }
 
-      /* Card content */
+      .launch-card-inner {
+        display: contents;
+      }
+
+      .launch-info-section {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .launch-status {
+        display: none;
+      }
+
       .launch-vehicle {
         font-family: 'Space Grotesk', system-ui, sans-serif;
-        font-size: 22px;
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin-bottom: 6px;
-        color: #ffffff;
-      }
-
-      .launch-site {
-        font-size: 13px;
-        color: rgba(255, 255, 255, 0.75);
-        margin-bottom: 16px;
-        font-weight: 600;
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 4px;
       }
 
       .launch-mission {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.65);
-        margin-bottom: 4px;
-        font-style: italic;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 2px;
       }
 
-      /* Countdown display */
+      .launch-mission::before {
+        display: none;
+      }
+
+      .launch-site {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.35);
+      }
+
+      .launch-site::before {
+        display: none;
+      }
+
+      /* Countdown section */
+      .launch-countdown-section {
+        text-align: right;
+        flex-shrink: 0;
+      }
+
       .launch-countdown {
-        margin: 16px 0 12px;
-        padding: 14px;
-        border-radius: 12px;
-        background: linear-gradient(90deg, rgba(0, 240, 255, 0.08), rgba(255, 0, 212, 0.04));
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        text-align: center;
+        padding: 0;
+        background: none;
+        border: none;
       }
 
       .launch-t {
-        font-size: 11px;
-        font-weight: 700;
-        color: #9fdcff;
-        margin-bottom: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.35);
         letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 4px;
       }
 
       .launch-time {
         font-family: 'Space Grotesk', system-ui, sans-serif;
-        font-size: 26px;
-        font-weight: 800;
-        letter-spacing: 0.02em;
-        color: #ffffff;
-        line-height: 1;
+        font-size: 22px;
+        font-weight: 700;
+        color: #00f0ff;
+        letter-spacing: -0.01em;
       }
 
-      /* Launch date */
       .launch-date {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.7);
-        font-weight: 600;
-        margin-top: 8px;
-        text-align: center;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.3);
+        margin-top: 4px;
+      }
+
+      .launch-date::before {
+        display: none;
+      }
+
+      /* Hide extras */
+      .view-more,
+      .featured-badge {
+        display: none;
       }
 
       /* Empty state */
       .no-launches {
-        grid-column: 1 / -1;
         text-align: center;
         padding: 60px 20px;
-        color: rgba(255, 255, 255, 0.5);
+        color: rgba(255, 255, 255, 0.4);
       }
 
       .no-launches-icon {
-        font-size: 48px;
-        margin-bottom: 16px;
-        opacity: 0.3;
+        font-size: 32px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+      }
+
+      .no-launches-text {
+        font-size: 14px;
+      }
+
+      /* First card highlight */
+      .launches-list .launch-card:first-child {
+        background: rgba(0, 240, 255, 0.05);
+        border-color: rgba(0, 240, 255, 0.15);
+      }
+
+      .launches-list .launch-card:first-child:hover {
+        background: rgba(0, 240, 255, 0.08);
+        border-color: rgba(0, 240, 255, 0.25);
       }
 
       /* Responsive */
-      @media (max-width: 768px) {
-        .launches-section {
-          margin: 40px auto 60px;
+      @media (max-width: 600px) {
+        .launch-card {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 16px 18px;
         }
 
-        .launches-list {
-          grid-template-columns: 1fr;
+        .launch-countdown-section {
+          text-align: left;
+          width: 100%;
+          padding-top: 12px;
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .launch-vehicle {
-          font-size: 20px;
+          font-size: 16px;
         }
 
         .launch-time {
-          font-size: 22px;
+          font-size: 20px;
         }
       }
     </style>
@@ -1906,38 +1929,42 @@
           const container = document.getElementById('launches-list');
 
           if (upcomingLaunches.length === 0) {
-            container.innerHTML =
-              '<div class="no-launches"><div class="no-launches-icon">🚀</div><div>No hay lanzamientos programados</div></div>';
+            container.innerHTML = `
+              <div class="no-launches">
+                <div class="no-launches-icon">🚀</div>
+                <div class="no-launches-text">No hay lanzamientos programados</div>
+              </div>`;
             return;
           }
 
-          container.innerHTML = upcomingLaunches.map(launch => {
+          container.innerHTML = upcomingLaunches.map((launch) => {
             const launchDate = new Date(launch.datetimeISO);
             const dateStr = launchDate.toLocaleString('es-ES', {
               day: 'numeric',
               month: 'short',
-              year: 'numeric',
               hour: '2-digit',
-              minute: '2-digit',
-              timeZoneName: 'short'
+              minute: '2-digit'
             });
 
             return `
-            <div class="launch-card" data-launch-id="${launch.id}" onclick="showEventModal('${launch.id}')" style="cursor:pointer;">
-              <div class="launch-vehicle">${launch.vehicle || 'Vehículo'}</div>
-              ${launch.mission ? `<div class="launch-mission">${launch.mission}</div>` : ''}
-              <div class="launch-site">${launch.site || 'Lugar no especificado'}</div>
-              <div class="launch-countdown">
-                <div class="launch-t">CUENTA ATRÁS</div>
-                <div class="launch-time" data-target="${launch.datetimeISO}">--:--:--</div>
+            <div class="launch-card" data-launch-id="${launch.id}" onclick="showEventModal('${launch.id}')">
+              <div class="launch-card-inner">
+                <div class="launch-info-section">
+                  <div class="launch-vehicle">${launch.vehicle || 'Vehículo'}</div>
+                  ${launch.mission ? `<div class="launch-mission">${launch.mission}</div>` : ''}
+                  <div class="launch-site">${launch.site || ''}</div>
+                </div>
+                <div class="launch-countdown-section">
+                  <div class="launch-countdown">
+                    <div class="launch-t">T-</div>
+                    <div class="launch-time" data-target="${launch.datetimeISO}">--:--:--</div>
+                  </div>
+                  <div class="launch-date">${dateStr}</div>
+                </div>
               </div>
-              <div class="launch-date">${dateStr}</div>
             </div>
           `;
           }).join('');
-
-          // Add click event listeners (alternative approach)
-          // Not needed since we use onclick in template
         }
 
         // Start countdown timers
