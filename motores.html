@@ -518,158 +518,282 @@
       }
     }
 
-    /* ===== Main Content ===== */
+    /* ===== Full Screen Engine Display ===== */
     main {
-      padding-top: calc(var(--header-h) + 40px);
-      padding-bottom: 60px;
-      width: min(1200px, 94vw);
-      margin: 0 auto;
-    }
-
-    /* Vortic Style Panel Content */
-    .engine-panel {
-      /* Glassmorphism container - Darkened for readability */
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(12px) saturate(1.1);
-
-      color: #fff;
-      font-family: 'Poppins', sans-serif;
-      overflow: hidden;
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 32px;
+      position: fixed;
+      inset: 0;
+      padding-top: calc(var(--header-h) + 24px);
       display: flex;
-      gap: 32px;
       align-items: center;
-    }
-
-    /* Left: Image */
-    .engine-visual {
-      flex: 0 0 300px;
-      display: flex;
       justify-content: center;
-      align-items: center;
+      background: linear-gradient(135deg, #0a0a0f 0%, #0d0d15 50%, #0a0a0f 100%);
     }
 
-    .engine-img-placeholder {
+    .engine-page {
       width: 100%;
-      aspect-ratio: 3/5;
-      /* Tall aspect ratio like the rocket image */
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
+      height: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: #666;
+      position: relative;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 60px;
     }
 
-    /* Right: Content */
-    .engine-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    /* Left: Info Panel */
+    .engine-info {
+      flex: 0 0 45%;
+      max-width: 500px;
+      z-index: 10;
     }
 
     .engine-title {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 32px;
-      letter-spacing: 0.1em;
+      font-size: clamp(32px, 5vw, 56px);
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      margin: 0;
+      margin: 0 0 12px;
       color: #fff;
+    }
+
+    .engine-subtitle {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .engine-subtitle span {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .engine-subtitle span.active {
+      color: #fff;
+    }
+
+    .engine-subtitle span:hover {
+      color: rgba(255, 255, 255, 0.8);
     }
 
     .engine-desc {
       font-size: 14px;
-      line-height: 1.6;
-      color: rgba(255, 255, 255, 0.8);
-      max-width: 600px;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 40px;
+      max-width: 450px;
     }
 
-    /* Pills / Stats */
-    .stats-container {
+    /* Specs Table */
+    .specs-table {
+      width: 100%;
+      max-width: 450px;
+    }
+
+    .spec-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 8px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .stat-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 8px 16px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      font-size: 13px;
+    .spec-row:last-child {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .spec-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .spec-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
       font-weight: 600;
       color: #fff;
-      backdrop-filter: blur(4px);
     }
 
-    .stat-pill strong {
-      margin-right: 4px;
-      color: rgba(255, 255, 255, 0.7);
-      font-weight: 400;
+    .spec-value .highlight {
+      color: #ff4d00;
     }
 
-    .action-btn {
-      display: inline-flex;
+    /* Right: 3D Viewer */
+    .engine-visual {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 55%;
+      height: 90%;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px 24px;
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 20px;
-      color: #fff;
-      font-weight: 700;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-top: 16px;
-      width: fit-content;
-      cursor: pointer;
-      transition: all 0.2s ease;
     }
 
-    .action-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: #fff;
+    #engine-3d-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      background: transparent;
+      position: relative;
+      transition: opacity 0.4s ease;
+    }
+
+    #engine-3d-container.fading {
+      opacity: 0;
+    }
+
+    .engine-transition-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 240, 255, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 5;
+    }
+
+    .engine-transition-overlay.active {
+      opacity: 1;
+    }
+
+    /* Navigation Arrows */
+    .nav-arrow {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 32px;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 20;
+    }
+
+    .nav-arrow:hover {
+      color: #fff;
+    }
+
+    .nav-arrow.prev {
+      left: 20px;
+    }
+
+    .nav-arrow.next {
+      right: 20px;
+    }
+
+    /* Page Dots */
+    .page-dots {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    .page-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .page-dot.active {
+      background: #fff;
+    }
+
+    .page-dot:hover {
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    /* Footer hidden */
+    footer {
+      display: none;
     }
 
     /* Responsive */
-    @media (max-width: 768px) {
-      .engine-panel {
+    @media (max-width: 1024px) {
+      .engine-page {
         flex-direction: column;
-        padding: 24px;
+        padding: 20px;
+        padding-top: 20px;
+      }
+
+      .engine-info {
+        flex: 0 0 auto;
+        max-width: 100%;
+        text-align: center;
+        order: 2;
+      }
+
+      .engine-subtitle {
+        justify-content: center;
+      }
+
+      .engine-desc {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .specs-table {
+        margin: 0 auto;
       }
 
       .engine-visual {
-        flex: 0 0 auto;
+        position: relative;
+        right: auto;
+        top: auto;
+        transform: none;
         width: 100%;
+        height: 40vh;
+        order: 1;
+        margin-bottom: 20px;
       }
 
-      .engine-img-placeholder {
-        aspect-ratio: 16/9;
-        max-width: 300px;
+      .nav-arrow {
+        display: none;
       }
     }
 
-    footer {
-      position: fixed;
-      bottom: 16px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 12px;
-      opacity: .85;
-      pointer-events: none;
+    @media (max-width: 600px) {
+      .engine-title {
+        font-size: 28px;
+      }
+
+      .engine-desc {
+        font-size: 13px;
+        margin-bottom: 24px;
+      }
+
+      .spec-row {
+        padding: 12px 0;
+      }
+
+      .engine-visual {
+        height: 35vh;
+      }
     }
   </style>
 </head>
@@ -718,67 +842,296 @@
   </header>
 
   <main>
-    <div class="engine-panel">
-      <!-- Visual -->
+    <div class="engine-page">
+      <!-- Left: Info Panel -->
+      <div class="engine-info">
+        <h1 class="engine-title" id="engine-title">EsZunEngine 1</h1>
+
+        <div class="engine-subtitle">
+          <span class="active" onclick="switchEngine('stage1')" id="tab-stage1">PRIMERA ETAPA</span>
+          <span onclick="switchEngine('vacuum')" id="tab-vacuum">SEGUNDA ETAPA (VAC)</span>
+        </div>
+
+        <p class="engine-desc" id="engine-desc">
+          El EsZunEngine 1 es un motor de combustión de hidrógeno-oxígeno líquido reutilizable
+          que impulsa el cohete VORTIC. Con un empuje de 2279 kN en vacío, es capaz de propulsar
+          la primera etapa del VORTIC con 7 motores en la base central y optimizando el rendimiento
+          para la recuperación del booster.
+        </p>
+
+        <div class="specs-table" id="specs-table">
+          <!-- Specs will be populated by JS -->
+        </div>
+      </div>
+
+      <!-- Right: 3D Viewer -->
       <div class="engine-visual">
-        <div class="engine-img-placeholder">
-          <img id="engine-carousel-img" src="images/motores/EsZunEngine 1/rs25.png" alt="EsZunEngine 1"
-            style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
-        </div>
+        <div id="engine-3d-container"></div>
       </div>
+    </div>
 
-      <!-- Content -->
-      <div class="engine-content">
-        <h2 class="engine-title">EsZunEngine 1</h2>
+    <!-- Navigation Arrows -->
+    <button class="nav-arrow prev" onclick="switchEngine('stage1')">‹</button>
+    <button class="nav-arrow next" onclick="switchEngine('vacuum')">›</button>
 
-        <div class="engine-desc">
-          Motor de alto rendimiento diseñado para la primera etapa del cohete VORTIC. Optimizado para empuje a nivel del
-          mar con alta fiabilidad y capacidad de reutilización.
-        </div>
-
-        <div class="stats-container">
-          <div class="stat-pill"><strong>Masa:</strong> 3.5 t</div>
-          <div class="stat-pill"><strong>Empuje (ASL):</strong> 1845 kN</div>
-          <div class="stat-pill"><strong>Empuje (Vac):</strong> 2279 kN</div>
-          <div class="stat-pill"><strong>Isp (Vac):</strong> 452 s</div>
-          <div class="stat-pill"><strong>Propulsores:</strong> LH2 / Oxígeno Líquido</div>
-          <div class="stat-pill"><strong>Gimbal:</strong> 10.50°</div>
-        </div>
-
-        <button class="action-btn">Ver Especificaciones Completas</button>
-      </div>
+    <!-- Page Dots -->
+    <div class="page-dots">
+      <div class="page-dot active" id="dot-stage1" onclick="switchEngine('stage1')"></div>
+      <div class="page-dot" id="dot-vacuum" onclick="switchEngine('vacuum')"></div>
     </div>
   </main>
 
-  <script>
-    (function () {
-      const images = [
-        'images/motores/EsZunEngine 1/rs25.png',
-        'images/motores/EsZunEngine 1/RS25a.png',
-        'images/motores/EsZunEngine 1/Rs25b.png'
-      ];
-      let currentIndex = 0;
-      const imgEl = document.getElementById('engine-carousel-img');
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
-      // Preload images
-      images.forEach(src => {
-        const img = new Image();
-        img.src = src;
+  <script>
+    // ===== ENGINE DATA =====
+    const enginesData = {
+      stage1: {
+        title: 'EsZunEngine 1',
+        desc: 'El EsZunEngine 1 es un motor de combustión de hidrógeno-oxígeno líquido reutilizable que impulsa el cohete VORTIC. Con un empuje de 2279 kN en vacío, es capaz de propulsar la primera etapa del VORTIC con 7 motores en la base central y optimizando el rendimiento para la recuperación del booster.',
+        model: 'rs-25_engine.glb',
+        specs: [
+          { label: 'MASA', value: '3.5 t' },
+          { label: 'EMPUJE (ASL)', value: '1845.4 kN' },
+          { label: 'EMPUJE (VAC)', value: '<span class="highlight">2279.0 kN</span>' },
+          { label: 'ISP', value: '366 s (ASL) / 452 s (Vac)' },
+          { label: 'GIMBAL', value: '10.50°' },
+          { label: 'PROPELENTES', value: 'LH2 / LOX' }
+        ]
+      },
+      vacuum: {
+        title: 'EsZunEngine 1 Vac',
+        desc: 'Motor criogénico de alta presión optimizado para operación en vacío. Con una tobera extendida desplegable, ofrece un ISP excepcional de 1710 segundos en vacío. Diseñado para la segunda etapa del VORTIC, proporciona un empuje eficiente para la inserción orbital.',
+        model: 'segunda.glb',
+        specs: [
+          { label: 'MASA', value: '1.0 t' },
+          { label: 'EMPUJE (ASL)', value: '432.7 kN' },
+          { label: 'EMPUJE (VAC)', value: '<span class="highlight">740.0 kN</span>' },
+          { label: 'ISP', value: '1000 s (ASL) / 1710 s (Vac)' },
+          { label: 'GIMBAL', value: '7.00°' },
+          { label: 'PROPELENTES', value: 'LH2 / LOX' }
+        ]
+      }
+    };
+
+    let currentEngine = 'stage1';
+    let currentModel = null;
+    let scene, camera, renderer, controls, loader;
+
+    // ===== 3D ENGINE VIEWER =====
+    (function () {
+      const container = document.getElementById('engine-3d-container');
+      if (!container) return;
+
+      // Scene setup
+      scene = new THREE.Scene();
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+      camera.position.set(0, 0.3, 3);
+
+      // Renderer with transparency
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setClearColor(0x000000, 0);
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.5;
+      container.appendChild(renderer.domElement);
+
+      // Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 1.5;
+      controls.minDistance = 1;
+      controls.maxDistance = 5;
+      controls.target.set(0, 0.3, 0);
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+
+      const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      mainLight.position.set(5, 5, 5);
+      scene.add(mainLight);
+
+      const fillLight = new THREE.DirectionalLight(0x00f0ff, 0.3);
+      fillLight.position.set(-3, 2, -3);
+      scene.add(fillLight);
+
+      const rimLight = new THREE.DirectionalLight(0xff00d4, 0.2);
+      rimLight.position.set(0, -2, -3);
+      scene.add(rimLight);
+
+      // Loader
+      loader = new THREE.GLTFLoader();
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Handle resize
+      window.addEventListener('resize', () => {
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
       });
 
-      setInterval(() => {
-        currentIndex = (currentIndex + 1) % images.length;
-        // Simple fade out/in effect could be added here, but for now just switch
-        imgEl.style.opacity = 0;
-        setTimeout(() => {
-          imgEl.src = images[currentIndex];
-          imgEl.style.opacity = 1;
-        }, 500); // Wait for fade out
-      }, 5000);
+      // Pause auto-rotate on interaction
+      container.addEventListener('pointerdown', () => {
+        controls.autoRotate = false;
+      });
 
-      // Add transition to image
-      imgEl.style.transition = 'opacity 5s ease-in-out';
+      let resumeTimeout;
+      container.addEventListener('pointerup', () => {
+        clearTimeout(resumeTimeout);
+        resumeTimeout = setTimeout(() => {
+          controls.autoRotate = true;
+        }, 3000);
+      });
+
+      // Load initial engine
+      loadEngine('stage1');
     })();
+
+    // ===== LOAD ENGINE =====
+    function loadEngine(engineId) {
+      const data = enginesData[engineId];
+      if (!data) return;
+
+      const container = document.getElementById('engine-3d-container');
+
+      // Start fade out transition
+      container.classList.add('fading');
+
+      // Wait for fade out, then load new model
+      setTimeout(() => {
+        // Clear ALL models from scene (keep only lights)
+        const objectsToRemove = [];
+        scene.traverse((child) => {
+          if (child.isMesh || child.isGroup) {
+            objectsToRemove.push(child);
+          }
+        });
+
+        objectsToRemove.forEach((obj) => {
+          if (obj.geometry) obj.geometry.dispose();
+          if (obj.material) {
+            if (Array.isArray(obj.material)) {
+              obj.material.forEach(mat => mat.dispose());
+            } else {
+              obj.material.dispose();
+            }
+          }
+          if (obj.parent) obj.parent.remove(obj);
+        });
+
+        currentModel = null;
+
+        // Loading indicator
+        let loadingDiv = container.querySelector('.loading-indicator');
+        if (!loadingDiv) {
+          loadingDiv = document.createElement('div');
+          loadingDiv.className = 'loading-indicator';
+          loadingDiv.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#00f0ff;font-size:14px;z-index:10;';
+          container.appendChild(loadingDiv);
+        }
+        loadingDiv.textContent = 'Cargando...';
+        loadingDiv.style.display = 'block';
+        loadingDiv.style.color = '#00f0ff';
+
+        loader.load(
+          data.model,
+          (gltf) => {
+            currentModel = gltf.scene;
+
+            // Center and scale
+            const box = new THREE.Box3().setFromObject(currentModel);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 1.5 / maxDim;
+            currentModel.scale.setScalar(scale);
+
+            currentModel.position.x = -center.x * scale;
+            currentModel.position.y = -center.y * scale + 0.3;
+            currentModel.position.z = -center.z * scale;
+
+            scene.add(currentModel);
+            loadingDiv.style.display = 'none';
+
+            // Fade in the new model
+            setTimeout(() => {
+              container.classList.remove('fading');
+            }, 100);
+          },
+          (progress) => {
+            if (progress.total > 0) {
+              const percent = Math.round((progress.loaded / progress.total) * 100);
+              loadingDiv.textContent = `${percent}%`;
+            }
+          },
+          (error) => {
+            console.error('Error loading model:', error);
+            loadingDiv.textContent = '❌ Error';
+            loadingDiv.style.color = '#ff6b6b';
+            container.classList.remove('fading');
+          }
+        );
+      }, 400); // Wait for fade out animation
+    }
+
+    // ===== SWITCH ENGINE =====
+    window.switchEngine = function (engineId, force = false) {
+      if (!force && engineId === currentEngine) return;
+      currentEngine = engineId;
+
+      const data = enginesData[engineId];
+      if (!data) return;
+
+      // Update title
+      document.getElementById('engine-title').textContent = data.title;
+
+      // Update description
+      document.getElementById('engine-desc').textContent = data.desc;
+
+      // Update specs
+      const specsTable = document.getElementById('specs-table');
+      specsTable.innerHTML = data.specs.map(spec => `
+        <div class="spec-row">
+          <span class="spec-label">${spec.label}</span>
+          <span class="spec-value">${spec.value}</span>
+        </div>
+      `).join('');
+
+      // Update tabs
+      document.getElementById('tab-stage1').classList.toggle('active', engineId === 'stage1');
+      document.getElementById('tab-vacuum').classList.toggle('active', engineId === 'vacuum');
+
+      // Update dots
+      document.getElementById('dot-stage1').classList.toggle('active', engineId === 'stage1');
+      document.getElementById('dot-vacuum').classList.toggle('active', engineId === 'vacuum');
+
+      // Load 3D model
+      loadEngine(engineId);
+    };
+
+    // Initialize specs on load
+    document.addEventListener('DOMContentLoaded', () => {
+      switchEngine('stage1', true); // Force initial load
+    });
   </script>
 
   <footer>© <span id="year">2025</span> EsZunSpace – Todos los derechos reservados</footer>
