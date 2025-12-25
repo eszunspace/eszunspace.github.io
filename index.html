@@ -729,8 +729,30 @@
     <div class="contact-card">
       <div class="contact-header">
         <h2 class="contact-title">💬 Contacto con EsZunSpace</h2>
-        <button class="contact-close" onclick="closeContactModal()" aria-label="Cerrar">&times;</button>
+        <div class="contact-header-actions">
+          <button id="chat-mute-btn" class="chat-mute-btn" onclick="toggleChatMute()" title="Silenciar notificaciones">
+            <svg id="mute-icon-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" style="display:none">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+            <svg id="mute-icon-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+          </button>
+          <button class="contact-close" onclick="closeContactModal()" aria-label="Cerrar">&times;</button>
+        </div>
       </div>
+
+      <!-- Notification Sound -->
+      <audio id="chat-notification-sound" preload="auto">
+        <source
+          src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwmHAAAAAAD/+1DEAAAGAAGn9AAAIwvBq/80IAAAAH/+5B//5cP/E5//yhz/+XBz/Lh/8uH5c//l3/y7////lwc//y4f+U//4AABbWFpbmUtbG9vcC1wb3AtdXAtMDEuAgQGCAoMDhASFBYYGh4gJCgsMDQ4PEBIUFhgaHiAoMDQAQEDEREhMTFBQWGBgaHBweHh8QEhMUFhgcHh8fEAAQHxAQHx8f//8fEBAf/xAUHx8fHxASExgYGh4eHxAfH/8QEAABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAP/7UMQAAAfwAaX/9KAAAAvBq/80IAABATGhoaGxsbHBwcHR0dHh4eHx8fHyAgICEhISMjIyUlJSYmJicnJyenp6goKCkpKSoqKisrKywsLC0tLS4uLi8vLzAwMDExMTIyMjMzMzQ0NDU1NTY2Njc3Nzg4ODk5OTo6Ojs7Ozw8PD09PT4+Pj8/Pz+AgICEhISIiIiMjIyQkJCUlJSYmJicnJygoKCkpKSoqKisrKywsLC0tLS4uLi8vLzAwMDExMTI0NjQ="
+          type="audio/mp3">
+      </audio>
 
       <!-- Vista para usuarios no autenticados -->
       <div id="contact-login-required" class="contact-login-required">
@@ -755,8 +777,13 @@
           <div id="chat-partner-info" class="chat-partner-info">
             <button id="chat-back-btn" class="chat-back-btn" onclick="backToConversations()" title="Volver">←</button>
             <span class="chat-partner-avatar">E</span>
-            <span class="chat-partner-name">Esstor</span>
-            <span class="chat-partner-status">Admin de EsZunSpace</span>
+            <div class="chat-partner-details">
+              <div class="chat-partner-name-row">
+                <span class="chat-partner-name">Esstor</span>
+                <span id="chat-partner-status-dot" class="status-dot offline" title="Desconectado"></span>
+              </div>
+              <span id="chat-partner-status-text" class="chat-partner-status">Admin de EsZunSpace</span>
+            </div>
           </div>
           <div id="chat-messages" class="chat-messages">
             <div class="chat-welcome">
@@ -764,8 +791,35 @@
               <p class="chat-hint">Puedes agendar misiones, hacer preguntas o solicitar información.</p>
             </div>
           </div>
+          <div id="typing-indicator" class="typing-indicator" style="display:none;">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-text">escribiendo...</span>
+          </div>
+          <!-- Attachment Preview -->
+          <div id="chat-attachment-preview" class="chat-attachment-preview" style="display:none;">
+            <div class="attachment-preview-content">
+              <img id="attachment-preview-img" src="" alt="Preview" style="display:none;">
+              <div id="attachment-preview-file" class="attachment-preview-file" style="display:none;">
+                <span class="attachment-file-icon">📄</span>
+                <span id="attachment-file-name"></span>
+              </div>
+            </div>
+            <button type="button" class="attachment-remove-btn" onclick="clearAttachment()"
+              title="Quitar archivo">✕</button>
+          </div>
           <form id="chat-form" class="chat-form" onsubmit="sendChatMessage(event)">
-            <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." autocomplete="off" required>
+            <input type="file" id="chat-file-input" accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar"
+              style="display:none;" onchange="handleFileSelect(event)">
+            <button type="button" class="chat-attach-btn" onclick="document.getElementById('chat-file-input').click()"
+              title="Adjuntar archivo">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+              </svg>
+            </button>
+            <input type="text" id="chat-input" placeholder="Escribe tu mensaje..." autocomplete="off">
             <button type="submit" class="chat-send-btn">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2" />
@@ -775,6 +829,20 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Image Lightbox Modal -->
+  <div id="image-lightbox" class="image-lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <img id="lightbox-image" src="" alt="Imagen ampliada">
+    <a id="lightbox-download" class="lightbox-download" download="">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      Descargar
+    </a>
   </div>
 
   <style>
@@ -824,6 +892,36 @@
       margin: 0;
       font-size: 18px;
       font-weight: 700;
+    }
+
+    .contact-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chat-mute-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .chat-mute-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .chat-mute-btn.muted {
+      background: rgba(255, 100, 100, 0.2);
+      color: #ff6b6b;
     }
 
     .contact-close {
@@ -1045,15 +1143,92 @@
       font-size: 13px;
     }
 
+    .chat-partner-details {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .chat-partner-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .chat-partner-name {
       font-weight: 700;
       font-size: 14px;
     }
 
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot.online {
+      background: #51cf66;
+      box-shadow: 0 0 6px rgba(81, 207, 102, 0.6);
+    }
+
+    .status-dot.offline {
+      background: #868e96;
+    }
+
     .chat-partner-status {
       font-size: 12px;
       color: rgba(255, 255, 255, 0.5);
-      margin-left: auto;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 16px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      animation: typingBounce 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typingBounce {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.5;
+      }
+
+      30% {
+        transform: translateY(-4px);
+        opacity: 1;
+      }
+    }
+
+    .typing-text {
+      margin-left: 4px;
+      font-style: italic;
     }
 
     .chat-messages {
@@ -1147,6 +1322,204 @@
     .chat-send-btn:hover {
       transform: scale(1.05);
       box-shadow: 0 4px 15px rgba(0, 224, 255, 0.4);
+    }
+
+    /* Chat Attachment Styles */
+    .chat-attach-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .chat-attach-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .chat-attachment-preview {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      margin: 0 16px 8px;
+      background: rgba(0, 224, 255, 0.1);
+      border: 1px solid rgba(0, 224, 255, 0.3);
+      border-radius: 12px;
+    }
+
+    .attachment-preview-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .attachment-preview-content img {
+      max-height: 80px;
+      max-width: 150px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .attachment-preview-file {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .attachment-file-icon {
+      font-size: 20px;
+    }
+
+    #attachment-file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .attachment-remove-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 100, 100, 0.2);
+      border: 1px solid rgba(255, 100, 100, 0.4);
+      color: #ff6b6b;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .attachment-remove-btn:hover {
+      background: rgba(255, 100, 100, 0.4);
+      transform: scale(1.1);
+    }
+
+    /* Message Attachment Display */
+    .chat-message-attachment {
+      margin-top: 8px;
+    }
+
+    .chat-message-attachment img {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .chat-message-attachment img:hover {
+      transform: scale(1.02);
+    }
+
+    .chat-message-file {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+
+    .chat-message-file:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .chat-message-file .file-icon {
+      font-size: 16px;
+    }
+
+    .chat-message-file .download-icon {
+      margin-left: auto;
+      font-size: 14px;
+    }
+
+    /* Image Lightbox */
+    .image-lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20000;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .image-lightbox.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .image-lightbox img {
+      max-width: 90%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .lightbox-close:hover {
+      background: rgba(255, 100, 100, 0.3);
+      transform: scale(1.1);
+    }
+
+    .lightbox-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00e0ff, #ff00d4);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .lightbox-download:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 224, 255, 0.4);
     }
   </style>
 
@@ -1900,6 +2273,29 @@
 
         window.upcomingLaunches = [];
         let countdownInterval = null;
+        const LAUNCHES_CACHE_KEY = 'esz_launches_cache';
+
+        // Load launches from cache first (instant), then sync from Firebase
+        function loadLaunchesFromCache() {
+          try {
+            const cached = localStorage.getItem(LAUNCHES_CACHE_KEY);
+            if (cached) {
+              const data = JSON.parse(cached);
+              const now = new Date();
+              upcomingLaunches = data
+                .filter(event => new Date(event.datetimeISO) > now)
+                .sort((a, b) => new Date(a.datetimeISO) - new Date(b.datetimeISO))
+                .slice(0, 6);
+              renderLaunches();
+              startCountdowns();
+              console.log("Lanzamientos cargados desde cache:", upcomingLaunches.length);
+              return true;
+            }
+          } catch (e) {
+            console.warn('Error loading launches cache:', e);
+          }
+          return false;
+        }
 
         // Load launches from Firebase
         async function loadLaunches() {
@@ -1917,10 +2313,30 @@
 
             renderLaunches();
             startCountdowns();
+            console.log("Lanzamientos sincronizados desde Firebase:", upcomingLaunches.length);
+
+            // Try to save to cache (non-blocking, ignore if quota exceeded)
+            try {
+              // Only cache lightweight data (no base64 images)
+              const lightEvents = events.map(e => ({
+                id: e.id,
+                vehicle: e.vehicle,
+                mission: e.mission,
+                site: e.site,
+                datetimeISO: e.datetimeISO,
+                description: e.description,
+                streamUrl: e.streamUrl
+              }));
+              localStorage.setItem(LAUNCHES_CACHE_KEY, JSON.stringify(lightEvents));
+            } catch (cacheError) {
+              console.warn('Could not cache launches (quota exceeded):', cacheError);
+            }
           } catch (error) {
             console.error('Error loading launches:', error);
-            document.getElementById('launches-list').innerHTML =
-              '<div class="no-launches"><div class="no-launches-icon">🚀</div><div>Error al cargar lanzamientos</div></div>';
+            if (upcomingLaunches.length === 0) {
+              document.getElementById('launches-list').innerHTML =
+                '<div class="no-launches"><div class="no-launches-icon">🚀</div><div>Error al cargar lanzamientos</div></div>';
+            }
           }
         }
 
@@ -2008,11 +2424,18 @@
           countdownInterval = setInterval(update, 1000);
         }
 
-        // Initialize on page load
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', loadLaunches);
-        } else {
+        // Initialize on page load - cache first, then sync
+        function initLaunches() {
+          // Try to load from cache first (instant)
+          loadLaunchesFromCache();
+          // Then sync from Firebase in background
           loadLaunches();
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initLaunches);
+        } else {
+          initLaunches();
         }
       })();
     </script>
@@ -2420,15 +2843,33 @@
     let currentUser = null;
     let allUsers = {};
     const SESSION_KEY = 'esz_user';
+    const USERS_CACHE_KEY = 'esz_users_cache';
+
+    // Load users from localStorage first (instant), then sync from Firebase
+    function loadUsersFromCache() {
+      try {
+        const cached = localStorage.getItem(USERS_CACHE_KEY);
+        if (cached) {
+          allUsers = JSON.parse(cached);
+          console.log("Usuarios cargados desde cache:", Object.keys(allUsers).length);
+          return true;
+        }
+      } catch (e) {
+        console.warn('Error loading users cache:', e);
+      }
+      return false;
+    }
 
     async function loadUsers() {
       try {
         const snapshot = await database.ref('users').once('value');
         allUsers = snapshot.val() || {};
-        console.log("Usuarios cargados:", Object.keys(allUsers).length);
+        // Save to cache for next time
+        localStorage.setItem(USERS_CACHE_KEY, JSON.stringify(allUsers));
+        console.log("Usuarios sincronizados desde Firebase:", Object.keys(allUsers).length);
       } catch (error) {
         console.error('Error al cargar usuarios:', error);
-        allUsers = {};
+        // Keep cached users if Firebase fails
       }
     }
 
@@ -2538,6 +2979,7 @@
         currentUser = username;
         localStorage.setItem(SESSION_KEY, currentUser);
         checkAuth();
+        updatePresence(true); // Set online
         closeAuthModal();
       } else {
         errEl.textContent = 'Contraseña incorrecta';
@@ -2578,6 +3020,7 @@
     }
 
     function logout() {
+      updatePresence(false); // Set offline before logout
       currentUser = null;
       localStorage.removeItem(SESSION_KEY);
       checkAuth();
@@ -2707,11 +3150,295 @@
     // ===== CONTACT CHAT SYSTEM =====
     let currentChatPartner = null;
     let chatUnsubscribe = null;
+    let pendingAttachment = null; // Stores {base64, fileName, fileType, isImage}
+    let typingTimeout = null;
+    let presenceUnsubscribe = null;
+    let typingUnsubscribe = null;
+    let lastMessageCount = 0; // Track message count to detect new messages
+
+    // Chat notification sound system
+    const CHAT_MUTE_KEY = 'eszunspace_chat_muted';
+    let isChatMuted = localStorage.getItem(CHAT_MUTE_KEY) === 'true';
+
+    function initChatMuteState() {
+      const btn = document.getElementById('chat-mute-btn');
+      const iconOn = document.getElementById('mute-icon-on');
+      const iconOff = document.getElementById('mute-icon-off');
+
+      if (isChatMuted) {
+        btn.classList.add('muted');
+        btn.title = 'Activar notificaciones';
+        iconOn.style.display = 'block';
+        iconOff.style.display = 'none';
+      } else {
+        btn.classList.remove('muted');
+        btn.title = 'Silenciar notificaciones';
+        iconOn.style.display = 'none';
+        iconOff.style.display = 'block';
+      }
+    }
+
+    function toggleChatMute() {
+      isChatMuted = !isChatMuted;
+      localStorage.setItem(CHAT_MUTE_KEY, isChatMuted);
+      initChatMuteState();
+    }
+
+    function playNotificationSound() {
+      if (isChatMuted) return;
+
+      // Create a simple beep using Web Audio API
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+      } catch (e) {
+        console.log('Could not play notification sound:', e);
+      }
+    }
+
+    // ===== PRESENCE SYSTEM =====
+    function updatePresence(online) {
+      if (!currentUser) return;
+      const presenceRef = database.ref(`presence/${currentUser}`);
+      presenceRef.set({
+        online: online,
+        lastSeen: Date.now()
+      });
+      // Set offline on disconnect
+      if (online) {
+        presenceRef.onDisconnect().set({
+          online: false,
+          lastSeen: Date.now()
+        });
+      }
+    }
+
+    function listenToPartnerPresence(partnerUsername) {
+      // Unsubscribe from previous listener
+      if (presenceUnsubscribe) {
+        presenceUnsubscribe();
+      }
+
+      const presenceRef = database.ref(`presence/${partnerUsername}`);
+      const listener = presenceRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        const statusDot = document.getElementById('chat-partner-status-dot');
+        const statusText = document.getElementById('chat-partner-status-text');
+
+        if (data && data.online) {
+          statusDot.className = 'status-dot online';
+          statusDot.title = 'Conectado';
+          if (partnerUsername === ADMIN_USER) {
+            statusText.textContent = 'En línea';
+          } else {
+            statusText.textContent = 'En línea';
+          }
+        } else {
+          statusDot.className = 'status-dot offline';
+          statusDot.title = 'Desconectado';
+          if (data && data.lastSeen) {
+            const lastSeen = new Date(data.lastSeen);
+            const now = new Date();
+            const diffMins = Math.floor((now - lastSeen) / 60000);
+            if (diffMins < 60) {
+              statusText.textContent = `Últ. vez hace ${diffMins}min`;
+            } else {
+              statusText.textContent = 'Desconectado';
+            }
+          } else {
+            statusText.textContent = partnerUsername === ADMIN_USER ? 'Admin de EsZunSpace' : 'Usuario';
+          }
+        }
+      });
+
+      presenceUnsubscribe = () => presenceRef.off('value', listener);
+    }
+
+    // ===== TYPING INDICATOR =====
+    function setTypingStatus(isTyping) {
+      if (!currentUser || !currentChatPartner) return;
+      const chatPath = currentUser === ADMIN_USER ? currentChatPartner : currentUser;
+      database.ref(`typing/${chatPath}/${currentUser}`).set(isTyping ? true : null);
+    }
+
+    function listenToTypingStatus() {
+      if (typingUnsubscribe) {
+        typingUnsubscribe();
+      }
+
+      if (!currentChatPartner) return;
+
+      const chatPath = currentUser === ADMIN_USER ? currentChatPartner : currentUser;
+      const partnerUsername = currentUser === ADMIN_USER ? currentChatPartner : ADMIN_USER;
+      const typingRef = database.ref(`typing/${chatPath}/${partnerUsername}`);
+
+      const listener = typingRef.on('value', (snapshot) => {
+        const isTyping = snapshot.val();
+        const indicator = document.getElementById('typing-indicator');
+        if (isTyping) {
+          indicator.style.display = 'flex';
+        } else {
+          indicator.style.display = 'none';
+        }
+      });
+
+      typingUnsubscribe = () => typingRef.off('value', listener);
+    }
+
+    function handleTyping() {
+      setTypingStatus(true);
+
+      // Clear previous timeout
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+
+      // Set typing to false after 2 seconds of no typing
+      typingTimeout = setTimeout(() => {
+        setTypingStatus(false);
+      }, 2000);
+    }
+
+    // Clean up typing status when closing chat
+    function cleanupTyping() {
+      setTypingStatus(false);
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+        typingTimeout = null;
+      }
+      if (typingUnsubscribe) {
+        typingUnsubscribe();
+        typingUnsubscribe = null;
+      }
+      if (presenceUnsubscribe) {
+        presenceUnsubscribe();
+        presenceUnsubscribe = null;
+      }
+    }
+
+
+    // File attachment functions
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validate file size (2MB max)
+      const maxSize = 2 * 1024 * 1024; // 2MB
+      if (file.size > maxSize) {
+        alert('El archivo es demasiado grande. El tamaño máximo es 2MB.');
+        e.target.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = function () {
+        const base64 = reader.result;
+        const isImage = file.type.startsWith('image/');
+
+        pendingAttachment = {
+          base64: base64,
+          fileName: file.name,
+          fileType: file.type,
+          isImage: isImage
+        };
+
+        // Show preview
+        const previewContainer = document.getElementById('chat-attachment-preview');
+        const previewImg = document.getElementById('attachment-preview-img');
+        const previewFile = document.getElementById('attachment-preview-file');
+        const fileName = document.getElementById('attachment-file-name');
+
+        if (isImage) {
+          previewImg.src = base64;
+          previewImg.style.display = 'block';
+          previewFile.style.display = 'none';
+        } else {
+          previewImg.style.display = 'none';
+          previewFile.style.display = 'flex';
+          fileName.textContent = file.name;
+        }
+
+        previewContainer.style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearAttachment() {
+      pendingAttachment = null;
+      document.getElementById('chat-file-input').value = '';
+      document.getElementById('chat-attachment-preview').style.display = 'none';
+      document.getElementById('attachment-preview-img').src = '';
+      document.getElementById('attachment-preview-img').style.display = 'none';
+      document.getElementById('attachment-preview-file').style.display = 'none';
+    }
+
+    function renderAttachment(attachment) {
+      if (!attachment) return '';
+
+      if (attachment.isImage) {
+        return `
+          <div class="chat-message-attachment">
+            <img src="${attachment.base64}" alt="${attachment.fileName}" onclick="openLightbox('${attachment.base64}', '${attachment.fileName}')">
+          </div>
+        `;
+      } else {
+        return `
+          <div class="chat-message-attachment">
+            <a href="${attachment.base64}" download="${attachment.fileName}" class="chat-message-file">
+              <span class="file-icon">📄</span>
+              <span>${attachment.fileName}</span>
+              <span class="download-icon">⬇️</span>
+            </a>
+          </div>
+        `;
+      }
+    }
+
+    function openLightbox(imageSrc, fileName) {
+      const lightbox = document.getElementById('image-lightbox');
+      const img = document.getElementById('lightbox-image');
+      const downloadBtn = document.getElementById('lightbox-download');
+
+      img.src = imageSrc;
+      downloadBtn.href = imageSrc;
+      downloadBtn.download = fileName;
+
+      lightbox.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      document.getElementById('image-lightbox').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    // Close lightbox on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('image-lightbox').classList.contains('show')) {
+        closeLightbox();
+      }
+    });
 
     function showContactModal() {
       const modal = document.getElementById('contact-modal');
       modal.classList.add('show');
       document.body.style.overflow = 'hidden';
+
+      // Initialize mute button state and reset message counter
+      initChatMuteState();
+      lastMessageCount = 0;
 
       // Verificar si hay usuario logueado
       if (currentUser) {
@@ -2734,6 +3461,15 @@
           document.getElementById('contact-chat').classList.remove('conversations-only');
           currentChatPartner = ADMIN_USER;
           loadChatMessages(currentUser, ADMIN_USER);
+
+          // Start presence and typing listeners
+          listenToPartnerPresence(ADMIN_USER);
+          listenToTypingStatus();
+
+          // Add typing detection to input
+          const chatInput = document.getElementById('chat-input');
+          chatInput.removeEventListener('input', handleTyping);
+          chatInput.addEventListener('input', handleTyping);
         }
       } else {
         document.getElementById('contact-login-required').style.display = 'block';
@@ -2748,6 +3484,7 @@
         chatUnsubscribe();
         chatUnsubscribe = null;
       }
+      cleanupTyping();
     }
 
     // Cargar lista de conversaciones para Esstor
@@ -2852,9 +3589,17 @@
 
       document.querySelector('.chat-partner-avatar').textContent = username.charAt(0).toUpperCase();
       document.querySelector('.chat-partner-name').textContent = username;
-      document.querySelector('.chat-partner-status').textContent = 'Usuario';
 
       loadChatMessages(username, ADMIN_USER);
+
+      // Start presence and typing listeners
+      listenToPartnerPresence(username);
+      listenToTypingStatus();
+
+      // Add typing detection to input
+      const chatInput = document.getElementById('chat-input');
+      chatInput.removeEventListener('input', handleTyping);
+      chatInput.addEventListener('input', handleTyping);
     }
 
     function backToConversations() {
@@ -2887,13 +3632,27 @@
       // La ruta del chat es siempre por el nombre del usuario normal (no Esstor)
       const chatPath = currentUser === ADMIN_USER ? username : currentUser;
 
-      const ref = database.ref(`chats/${chatPath}`).orderByChild('timestamp');
+      // Use simple ref without orderByChild for faster loading (sort client-side)
+      const ref = database.ref(`chats/${chatPath}`);
 
       const listener = ref.on('value', (snapshot) => {
         const messages = [];
         snapshot.forEach(child => {
           messages.push({ id: child.key, ...child.val() });
         });
+
+        // Sort by timestamp client-side (faster than Firebase orderByChild without index)
+        messages.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+        // Check for new incoming messages to play notification
+        if (messages.length > lastMessageCount && lastMessageCount > 0) {
+          const lastMsg = messages[messages.length - 1];
+          // Only play notification if message is from the OTHER user
+          if (lastMsg && lastMsg.from !== currentUser) {
+            playNotificationSound();
+          }
+        }
+        lastMessageCount = messages.length;
 
         if (messages.length === 0) {
           container.innerHTML = `
@@ -2912,8 +3671,16 @@
           msgEl.className = `chat-message ${isSent ? 'sent' : 'received'}`;
 
           const time = new Date(msg.timestamp).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+          // Render attachment if present
+          let attachmentHtml = '';
+          if (msg.attachment) {
+            attachmentHtml = renderAttachment(msg.attachment);
+          }
+
           msgEl.innerHTML = `
-            <div>${msg.text}</div>
+            ${msg.text ? `<div>${msg.text}</div>` : ''}
+            ${attachmentHtml}
             <div class="chat-message-time">${time}</div>
           `;
           container.appendChild(msgEl);
@@ -2936,7 +3703,9 @@
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
 
-      if (!text || !currentUser) return;
+      // Require either text or attachment
+      if (!text && !pendingAttachment) return;
+      if (!currentUser) return;
 
       // Determinar la ruta del chat
       const chatPath = currentUser === ADMIN_USER ? currentChatPartner : currentUser;
@@ -2954,9 +3723,22 @@
         read: false
       };
 
+      // Add attachment if present
+      if (pendingAttachment) {
+        message.attachment = {
+          base64: pendingAttachment.base64,
+          fileName: pendingAttachment.fileName,
+          fileType: pendingAttachment.fileType,
+          isImage: pendingAttachment.isImage
+        };
+      }
+
       try {
         await database.ref(`chats/${chatPath}`).push(message);
         input.value = '';
+
+        // Clear attachment after sending
+        clearAttachment();
 
         // Si Esstor está respondiendo, actualizar la lista de conversaciones
         if (currentUser === ADMIN_USER) {
@@ -3186,13 +3968,21 @@
       }
     });
 
-    document.addEventListener("DOMContentLoaded", async () => {
+    document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.add("fade-in");
       document.getElementById("year").textContent = new Date().getFullYear();
 
-      // INITIALIZE CUSTOM AUTH
-      await loadUsers();
+      // INITIALIZE CUSTOM AUTH - Load from cache first (instant), then sync from Firebase in background
+      loadUsersFromCache();
       hydrateSessionFromStorage();
+
+      // Set user as online if logged in
+      if (currentUser) {
+        updatePresence(true);
+      }
+
+      // Sync users from Firebase in background (non-blocking)
+      loadUsers();
 
       // Image upload handler for updates
       const updateImageInput = document.getElementById('update-image-file');
@@ -3267,6 +4057,13 @@
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           showProfileModal();
+        }
+      });
+
+      // Set offline when leaving page
+      window.addEventListener('beforeunload', () => {
+        if (currentUser) {
+          updatePresence(false);
         }
       });
     });
