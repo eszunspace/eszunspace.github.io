@@ -46,7 +46,8 @@ header.topbar {
 }
 
 .nav-shell {
-  width: 94vw; /* Fallback */
+  width: 94vw;
+  /* Fallback */
   width: min(1200px, 94vw);
   margin: 0 auto;
   height: var(--header-h);
@@ -247,9 +248,9 @@ header.topbar {
   color: #fff;
   cursor: pointer;
   -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   transition: transform .15s ease, background .2s ease, border-color .2s ease;
   text-decoration: none;
   gap: 8px;
@@ -277,7 +278,8 @@ header.topbar {
 /* ===== Hero ===== */
 .hero {
   position: relative;
-  min-height: 100vh; /* Fallback */
+  min-height: 100vh;
+  /* Fallback */
   min-height: 100dvh;
   display: grid;
   place-items: center;
@@ -288,7 +290,10 @@ header.topbar {
 
 .bg {
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background-image: var(--bg-image);
   background-size: cover;
   background-position: center;
@@ -298,7 +303,10 @@ header.topbar {
 
 .overlay {
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: radial-gradient(80% 60% at 50% 20%, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.65) 60%, rgba(0, 0, 0, 0.85));
 }
 
@@ -313,9 +321,9 @@ header.topbar {
   text-transform: uppercase;
   background: linear-gradient(180deg, #e7f9ff, #bfe4ff 40%, #a6a6a6 60%, #ffffff);
   -webkit--webkit-background-clip: text;
-      background-clip: text;
+  background-clip: text;
   -webkit-background-clip: text;
-      background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
   animation: fadeZoom 1.5s ease forwards;
@@ -371,41 +379,57 @@ footer {
   opacity: .85;
 }
 
-/* Modal */
+/* Modal - Cross-browser compatible version */
 .modal-overlay {
   position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: rgba(0, 0, 0, .85);
-  display: none;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
   align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
   justify-content: center;
   z-index: 999999;
   padding: 18px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal-overlay.show {
-  display: flex;
-  animation: fadeIn 0.3s ease forwards;
+  opacity: 1;
+  visibility: visible;
 }
 
 .modal-card {
-  width: 96vw; /* Fallback */
+  width: 96vw;
+  /* Fallback */
   width: min(680px, 96vw);
   border-radius: 18px;
   background: radial-gradient(1200px 1200px at -10% -20%, rgba(0, 240, 255, .08), transparent 35%), #111113;
   border: 1px solid rgba(255, 255, 255, .12);
+  -webkit-box-shadow: 0 28px 80px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .06);
   box-shadow: 0 28px 80px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .06);
   padding: 18px 18px 16px;
   max-height: 90vh;
   overflow-y: auto;
+  -webkit-transform: scale(0.9) translateY(20px);
   transform: scale(0.9) translateY(20px);
   opacity: 0;
+  -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
 }
 
 .modal-overlay.show .modal-card {
+  -webkit-transform: scale(1) translateY(0);
   transform: scale(1) translateY(0);
   opacity: 1;
 }
@@ -608,7 +632,10 @@ footer {
 /* Modal de Contacto / Chat */
 .contact-overlay {
   position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
   display: flex;
@@ -627,7 +654,8 @@ footer {
 }
 
 .contact-card {
-  width: 95vw; /* Fallback */
+  width: 95vw;
+  /* Fallback */
   width: min(600px, 95vw);
   max-height: 85vh;
   background: linear-gradient(180deg, #161618, #0d0d0f);
@@ -1213,7 +1241,10 @@ footer {
 /* Image Lightbox */
 .image-lightbox {
   position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: rgba(0, 0, 0, 0.95);
   display: flex;
   flex-direction: column;
@@ -1341,7 +1372,10 @@ footer {
 /* Modal de Actualizaciones */
 .updates-overlay {
   position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
   display: flex;
@@ -1360,7 +1394,8 @@ footer {
 }
 
 .updates-card {
-  width: 95vw; /* Fallback */
+  width: 95vw;
+  /* Fallback */
   width: min(600px, 95vw);
   max-height: 80vh;
   border-radius: 20px;
@@ -1392,9 +1427,9 @@ footer {
   font-weight: 800;
   background: linear-gradient(90deg, #00f0ff, #ff00d4);
   -webkit--webkit-background-clip: text;
-      background-clip: text;
+  background-clip: text;
   -webkit-background-clip: text;
-      background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -1664,7 +1699,10 @@ footer {
 /* Modal de Detalle de Actualización */
 .update-detail-overlay {
   position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: rgba(0, 0, 0, 0.9);
   backdrop-filter: blur(12px);
   display: flex;
@@ -1684,7 +1722,8 @@ footer {
 
 .update-detail-card {
   position: relative;
-  width: 95vw; /* Fallback */
+  width: 95vw;
+  /* Fallback */
   width: min(800px, 95vw);
   max-height: 90vh;
   border-radius: 20px;
@@ -1811,7 +1850,8 @@ footer {
 .launches-section {
   position: relative;
   z-index: 1;
-  width: 92vw; /* Fallback */
+  width: 92vw;
+  /* Fallback */
   width: min(1000px, 92vw);
   margin: 60px auto 80px;
 }
@@ -2026,10 +2066,10 @@ footer {
   margin: 20px 0;
   background: linear-gradient(135deg, #00f0ff, #ff00d4);
   -webkit--webkit-background-clip: text;
-      background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   -webkit-background-clip: text;
-      background-clip: text;
+  background-clip: text;
   letter-spacing: 0.02em;
 }
 
