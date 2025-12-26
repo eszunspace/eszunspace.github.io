@@ -381,6 +381,11 @@ function hydrateSessionFromStorage() {
   const saved = localStorage.getItem(SESSION_KEY);
   currentUser = (saved && saved.trim()) ? saved : null;
   checkAuth();
+
+  // Pre-cargar conversaciones si es Esstor (en segundo plano)
+  if (currentUser === 'Esstor') {
+    setTimeout(() => preloadConversationsForAdmin(), 500); // Pequeño delay para no bloquear carga inicial
+  }
 }
 
 function checkAuth() {
@@ -491,6 +496,11 @@ async function handleLogin(e) {
     checkAuth();
     updatePresence(true); // Set online
     closeAuthModal();
+
+    // Pre-cargar conversaciones si es Esstor
+    if (username === ADMIN_USER) {
+      preloadConversationsForAdmin();
+    }
   } else {
     errEl.textContent = 'Contraseña incorrecta';
     errEl.classList.add('show');
@@ -1011,61 +1021,152 @@ function closeContactModal() {
   cleanupTyping();
 }
 
-// Cargar lista de conversaciones para Esstor
+// ===== CACHE PARA CONVERSACIONES =====
+const CONVERSATIONS_CACHE_KEY = 'esz_conversations_cache';
+
+// Renderizar lista de conversaciones desde datos procesados
+function renderConversationsList(conversationsData) {
+  const list = document.getElementById('conversations-list');
+
+  if (!conversationsData || conversationsData.length === 0) {
+    list.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.5);">No hay conversaciones aún.</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  for (const conv of conversationsData) {
+    const timeStr = conv.lastTime
+      ? new Date(conv.lastTime).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+      : '';
+
+    const item = document.createElement('div');
+    item.className = 'conversation-item' + (currentChatPartner === conv.username ? ' active' : '');
+    item.innerHTML = `
+          <span class="conversation-avatar">${conv.username.charAt(0).toUpperCase()}</span>
+          <div class="conversation-info">
+            <div class="conversation-name">${conv.username}</div>
+            <div class="conversation-preview">${conv.lastMessage.substring(0, 25)}${conv.lastMessage.length > 25 ? '...' : ''}</div>
+            <div class="conversation-meta">${conv.messageCount} mensaje${conv.messageCount !== 1 ? 's' : ''} · ${timeStr}</div>
+          </div>
+          <div class="conversation-actions">
+            ${conv.hasUnread ? '<span class="conversation-unread"></span>' : ''}
+            <button class="conversation-delete" onclick="event.stopPropagation(); deleteConversation('${conv.username}')" title="Eliminar chat">🗑️</button>
+          </div>
+        `;
+    item.onclick = () => selectConversation(conv.username);
+    list.appendChild(item);
+  }
+}
+
+// Procesar chats raw en formato listo para mostrar
+function processChatsData(chats) {
+  const conversationUsers = Object.keys(chats || {});
+
+  if (conversationUsers.length === 0) return [];
+
+  const conversationsData = conversationUsers.map(username => {
+    const userMessages = chats[username];
+    const messagesArray = Object.values(userMessages || {});
+
+    // Ordenar por timestamp para obtener el último mensaje
+    messagesArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+    const lastMsg = messagesArray[messagesArray.length - 1];
+    const hasUnread = messagesArray.some(msg => msg.from !== ADMIN_USER && !msg.read);
+
+    return {
+      username,
+      lastMessage: lastMsg?.text || '',
+      lastTime: lastMsg?.timestamp || null,
+      hasUnread,
+      messageCount: messagesArray.length
+    };
+  });
+
+  // Ordenar por último mensaje (más reciente primero)
+  conversationsData.sort((a, b) => (b.lastTime || 0) - (a.lastTime || 0));
+
+  return conversationsData;
+}
+
+// Cargar conversaciones desde caché (instantáneo)
+function loadConversationsFromCache() {
+  try {
+    const cached = localStorage.getItem(CONVERSATIONS_CACHE_KEY);
+    if (cached) {
+      const conversationsData = JSON.parse(cached);
+      renderConversationsList(conversationsData);
+      console.log("Conversaciones cargadas desde cache:", conversationsData.length);
+      return true;
+    }
+  } catch (e) {
+    console.warn('Error loading conversations cache:', e);
+  }
+  return false;
+}
+
+// Cargar lista de conversaciones para Esstor (CON CACHÉ)
 async function loadConversations() {
   const list = document.getElementById('conversations-list');
-  list.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.5);">Cargando conversaciones...</div>';
+
+  // 1. Mostrar caché primero (instantáneo)
+  const hadCache = loadConversationsFromCache();
+
+  // Solo mostrar "cargando" si no hay caché
+  if (!hadCache) {
+    list.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.5);">Cargando conversaciones...</div>';
+  }
+
+  try {
+    // 2. Sincronizar con Firebase en segundo plano
+    const snapshot = await database.ref('chats').once('value');
+    const chats = snapshot.val() || {};
+
+    // Procesar datos
+    const conversationsData = processChatsData(chats);
+
+    // Guardar en caché para próxima vez
+    try {
+      localStorage.setItem(CONVERSATIONS_CACHE_KEY, JSON.stringify(conversationsData));
+    } catch (cacheError) {
+      console.warn('Could not cache conversations:', cacheError);
+    }
+
+    // Renderizar datos frescos
+    renderConversationsList(conversationsData);
+    console.log("Conversaciones sincronizadas desde Firebase:", conversationsData.length);
+
+  } catch (error) {
+    console.error('Error loading conversations:', error);
+    // Solo mostrar error si no teníamos caché
+    if (!hadCache) {
+      list.innerHTML = '<div style="padding:20px; text-align:center; color:#ff6b6b;">Error al cargar conversaciones</div>';
+    }
+  }
+}
+
+// Pre-cargar conversaciones en segundo plano para Esstor (sin UI)
+let conversationsPreloaded = false;
+async function preloadConversationsForAdmin() {
+  if (currentUser !== ADMIN_USER || conversationsPreloaded) return;
+
+  console.log("Pre-cargando conversaciones para Esstor...");
+  conversationsPreloaded = true;
 
   try {
     const snapshot = await database.ref('chats').once('value');
     const chats = snapshot.val() || {};
-    const conversationUsers = Object.keys(chats);
+    const conversationsData = processChatsData(chats);
 
-    if (conversationUsers.length === 0) {
-      list.innerHTML = '<div style="padding:20px; text-align:center; color:rgba(255,255,255,0.5);">No hay conversaciones aún.</div>';
-      return;
-    }
-
-    list.innerHTML = '';
-    for (const username of conversationUsers) {
-      const messagesSnap = await database.ref(`chats/${username}`).orderByChild('timestamp').once('value');
-      let lastMessage = '';
-      let lastTime = null;
-      let hasUnread = false;
-      let messageCount = 0;
-
-      messagesSnap.forEach(msg => {
-        const data = msg.val();
-        lastMessage = data.text || '';
-        lastTime = data.timestamp;
-        messageCount++;
-        if (data.from !== ADMIN_USER && !data.read) {
-          hasUnread = true;
-        }
-      });
-
-      const timeStr = lastTime ? new Date(lastTime).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
-
-      const item = document.createElement('div');
-      item.className = 'conversation-item' + (currentChatPartner === username ? ' active' : '');
-      item.innerHTML = `
-            <span class="conversation-avatar">${username.charAt(0).toUpperCase()}</span>
-            <div class="conversation-info">
-              <div class="conversation-name">${username}</div>
-              <div class="conversation-preview">${lastMessage.substring(0, 25)}${lastMessage.length > 25 ? '...' : ''}</div>
-              <div class="conversation-meta">${messageCount} mensaje${messageCount !== 1 ? 's' : ''} · ${timeStr}</div>
-            </div>
-            <div class="conversation-actions">
-              ${hasUnread ? '<span class="conversation-unread"></span>' : ''}
-              <button class="conversation-delete" onclick="event.stopPropagation(); deleteConversation('${username}')" title="Eliminar chat">🗑️</button>
-            </div>
-          `;
-      item.onclick = () => selectConversation(username);
-      list.appendChild(item);
+    // Solo guardar en caché, no renderizar
+    try {
+      localStorage.setItem(CONVERSATIONS_CACHE_KEY, JSON.stringify(conversationsData));
+      console.log("Conversaciones pre-cargadas:", conversationsData.length);
+    } catch (cacheError) {
+      console.warn('Could not cache conversations:', cacheError);
     }
   } catch (error) {
-    console.error('Error loading conversations:', error);
-    list.innerHTML = '<div style="padding:20px; text-align:center; color:#ff6b6b;">Error al cargar conversaciones</div>';
+    console.error('Error pre-loading conversations:', error);
   }
 }
 
@@ -1076,6 +1177,9 @@ async function deleteConversation(username) {
 
   try {
     await database.ref(`chats/${username}`).remove();
+
+    // Limpiar caché para forzar recarga fresca
+    localStorage.removeItem(CONVERSATIONS_CACHE_KEY);
 
     // Si era la conversación activa, limpiar la vista
     if (currentChatPartner === username) {
