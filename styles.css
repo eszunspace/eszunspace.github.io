@@ -46,6 +46,7 @@ header.topbar {
 }
 
 .nav-shell {
+  width: 94vw; /* Fallback */
   width: min(1200px, 94vw);
   margin: 0 auto;
   height: var(--header-h);
@@ -64,8 +65,12 @@ header.topbar {
 .nav-shell::before {
   content: "";
   position: absolute;
-  inset: -1px;
+  top: -1px;
+  right: -1px;
+  bottom: -1px;
+  left: -1px;
   background: conic-gradient(from 0deg, #00f0ff, #ff00d4, #00f0ff);
+  -webkit-filter: blur(22px);
   filter: blur(22px);
   opacity: .14;
   pointer-events: none;
@@ -241,7 +246,10 @@ header.topbar {
   border: 1px solid rgba(255, 255, 255, .18);
   color: #fff;
   cursor: pointer;
-  user-select: none;
+  -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
   transition: transform .15s ease, background .2s ease, border-color .2s ease;
   text-decoration: none;
   gap: 8px;
@@ -269,7 +277,8 @@ header.topbar {
 /* ===== Hero ===== */
 .hero {
   position: relative;
-  min-height: 100svh;
+  min-height: 100vh; /* Fallback */
+  min-height: 100dvh;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -279,7 +288,7 @@ header.topbar {
 
 .bg {
   position: absolute;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   background-image: var(--bg-image);
   background-size: cover;
   background-position: center;
@@ -289,7 +298,7 @@ header.topbar {
 
 .overlay {
   position: absolute;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   background: radial-gradient(80% 60% at 50% 20%, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.65) 60%, rgba(0, 0, 0, 0.85));
 }
 
@@ -303,8 +312,10 @@ header.topbar {
   font-size: clamp(36px, 11vw, 120px);
   text-transform: uppercase;
   background: linear-gradient(180deg, #e7f9ff, #bfe4ff 40%, #a6a6a6 60%, #ffffff);
+  -webkit--webkit-background-clip: text;
+      background-clip: text;
   -webkit-background-clip: text;
-  background-clip: text;
+      background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
   animation: fadeZoom 1.5s ease forwards;
@@ -363,7 +374,7 @@ footer {
 /* Modal */
 .modal-overlay {
   position: fixed;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   background: rgba(0, 0, 0, .85);
   display: none;
   align-items: center;
@@ -380,6 +391,7 @@ footer {
 }
 
 .modal-card {
+  width: 96vw; /* Fallback */
   width: min(680px, 96vw);
   border-radius: 18px;
   background: radial-gradient(1200px 1200px at -10% -20%, rgba(0, 240, 255, .08), transparent 35%), #111113;
@@ -596,7 +608,7 @@ footer {
 /* Modal de Contacto / Chat */
 .contact-overlay {
   position: fixed;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
   display: flex;
@@ -615,6 +627,7 @@ footer {
 }
 
 .contact-card {
+  width: 95vw; /* Fallback */
   width: min(600px, 95vw);
   max-height: 85vh;
   background: linear-gradient(180deg, #161618, #0d0d0f);
@@ -1200,7 +1213,7 @@ footer {
 /* Image Lightbox */
 .image-lightbox {
   position: fixed;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   background: rgba(0, 0, 0, 0.95);
   display: flex;
   flex-direction: column;
@@ -1328,7 +1341,7 @@ footer {
 /* Modal de Actualizaciones */
 .updates-overlay {
   position: fixed;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
   display: flex;
@@ -1347,6 +1360,7 @@ footer {
 }
 
 .updates-card {
+  width: 95vw; /* Fallback */
   width: min(600px, 95vw);
   max-height: 80vh;
   border-radius: 20px;
@@ -1377,8 +1391,10 @@ footer {
   font-size: 1.4rem;
   font-weight: 800;
   background: linear-gradient(90deg, #00f0ff, #ff00d4);
+  -webkit--webkit-background-clip: text;
+      background-clip: text;
   -webkit-background-clip: text;
-  background-clip: text;
+      background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -1648,7 +1664,7 @@ footer {
 /* Modal de Detalle de Actualización */
 .update-detail-overlay {
   position: fixed;
-  inset: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
   background: rgba(0, 0, 0, 0.9);
   backdrop-filter: blur(12px);
   display: flex;
@@ -1668,6 +1684,7 @@ footer {
 
 .update-detail-card {
   position: relative;
+  width: 95vw; /* Fallback */
   width: min(800px, 95vw);
   max-height: 90vh;
   border-radius: 20px;
@@ -1794,6 +1811,7 @@ footer {
 .launches-section {
   position: relative;
   z-index: 1;
+  width: 92vw; /* Fallback */
   width: min(1000px, 92vw);
   margin: 60px auto 80px;
 }
@@ -2007,9 +2025,11 @@ footer {
   text-align: center;
   margin: 20px 0;
   background: linear-gradient(135deg, #00f0ff, #ff00d4);
-  -webkit-background-clip: text;
+  -webkit--webkit-background-clip: text;
+      background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
+  -webkit-background-clip: text;
+      background-clip: text;
   letter-spacing: 0.02em;
 }
 
